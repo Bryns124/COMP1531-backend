@@ -18,7 +18,7 @@ def test_register_invalid_email():
         auth_register_v1("@gmail", "password123", "Bryan", "Le")
         auth_register_v1("", "password123", "Bryan", "Le")
 
-# test when the registering email has already been used by another user  
+# test when the registering email has already been used by another user
 def test_register_email_already_used():
     clear_v1()
     auth_login_v1("bryanle@gmail.com", "password123")
