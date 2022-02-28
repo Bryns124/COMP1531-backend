@@ -18,19 +18,17 @@ def test_login_invalid_email():
         auth_login_v1("bryanle-@gmail.com", "password123")
         auth_login_v1("@gmail", "password123")
         auth_login_v1("", "password123")
+        
 # test when login email is incorrect
 def test_login_incorrect_email():
     clear_v1()
-    auth_login_v1("bryan.le@gmailcom", "password123")
+    auth_register_v1("bryan.le@gmailcom", "password123")
     with pytest.raises(InputError):
-        assert auth_login_v1("notbryan.le@gmail.com", "password123")
+        assert auth_login_v1("notbryan.le@gmail.com", "password123") == 1
         
 # test when login password is incorrect
 def test_login_incorrect_password():
     clear_v1()
-    auth_login_v1("bryan.le@gmailcom", "password123")
+    auth_register_v1("bryan.le@gmailcom", "password123")
     with pytest.raises(InputError):
-        assert auth_login_v1("bryan.le@gmailcom", "password456")
-
-# test when
-# 
+        assert auth_login_v1("bryan.le@gmailcom", "password456") == 1
