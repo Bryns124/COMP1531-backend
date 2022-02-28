@@ -57,6 +57,8 @@ def test_register_email_already_used():
 
 # test when the registering password is invalid (too short? or not strong enough?)
 
-# test when the registering password is 
+# test when the first name is invalid
+
+# test when the last name is invalid
 
 # def 
