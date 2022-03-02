@@ -29,7 +29,7 @@ def test_channel_invite(user_1, channel_1, user_2):
     :param: u_id: the u_id of the person receiving the invite 
     return: we return nothing for this iteration, the user is just added straight away. 
     """
-    assert channel_details_v1(channel_1[channel_id=])
+    assert channel_details_v1(channel_1[])
     #however need to test that the user was added sucessfully so need to check the channel details and find the user in the list of users in the channel 
     
     
