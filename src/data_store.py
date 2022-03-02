@@ -34,8 +34,6 @@ initial_object = {
             'name_last': "",
             'handle_str': "" ,
             'password': "",
-            'channels_joined': ['channels'],  #can we use ['channels']
-            'channels_owned': [],   #or should it be a empty list
         }
     ],
     'channels': [
