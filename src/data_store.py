@@ -31,6 +31,7 @@ initial_object = {
         'password': [],
         'user_id':[],
         'user_channels': [],
+        'channels_joined': [],
     },
     'channels': {
         'channel_id':[],
