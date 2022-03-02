@@ -2,6 +2,15 @@ import data_store
 import channel
 
 def channels_list_v1(auth_user_id):
+    store = data_store.get()
+    channel_list = {[]}
+    
+    for users in store['users']['user_id']:
+        if (auth_user_id == users):
+            channel_list.append(channel[users])
+            
+    return channel_list
+    
     return {
         'channels': [
         	{
