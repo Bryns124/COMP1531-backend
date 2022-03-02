@@ -5,20 +5,12 @@ def channels_list_v1(auth_user_id):
     store = data_store.get()
     channel_list = {[]}
     
-    for users in store['users']['user_id']:
-        if (auth_user_id == users):
-            channel_list.append(channel[users])
+    for ids in store['users']:
+        if (auth_user_id == ids['user_id']):
+            channel_list.append(channel[ids])
             
     return channel_list
-    
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+
 
 def channels_listall_v1(auth_user_id):
     return {

@@ -30,7 +30,7 @@ initial_object = {
         'email': [],
         'password': [],
         'user_id':[],
-        'user_channels': [],
+        'channels_owned': [],
         'channels_joined': [],
     }],
     'channels': [{
