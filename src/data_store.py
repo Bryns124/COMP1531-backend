@@ -26,21 +26,21 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': {
+    'users': [{
         'email': [],
         'password': [],
         'user_id':[],
         'user_channels': [],
         'channels_joined': [],
-    },
-    'channels': {
+    }],
+    'channels': [{
         'channel_id':[],
         'name': [],
         'is_public': [],
         'channel_owner': [],
         'channel_members': [],
         'channel_messages': [],
-    },
+    }],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
