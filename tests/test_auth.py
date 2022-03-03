@@ -4,7 +4,10 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
 
-# LOGINS
+@pytest.fixture
+def user_1():
+    return auth_register_v1("bryan.le@gmailcom", "password123", "Bryan", "Le")
+
 # test when login email is invalid
 def test_login_invalid_email():
     with pytest.raises(InputError):
@@ -20,15 +23,18 @@ def test_login_invalid_email():
     clear_v1()
         
 # test when login email is incorrect
-def test_login_incorrect_email():
-    auth_register_v1("bryan.le@gmailcom", "password123", "Bryan", "Le")
+def test_login_incorrect_email(user_1):
     with pytest.raises(InputError):
-        assert auth_login_v1("notbryan.le@gmail.com", "password123") == {'auth_user_id': 1}
+        assert auth_login_v1("notbryan.le@gmail.com", "password123")
     clear_v1()
         
 # test when login password is incorrect
-def test_login_incorrect_password():
-    auth_register_v1("bryan.le@gmailcom", "password123", "Bryan", "Le")
+def test_login_incorrect_password(user_1):
     with pytest.raises(InputError):
-        assert auth_login_v1("bryan.le@gmailcom", "password456") == {'auth_user_id': 1}
+        assert auth_login_v1("bryan.le@gmailcom", "password456")
+    clear_v1()
+    
+# test registered account is logged in
+def test_login_correct(user_1):
+    assert auth_login_v1("bryan.le@gmailcom", "password123")
     clear_v1()
