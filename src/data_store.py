@@ -32,7 +32,7 @@ initial_object = {
             # 'email': "", check if using empty string is ok 
             # 'name_first': "", 
             # 'name_last': "", 
-            #  'handle_str': "" ,        
+            # 'handle_str': "" ,        
             # 'password': "",
             # 'channels_owned' : , 
             # 'channels_joined' : ,
