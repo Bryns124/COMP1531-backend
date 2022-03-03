@@ -14,7 +14,7 @@ def auth_login_v1(email, password):
         'auth_user_id': 1,
     }
     
-def auth_register_v1(u_id, email, password, name_first, name_last):
+def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
         raise InputError("Email entered is not a valid email")
     if duplicate_email_check(email) == True:
@@ -26,7 +26,7 @@ def auth_register_v1(u_id, email, password, name_first, name_last):
     if len(name_last) < 1 and len(name_last) > 50:
         raise InputError("Last name entered must be between 1 and 50 characters inclusive")
     
-    user = create_user(u_id, email, password, name_first, name_last)
+    user = add_user(email, password, name_first, name_last)
     store = data_store.get()
     store['users'] = []
     store['users'].append(user)
@@ -47,7 +47,9 @@ def create_user(u_id, email, password, name_first, name_last):
         'handle_str' : [],
     } 
     return user
-    
+
+def add_user(email, password, name_first, name_last):
+    pass
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
