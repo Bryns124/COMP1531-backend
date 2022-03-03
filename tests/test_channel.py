@@ -1,3 +1,33 @@
+from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
+from src.channels import channels_create_v1
+from src.auth import auth_register_v1
+
+@fixture
+def user_1():
+    return auth_register_v1("mikey@unsw.com", "test", "Mikey", "Test")
+
+@fixture
+def user_2():
+    return auth_register_v1("miguel@unsw.com", "test", "Miguel", "Test")
+
+@fixture
+def channel_1():
+    return channels_create_v1(user_1["auth_user_id"], "A New Hope", True)
+
+@fixture
+def channel_2():
+    return channels_create_v1(user_2["auth_user_id"], "The Empire Strikes Back", True)
+
+@fixture 
+def starting_value():
+    return 0
+
+@fixture
+def invalid_channel():
+    return {
+        'channel_id': -1
+    } 
+
 
 # functions to test: channel_details_v1, channel_join_v1
 
@@ -11,87 +41,35 @@ returns (name, is_public, owner_members, all_members)
 Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 '''
 
-# fixtures
-def test_channel_details_v1():
-# Chunk of preset lists imitating actual lists of info, eg. lists of all users, channels etc
+def test_input_error_channel_details_v1():
+    # returns InputError when invalid channel_id is provided
+    with pytest.raise(InputError):
+        channel_details_v1(user_1['auth_user_id'], invalid_channel['channel_id'])
+    clear_v1()
 
-    # Couple of test users, honestly idk
-    user0000 = {
-        "u_id" = 20000
-        "email" = "danielyung@web.com"
-        "name_first" = "Daniel"
-        "name_last" = "Yung"
-        "handle_str" = "danielyung"
-    }
-    user0001 = {
-        "u_id" = 20001
-        "email" = "geoffreyzhu@web.com"
-        "name_first" = "Geoffrey"
-        "name_last" = "Zhu"
-        "handle_str" = "geoffreyzhu"
-    }
+def test_access_error_channel_details_v1():
+    # returns AccessError when user is not a member of the channel
+    with pytest.raise(AccessError):
+        channel_details_v1(user_2['auth_user_id'], channel_1['channel_id'])
 
-    # Assume channel_list_master is a list of channels with each element being a tuple of the form
-    # (channel_id, name, is_public, member_list)
-    channel_list_master = [
-    (30000, "general", True, [user0000, user0001]),
-    (30001, "admin", False, [user0000])
-    (30002, "muted", True, [user0001])
-    (30003, "private", False, [])
-    (30004, "other", True, [user0000])
-    ]
-    chan0 = {
-        "channel_id" = 30000
-        "name" = "general"
-    }
-    chan1 = {
-        "channel_id" = 30001
-        "name" = "admin"
-    }
-    chan2 = {
-        "channel_id" = 30002
-        "name" = "muted"
-    }
-    
+def test_correct_inputs_channel_details_v1():
+    # Tests for correct inputs
+    assert channel_details_v1(user_1['auth_user_id'], channel_1['channel_id']) == (
+        "A New Hope", 
+        True, 
+        [{'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}], 
+        [{'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Miikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}]
+    )
 
-    # Should spit InputError when channel_id does not refer to a valid channel
-    assert channel_details_v1(20000, 30003) == InputError
-
-    # Should spit AccessError when channel_id is valid and the authorised user is not a member of the channel
-    assert channel_details_v1(20000, 30002) == AccessError
-
-    # Error for when auth_user_id is invalid
-    assert channel_details_v1(20002, 30001) == InvalidUser
-
-    # Standard Tests for correct inputs
-    assert channel_details_v1(20000, 30000) == ("general", True, [user0000], [user0000, user0001])
-    assert channel_details_v1(20001, 30000) == ("general", True, [user0000], [user0000, user0001])
-    assert channel_details_v1(20000, 30001) == ("admin", False, [user0000], [user0000])
-    assert channel_details_v1(20001, 30002) == ("muted", True, [], [user0001])
-
-'''
-channel_join_v1(auth_user_id, channel_id)
-
-returns None
-
-Given a channel_id of a channel that the authorised user can join, adds them to that channel.
-'''
-# Assumed that all users can join a public channel and that owners can join any channel
-
-def test_channel_join_v1():
-    # Spits InputError when channel_id does not refer to a valid channel or the authorised user is already a member of the channel
-    assert channel_join_v1(20000, 30011) == InputError
-    assert channel_join_v1(20000, 30000) == InputError
-
-    # Spits AccessError when channel_id refers to a channel that is private and the authorised user is not already a channel member 
-    # and is not a global owner
-    assert channel_join_v1(20001, 30001) == AccessError
-
-    # Standard tests for correct input
-    # Test that users can join public channels
-    channel_join_v1(20000, 30002)
-    assert user0000 in channel_details_v1(20000, 30002)[3]
-
-    # Test that owners can join any channel
-    channel_join_v1(20001, 30004)
-    assert user0001 in channel_details_v1(20001, 30004)[3]
+    channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
+    assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == (
+        "The Empire Strikes Back", 
+        True, 
+        [
+            {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'}
+        ], 
+        [
+            {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'},
+            {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ]
+    )
