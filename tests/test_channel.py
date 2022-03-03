@@ -28,11 +28,7 @@ def channel_private(user_no_access):
     return channels_create_v1(user_no_access["auth_user_id"], "No Access Test Channel", False)
 @pytest.fixture
 def invalid_channel_id():
-    return "invalid_channel_id"
-"""Clearing Datastore"""
-@pytest.fixture
-def clear():
-    return clear_v1
+    return -1
    
 def test_channel_invite_access_error(user_1, channel_private, user_no_access):    
     """
@@ -43,9 +39,9 @@ def test_channel_invite_access_error(user_1, channel_private, user_no_access):
         channel_private (_type_): _description_
         user_no_access (_type_): _description_
     """
-    clear()
     with pytest.raises(AccessError):
         channel_invite_v1(user_1["auth_user_id"],channel_private, user_2["auth_user_id"])
+clear_v1()
 
 def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
     """
@@ -56,9 +52,9 @@ def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
         invalid_channel_id (_type_): The invalid channel_id
         user_2 (_type_): The u_id of the person being invited
     """
-    clear()
     with pytest.raises(InputError):
         channel_invite_v1(user_1["auth_user_id"], invalid_channel_id, user_2["auth_user_id"])
+clear_v1()
 
 def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
     """
@@ -69,9 +65,9 @@ def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
         channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
         user_invalid (u_id): The invalid u_id
     """
-    clear()
     with pytest.raises(InputError):
         channel_invite_v1(user_1['auth_user_id'], channel_public, user_invalid) 
+clear_v1()
         
 def test_channel_invite_u_id_member(user_1, channel_public, user_2):
     """
@@ -82,11 +78,10 @@ def test_channel_invite_u_id_member(user_1, channel_public, user_2):
         channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
         user_2 (u_id): The u_id of the person that is already in the channel.
     """
-    clear()
     channel_invite_v1(user_1['auth_user_id'], channel_public, user_2['auth_user_id'])
     with pytest.raises(InputError):
         channel_invite_v1(user_1['auth_user_id'], channel_public, user_2['auth_user_id'])
-    
+clear_v1()
     
 
 def test_channel_invite(user_1, channel_public, user_2):
@@ -97,9 +92,8 @@ def test_channel_invite(user_1, channel_public, user_2):
         channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
         user_2 (u_id): The u_id of the person being invited.
     """
-    clear()
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
     #however need to test that the user was added sucessfully so need to check the channel details and find the user in the list of users in the channel 
-
+clear_v1()
     
