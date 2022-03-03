@@ -1,7 +1,6 @@
 import re
 from src.data_store import data_store
 from src.error import InputError
-# yea not sure how to actually create the user for now
 
 def auth_login_v1(email, password):
     if email_check(email) == False:
@@ -15,8 +14,7 @@ def auth_login_v1(email, password):
         'auth_user_id': 1,
     }
     
-# need to initialise a user to use the check functions.
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v1(u_id, email, password, name_first, name_last):
     if email_check(email) == False:
         raise InputError("Email entered is not a valid email")
     if duplicate_email_check(email) == True:
@@ -28,6 +26,12 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(name_last) < 1 and len(name_last) > 50:
         raise InputError("Last name entered must be between 1 and 50 characters inclusive")
     
+    user = create_user(u_id, email, password, name_first, name_last)
+    store = data_store.get()
+    store['users'] = []
+    store['users'].append(user)
+    data_store.set(store)
+    print(store)
     return {
         'auth_user_id': 1,
     }
