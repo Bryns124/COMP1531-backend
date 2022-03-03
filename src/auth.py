@@ -28,8 +28,6 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(name_last) < 1 and len(name_last) > 50:
         raise InputError("Last name entered must be between 1 and 50 characters inclusive")
     
-    user = add_user(u_id, email, password, name_first, name_last)
-    
     return {
         'auth_user_id': 1,
     }
@@ -44,14 +42,6 @@ def create_user(u_id, email, password, name_first, name_last):
         'name_last' : name_last, 
         'handle_str' : [],
     } 
-    return user
-
-def add_user(u_id, email, password, name_first, name_last):
-    # not sure how i calculate u_id
-    u_id = 12
-    user = create_user(u_id, email, password, name_first, name_last)
-    store = data_store.get()
-    store['users'].append(user)
     return user
     
 ###############################################################
