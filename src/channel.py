@@ -1,3 +1,5 @@
+import data_store
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
@@ -40,5 +42,15 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+    store = data_store.get()
+    
+    for users in store['users']:
+        if users['u_id'] == auth_user_id:
+            new_member = users
+    
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id and channels['is_public'] == True:
+            channels['all_members'].append(new_member)
+            
+    data_store.set(store)
+    return
