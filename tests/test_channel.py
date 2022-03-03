@@ -17,7 +17,7 @@ def user_no_access():
     return auth_register_v1("error@unsw.com", "no_access", "no_access", "no_access")
 @pytest.fixture
 def user_invalid():
-    return "invalid"
+    return -1
 
 """Channels"""
 @pytest.fixture
@@ -28,14 +28,14 @@ def channel_private(user_no_access):
     return channels_create_v1(user_no_access["auth_user_id"], "No Access Test Channel", False)
 @pytest.fixture
 def invalid_channel_id():
-    return "invalid_channel_id"
-@pytest.fixture
-def first_message():
-    return 0
+    return -1
+# @pytest.fixture
+# def first_message():
+#     return 0
 """Clearing Datastore"""
 
 
-def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id, start):
+def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
     This function tests that a id_error is raised when the user is trying to access the messages for 
     a invalid channel_id
@@ -45,7 +45,7 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id, start)
         start (start): Where the user wants to start indexing the messages from 
     """
     with pytest.raises(InputError):
-        channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
+        channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, 0)
 clear_v1()
 
 # def test_channel_messages_v1_invalid_start(user_1, invalid_channel_id, start):
@@ -53,7 +53,7 @@ clear_v1()
 #         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
 # clear_v1()
 
-def test_channel_messages_v1_access_error(user_no_access, channel_public, start):
+def test_channel_messages_v1_access_error(user_no_access, channel_public):
     """
     This function tests that a exception is raised when a user tries to read the messages 
     of a channel they do not have access to. 
@@ -63,9 +63,9 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public, start)
         start start): Starting index
     """
     with pytest.raised(AccessError):
-        channel_messages_v1(user_no_access['auth_user_id'], channel_public, start)
+        channel_messages_v1(user_no_access['auth_user_id'], channel_public, 0)
 
-def test_channel_messages_v1(user_1, channel_public, first_message):
+def test_channel_messages_v1(user_1, channel_public):
     """
     This test checks to see that no messages are present when after creating a channel
     Args:
@@ -73,7 +73,7 @@ def test_channel_messages_v1(user_1, channel_public, first_message):
         channel_public (channel_id): The channel_id the user is trying to access
         first_message (start_): Starting index of the messages
     """
-    assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], first_message) == {
+    assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], 0) == {
         'messages' : [], 
-        'start' : first_message, 
-        'end' : -1}
+        'start' : 0, 
+        'end' : -1 }
