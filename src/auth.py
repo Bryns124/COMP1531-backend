@@ -50,8 +50,8 @@ def add_user(u_id, email, password, name_first, name_last):
     # not sure how i calculate u_id
     u_id = 12
     user = create_user(u_id, email, password, name_first, name_last)
-    data = data_store.get()
-    data['users'].append(user)
+    store = data_store.get()
+    store['users'].append(user)
     return user
     
 ###############################################################
@@ -65,16 +65,16 @@ def email_check(email):
         return False
     
 def duplicate_email_check(email):
-    data = data_store.get()
-    for user in data['users']:
+    store = data_store.get()
+    for user in store['users']:
         if user['email'] == email:
             return True
         else:
             return False
 
 def password_check(password):
-    data = data_store.get()
-    for user in data['users']:
+    store = data_store.get()
+    for user in store['users']:
         if user['password'] == password:
             return user
         else:
