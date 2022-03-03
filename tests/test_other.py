@@ -14,11 +14,14 @@ def user_2():
 
 def test_clear_empty():
     assert clear_v1() == {}
+    clear_v1()
 
 def test_clear_user(user_1, user_2):
     assert clear_v1() == {}
+    clear_v1()
 
 def test_clear_channel(user_1, user_2):
     channels_create_v1(user_1['auth_user_id'], 'Public', True)         
     channels_create_v1(user_2['auth_user_id'], 'Private', False)         
     assert clear_v1() == {}
+    clear_v1()
