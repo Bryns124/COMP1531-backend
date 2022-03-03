@@ -30,16 +30,50 @@ def channel_private(user_no_access):
 def invalid_channel_id():
     return "invalid_channel_id"
 @pytest.fixture
-def start():
+def first_message():
     return 0
 """Clearing Datastore"""
 
 
 def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id, start):
+    """
+    This function tests that a id_error is raised when the user is trying to access the messages for 
+    a invalid channel_id
+    Args:
+        user_1 (u_id): Id of the user who is attempting to read a channel's messages 
+        invalid_channel_id (channel_id): The invalid channel id
+        start (start): Where the user wants to start indexing the messages from 
+    """
     with pytest.raises(InputError):
         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
 clear_v1()
-def test_channel_messages_v1_invalid_start(user_1, invalid_channel_id, start):
-    with pytest.raises(InputError):
-        channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
-clear_v1()
+
+# def test_channel_messages_v1_invalid_start(user_1, invalid_channel_id, start):
+#     with pytest.raises(InputError):
+#         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
+# clear_v1()
+
+def test_channel_messages_v1_access_error(user_no_access, channel_public, start):
+    """
+    This function tests that a exception is raised when a user tries to read the messages 
+    of a channel they do not have access to. 
+    Args:
+        user_no_access (u_id): Id of the user who has no access to read the channel messages
+        channel_public (channel_id): Id of the channel the user is trying to access 
+        start start): Starting index
+    """
+    with pytest.raised(AccessError):
+        channel_messages_v1(user_no_access['auth_user_id'], channel_public, start)
+
+def test_channel_messages_v1(user_1, channel_public, first_message):
+    """
+    This test checks to see that no messages are present when after creating a channel
+    Args:
+        user_1 (u_id): The id of the user trying to read the messages in a channel 
+        channel_public (channel_id): The channel_id the user is trying to access
+        first_message (start_): Starting index of the messages
+    """
+    assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], first_message) == {
+        'messages' : [], 
+        'start' : first_message, 
+        'end' : -1}
