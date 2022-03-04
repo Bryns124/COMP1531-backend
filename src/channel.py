@@ -1,9 +1,36 @@
 from src.data_store import data_store
+from src.channels import channels_list_v1
 from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     store = data_store.get()
     
+    for user in store['users']:
+        if auth_user_id != user['u_id']: 
+            raise InputError
+        elif u_id != user['u_id']:        
+            raise InputError
+    
+    for channel in store['channels']:
+        if channel['channel_id'] != channel_id:
+            raise InputError
+        
+        
+    for members in channels_list_v1['all_members']:
+        if members['u_id'] == u_id:
+            raise InputError
+        if members['u_id'] != auth_user_id:
+            raise AccessError    
+        
+    for user in store['users']:
+        if auth_user_id == user['u_id']:
+            invited_member = user
+    
+    for channel in store['channels']:
+        if channel["channel_id"] == channel_id: 
+            channel['all_members'].append(invited_member)
+        
+    data_store.set(store)
     return {
     }
 
