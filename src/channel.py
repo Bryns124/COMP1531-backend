@@ -44,13 +44,33 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
     
-    for users in store['users']:
-        if users['u_id'] == auth_user_id:
-            new_member = users
+    if channel_join_validity(channel_id) == True:
+        for user_accounts in store['users']:
+            if user_accounts['u_id'] == auth_user_id:
+                new_member = user_accounts
+                user_accounts['channels_joined'].append(extract_channel_details(channel_id))
     
     for channels in store['channels']:
-        if channels['channel_id'] == channel_id and channels['is_public'] == True:
+        if channels['channel_id'] == channel_id:
             channels['all_members'].append(new_member)
             
     data_store.set(store)
     return
+
+def channel_join_validity(channel_id):
+    store = data_store.get()
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id and channels['is_public'] == True:
+            return True
+        
+    return False
+
+def extract_channel_details(channel_id):
+    store = data_store.get()
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id:
+            channel_details = channels
+    return channel_details
+        
+    
+    
