@@ -30,7 +30,7 @@ def channel_private(user_no_access):
 def invalid_channel_id():
     return -1
    
-def test_channel_invite_access_error(user_1, channel_private, user_no_access):    
+def test_channel_invite_access_error(user_1, channel_private, user_2):    
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
     but they do not have the access privlieges to do so. 
