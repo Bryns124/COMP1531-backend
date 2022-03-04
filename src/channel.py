@@ -75,16 +75,16 @@ def channel_validity(channel_id):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
             return True
-        
     return False
+
 
 def already_member(user_id, channel_id):
     store = data_store.get()
     for channels in store['channels']:
         if channels['channel_id'] == channel_id and user_id in channels['all_members']:
-            return True
-        
+            return True    
     return False
+
 
 def extract_channel_details(channel_id):
     store = data_store.get()
