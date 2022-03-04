@@ -1,3 +1,5 @@
+from sre_constants import IN
+from sqlalchemy import true
 from src.data_store import data_store
 from src.channels import channels_list_v1
 from src.error import AccessError, InputError
@@ -5,22 +7,39 @@ from src.error import AccessError, InputError
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     store = data_store.get()
     
-    for user in store['users']:
-        if auth_user_id != user['u_id']: 
-            raise InputError
-        elif u_id != user['u_id']:        
-            raise InputError
+    auth_user_exist = False
+    user_exist = False
     
+    for user in store['users']:
+        if auth_user_id == user['u_id']: 
+            auth_user_exist = True
+        elif u_id == user['u_id']:        
+            user_exist = True
+            
+    if auth_user_exist == False or user_exist == False:
+        raise InputError
+    
+    channel_exist = False
     for channel in store['channels']:
-        if channel['channel_id'] != channel_id:
-            raise InputError
+        if channel['channel_id'] == channel_id:
+            channel_exist = True
+            
+    if channel_exist == False:
+        raise InputError
         
-        
+    already_member = False
+    can_invite = False
     for members in channels_list_v1['all_members']:
         if members['u_id'] == u_id:
-            raise InputError
-        if members['u_id'] != auth_user_id:
-            raise AccessError    
+            already_member == True
+        if members['u_id'] == auth_user_id:
+            can_invite == True
+    
+    if already_member == True:
+        raise InputError
+    
+    if can_invite == False:
+        raise AccessError
         
     for user in store['users']:
         if auth_user_id == user['u_id']:
