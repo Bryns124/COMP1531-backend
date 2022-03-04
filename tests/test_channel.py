@@ -26,7 +26,7 @@ def test_channel_join_invalid_channel(user_1):
     '''
     channel_id does not refer to a valid channel
     '''
-    with pytest.raise(InputError):
+    with pytest.raises(InputError):
         channel_join_v1(user_1['auth_user_id'], -1)
     clear_v1()
 
@@ -34,7 +34,7 @@ def test_channel_join_already_member(user_1, channel_public, channel_private):
     '''
     the authorised user is already a member of the channel
     '''
-    with pytest.raise(InputError):
+    with pytest.raises(InputError):
         channel_join_v1(user_1['auth_user_id'], channel_public['channel_id'])
         channel_join_v1(user_1['auth_user_id'], channel_private['channel_id'])
     clear_v1()
@@ -45,7 +45,7 @@ def test_channel_join_access_private(user_1, user_2, channel_private):
     and the authorised user is not already a channel member 
     and is not a global owner
     '''
-    with pytest.raise(AccessError):
+    with pytest.raises(AccessError):
         channel_join_v1(user_2['auth_user_id'], channel_private['channel_id'])
     clear_v1()
 
@@ -59,7 +59,7 @@ def test_channel_join_success(user_1, user_2, channel_public):
     channel_join_v1(user_2['auth_user_id'], channel_public['channel_id'])
     user_2_channels = channels_list_v1(user_2['auth_user_id'])
     joined_channel = user_2_channels[-1]
-    assert channel_public['channel_id'] == joined_channel['channel_id']
+    assert channel_public['channel_id'] == joined_channel[-1]['channel_id']
 
     clear_v1()
 
