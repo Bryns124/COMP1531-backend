@@ -26,6 +26,7 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    
     return {
         'messages': [
             {
