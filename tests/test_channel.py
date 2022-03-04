@@ -67,6 +67,7 @@ def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
     """
     with pytest.raises(InputError):
         channel_invite_v1(user_1['auth_user_id'], channel_public, user_invalid) 
+        channel_invite_v1(user_invalid, channel_public, user_1['auth_user_id'])
 clear_v1()
         
 def test_channel_invite_u_id_member(user_1, channel_public, user_2):
