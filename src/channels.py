@@ -1,4 +1,4 @@
-from src.data_store import data_store
+import src.data_store
 import src.channel
 
 def channels_list_v1(auth_user_id):
