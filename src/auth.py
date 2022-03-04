@@ -49,12 +49,17 @@ def create_user(u_id, email, password, name_first, name_last):
     return user
 
 def add_user(email, password, name_first, name_last):
-    pass
+    # not sure what to initialise the value of u_id is meant to be
+    user = create_user(u_id, email, password, name_first, name_last)
+    store = data_store.get()
+    store['users'] = []
+    store['users'].append(user)
+    return user
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
 def email_check(email):
-    regex = r'[A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,3}+'
+    regex = r'\b[A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,3}+\b'
     if (re.search(regex, email)):
         return True
     else:
