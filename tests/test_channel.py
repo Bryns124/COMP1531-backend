@@ -8,13 +8,13 @@ import pytest
 """Users"""
 @pytest.fixture
 def user_1():
-    return auth_register_v1("mikey@unsw.com", "test", "Mikey", "Test")
+    return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
 @pytest.fixture 
 def user_2():
-    return auth_register_v1("miguel@unsw.com", "test", "Miguel", "Test")
+    return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
 @pytest.fixture
 def user_no_access():
-    return auth_register_v1("error@unsw.com", "no_access", "no_access", "no_access")
+    return auth_register_v1("error@unsw.com", "no_access1235667", "no_access", "no_access")
 @pytest.fixture
 def user_invalid():
     return "invalid"
@@ -30,7 +30,7 @@ def channel_private(user_no_access):
 def invalid_channel_id():
     return -1
    
-def test_channel_invite_access_error(user_1, channel_private, user_2):    
+def test_channel_invite_access_error(channel_private, user_2):    
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
     but they do not have the access privlieges to do so. 
@@ -40,7 +40,7 @@ def test_channel_invite_access_error(user_1, channel_private, user_2):
         user_no_access (_type_): _description_
     """
     with pytest.raises(AccessError):
-        channel_invite_v1(user_1["auth_user_id"],channel_private, user_2["auth_user_id"])
+        channel_invite_v1(user_1["auth_user_id"],channel_private['channel_id'], user_2["auth_user_id"])
 clear_v1()
 
 def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
@@ -56,7 +56,7 @@ def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
         channel_invite_v1(user_1["auth_user_id"], invalid_channel_id, user_2["auth_user_id"])
 clear_v1()
 
-def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
+def test_channel_invite_u_id_error(channel_public, user_invalid):
     """
     This test checks to see that a InputError is raised when attemtping to invite someone with
     an invalid u_id.
@@ -66,11 +66,11 @@ def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
         user_invalid (u_id): The invalid u_id
     """
     with pytest.raises(InputError):
-        channel_invite_v1(user_1['auth_user_id'], channel_public, user_invalid) 
-        channel_invite_v1(user_invalid, channel_public, user_1['auth_user_id'])
+        channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_invalid) 
+        channel_invite_v1(user_invalid, channel_public['channel_id'], user_1['auth_user_id'])
 clear_v1()
         
-def test_channel_invite_u_id_member(user_1, channel_public, user_2):
+def test_channel_invite_u_id_member(channel_public, user_2):
     """
     This test checks to see that a InputError is raised when attempting invite someone 
     to a channel who is already apart of that channel.
@@ -79,13 +79,13 @@ def test_channel_invite_u_id_member(user_1, channel_public, user_2):
         channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
         user_2 (u_id): The u_id of the person that is already in the channel.
     """
-    channel_invite_v1(user_1['auth_user_id'], channel_public, user_2['auth_user_id'])
+    channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     with pytest.raises(InputError):
-        channel_invite_v1(user_1['auth_user_id'], channel_public, user_2['auth_user_id'])
+        channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
 clear_v1()
     
 
-def test_channel_invite(user_1, channel_public, user_2):
+def test_channel_invite(channel_public, user_2):
     """
     This test verifies that when a user is invited to a channel they successfully become a member
     Args:
@@ -95,7 +95,7 @@ def test_channel_invite(user_1, channel_public, user_2):
     """
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
-    #however need to test that the user was added sucessfully so need to check the channel details and find the user in the list of users in the channel 
+    # #however need to test that the user was added sucessfully so need to check the channel details and find the user in the list of users in the channel 
     # print(channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'])
     # print(channels_list_v1(user_2['auth_user_id'])['channels'][-1])
     # print(channels_list_v1(user_2['auth_user_id'])['channels'])
