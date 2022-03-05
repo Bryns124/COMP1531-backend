@@ -6,25 +6,31 @@ store = data_store.get()
 
 def channels_list_v1(auth_user_id):
     global store
-    store = data_store.get()
-    channel_list = []
     output_list = []
-    
+
     for accounts in store['users']:
-        if auth_user_id == accounts['u_id']:
-            channel_list = accounts['channels_owned']
-            channel_list += accounts['channels_joined']
-            
-    for channels in channel_list:
-        temp_channel_dict = {
-            'channel_id': channels['channel_id'],
-            'channel_name': channels['channel_name']
-        }
-        output_list.append(temp_channel_dict)
+        if accounts['u_id'] == auth_user_id:
+            create_list_dictionary(output_list, accounts)
+        print(accounts)
         
-    return output_list
+    return {
+        'channels': output_list
+    }
 
-
+def create_list_dictionary(output_list, accounts):
+    for owned in accounts['channels_owned']:
+            channel = {
+                'channel_id': owned['channel_id'],
+                'channel_name': owned['channel_name']
+            }
+            output_list.append(channel)
+        
+    for joined in accounts['channels_joined']:
+        channel = {
+            'channel_id': joined['channel_id'],
+            'channel_name': joined['channel_name']
+        }
+        output_list.append(channel)
 
 def channels_listall_v1(auth_user_id):
     return {
