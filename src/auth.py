@@ -3,7 +3,9 @@ from src.data_store import data_store
 from src.error import InputError
 
 store = data_store.get()
-    
+def auth_login_v1(email, password):
+    pass
+
 def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
         raise InputError("Email entered is not a valid email")
