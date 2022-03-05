@@ -6,7 +6,7 @@ from src.other import clear_v1
 
 @pytest.fixture
 def user_1():
-    return auth_register_v1("bryan.le@gmailcom", "password123", "Bryan", "Le")
+    return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
 
 # test when login email is invalid
 def test_login_invalid_email():
@@ -31,10 +31,10 @@ def test_login_incorrect_email(user_1):
 # test when login password is incorrect
 def test_login_incorrect_password(user_1):
     with pytest.raises(InputError):
-        auth_login_v1("bryan.le@gmailcom", "password456")
+        auth_login_v1("bryanle@gmail.com", "password456")
     clear_v1()
     
 # test registered account is logged in correctly
 def test_login_correct(user_1):
-    assert auth_login_v1("bryan.le@gmailcom", "password123")
+    assert auth_login_v1("bryanle@gmail.com", "password123") == user_1
     clear_v1()
