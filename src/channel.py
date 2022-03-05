@@ -1,44 +1,39 @@
-def channel_invite_v1(auth_user_id, channel_id, u_id):
-    return {
-    }
+from src.data_store import data_store
+from src.error import AccessError, InputError
 
+'''
+channel_details_v1(auth_user_id, channel_id) 
+
+returns (name, is_public, owner_members, all_members)
+
+Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+'''
+store = data_store.get()
 def channel_details_v1(auth_user_id, channel_id):
-    return {
-        'name': 'Hayden',
-        'owner_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
-        'all_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
-    }
+    global store
 
-def channel_messages_v1(auth_user_id, channel_id, start):
-    return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
-    }
+    channel_members = []
+    owner_members = []
+    is_channel = False
+    is_member = False
+    
+    all_channels = store['channels']
 
-def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+    for channel in all_channel:
+        if channel['channel_id'] == channel_id:
+            is_channel = True
+            active_channel = channel
+            break
+    
+    for member in active_channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            is_member = True
+            break
+        
+    if not is_channel:
+        raise InputError() # fix this pls
+
+    if not is_member:
+        raise AccessError()
+
+    return (active_channel['channel_name'], active_channel['is_public'], active_channel['owner members'], active_channel['all_members'])
