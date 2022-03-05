@@ -2,6 +2,8 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 
+store = data_store.get()
+
 def auth_login_v1(email, password):
     if email_check(email) == False:
         raise InputError
@@ -25,49 +27,45 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("First name entered must be between 1 and 50 characters inclusive")
     if len(name_last) < 1 and len(name_last) > 50:
         raise InputError("Last name entered must be between 1 and 50 characters inclusive")
-    
-    user = add_user(email, password, name_first, name_last)
-    store = data_store.get()
-    store['users'] = []
-    store['users'].append(user)
-    data_store.set(store)
-    print(store)
+
+    user = create_user(email, password, name_first, name_last)
     return {
-        'auth_user_id': 1,
+        'auth_user_id': user['u_id'],
     }
 
 # need to be able to actually create a user but not sure how for now
-def create_user(u_id, email, password, name_first, name_last):
+def create_user(email, password, name_first, name_last):
+    global store
+    new_id = len(store['users']) + 1
     user = {
-        'u_id' : u_id,
-        'email' : email, 
-        'password' : password,
-        'name_first' : name_first, 
-        'name_last' : name_last, 
-        'handle_str' : [],
-    } 
+        'u_id' : new_id, 
+        'email': email, 
+        'name_first': name_first, 
+        'name_last': name_last, 
+        'handle_str': "" , # generate later 
+        'password': password,
+        'channels_owned' : [], 
+        'channels_joined' : [],
+    }
+    store['users'].append(user)
+    data_store.set(store)
     return user
 
-def add_user(email, password, name_first, name_last):
-    # not sure what to initialise the value of u_id is meant to be
-    u_id = 420
-    user = create_user(u_id, email, password, name_first, name_last)
-    store = data_store.get()
-    store['users'] = []
-    store['users'].append(user)
-    return user
+def create_handle(name_first, name_last):
+    pass
+    
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
 def email_check(email):
     regex = r'\b[A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,3}+\b'
-    if (re.search(regex, email)):
+    if (re.fullmatch(regex, email)):
         return True
     else:
         return False
     
 def duplicate_email_check(email):
-    store = data_store.get()
+    global store
     for user in store['users']:
         if user['email'] == email:
             return True
@@ -75,7 +73,7 @@ def duplicate_email_check(email):
             return False
 
 def password_check(password):
-    store = data_store.get()
+    global store
     for user in store['users']:
         if user['password'] == password:
             return user
