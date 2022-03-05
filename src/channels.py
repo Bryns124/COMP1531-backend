@@ -2,6 +2,7 @@ import src.data_store
 import src.channel
 
 def channels_list_v1(auth_user_id):
+    global store
     store = data_store.get()
     channel_list = []
     output_list = []
