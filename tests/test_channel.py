@@ -62,7 +62,7 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public):
         channel_public (channel_id): Id of the channel the user is trying to access 
         start start): Starting index
     """
-    with pytest.raised(AccessError):
+    with pytest.raises(AccessError):
         channel_messages_v1(user_no_access['auth_user_id'], channel_public, 0)
 
 def test_channel_messages_v1(user_1, channel_public):
@@ -73,7 +73,7 @@ def test_channel_messages_v1(user_1, channel_public):
         channel_public (channel_id): The channel_id the user is trying to access
         first_message (start_): Starting index of the messages
     """
-    assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], 0) == {
+    assert channel_messages_v1(user_1['auth_user_id'], channel_public, 0) == {
         'messages' : [], 
         'start' : 0, 
         'end' : -1 }
