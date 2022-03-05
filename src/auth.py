@@ -3,18 +3,6 @@ from src.data_store import data_store
 from src.error import InputError
 
 store = data_store.get()
-
-def auth_login_v1(email, password):
-    if email_check(email) == False:
-        raise InputError
-    if duplicate_email_check(email) == False:
-        raise InputError
-    if password_check(password) == False:
-        raise InputError
-    
-    return {
-        'auth_user_id': 1,
-    }
     
 def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
@@ -42,7 +30,7 @@ def create_user(email, password, name_first, name_last):
         'email': email, 
         'name_first': name_first, 
         'name_last': name_last, 
-        'handle_str': "" , # generate later 
+        'handle_str': create_handle(name_first, name_last),
         'password': password,
         'channels_owned' : [], 
         'channels_joined' : [],
@@ -52,7 +40,18 @@ def create_user(email, password, name_first, name_last):
     return user
 
 def create_handle(name_first, name_last):
-    pass
+    global store
+    
+    handle = name_first.lower() + name_last.lower()
+    handle = handle[:20]
+    
+    i = 0
+    for user in store['users']:
+        if user['handle_str'] == handle:
+            handle += (str(i))
+            i += 1
+            
+    return handle
     
 ###############################################################
 ##                 Checking functions                        ##
