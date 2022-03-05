@@ -1,3 +1,9 @@
+from sre_constants import IN
+from sqlalchemy import true
+from src.data_store import data_store
+from src.channels import channels_list_v1
+from src.error import AccessError, InputError
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
@@ -26,7 +32,38 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    store = data_store.get()
     
+    auth_user_exist = False
+    
+    for user in store['users']:
+        if auth_user_id == user['u_id']: 
+            auth_user_exist = True
+    
+    channel_exist = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel_exist = True
+            
+    if channel_exist == False:
+        raise InputError
+    
+    if len(store['channels']['message']) < start:
+        raise InputError
+        
+    in_channel = False
+    for members in channels_list_v1['all_members']:
+        
+        if members['u_id'] == auth_user_id:
+            in_channel == True
+    
+    if in_channel == False:
+        raise AccessError
+    
+    for messages in any(store['channels']['messages']):
+        messages = {'messages' : store['channels']['messages']}
+
+
     return {
         'messages': [
             {
