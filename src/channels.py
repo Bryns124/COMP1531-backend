@@ -1,5 +1,6 @@
-import data_store
-import channels
+import src.data_store
+import src.channels
+from src.error import InputError, AccessError
 
 
 def channels_list_v1(auth_user_id):
@@ -23,8 +24,15 @@ def channels_listall_v1(auth_user_id):
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
-    store = data_store.get()
-    new_channel_id = len(store['channels']['channel_id']) + 1
+    global store
+    
+    if len(name) > 20:
+        raise InputError("The name of the channel cannot be more than 20 characters.")
+    
+    if len(name) < 1:
+        raise InputError("The name of the channel cannot be less than 1 character.")
+    store = src.data_store.get()
+    new_channel_id = len(store['channels']) + 1
     
     new_channel = {
         'channel_id' : new_channel_id, 
@@ -38,7 +46,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
     
     store['channels'].append(new_channel)
-    data_store.set(store)
+    src.data_store.set(store)
     
     return {
         store['channels'][-1]['channel_id']
