@@ -6,15 +6,16 @@ from src.other import clear_v1
 import pytest
 
 """Users"""
+
 @pytest.fixture
 def user_1():
-    return auth_register_v1("mikey@unsw.com", "test", "Mikey", "Test")
+    return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
 @pytest.fixture 
 def user_2():
-    return auth_register_v1("miguel@unsw.com", "test", "Miguel", "Test")
+    return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
 @pytest.fixture
 def user_no_access():
-    return auth_register_v1("error@unsw.com", "no_access", "no_access", "no_access")
+    return auth_register_v1("error@unsw.com", "no_access123456", "no_access", "no_access")
 @pytest.fixture
 def user_invalid():
     return -1
@@ -46,7 +47,7 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
     with pytest.raises(InputError):
         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, 0)
-clear_v1()
+    clear_v1()
 
 # def test_channel_messages_v1_invalid_start(user_1, invalid_channel_id, start):
 #     with pytest.raises(InputError):
@@ -63,7 +64,8 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public):
         start start): Starting index
     """
     with pytest.raises(AccessError):
-        channel_messages_v1(user_no_access['auth_user_id'], channel_public, 0)
+        channel_messages_v1(user_no_access['auth_user_id'], channel_public['channel_id'], 0)
+    clear_v1()
 
 def test_channel_messages_v1(user_1, channel_public):
     """
@@ -73,7 +75,8 @@ def test_channel_messages_v1(user_1, channel_public):
         channel_public (channel_id): The channel_id the user is trying to access
         first_message (start_): Starting index of the messages
     """
-    assert channel_messages_v1(user_1['auth_user_id'], channel_public, 0) == {
+    assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], 0) == {
         'messages' : [], 
         'start' : 0, 
         'end' : -1 }
+    clear_v1()
