@@ -89,6 +89,6 @@ def test_login_incorrect_password():
     clear_v1()
     
 # test registered account is logged in correctly
-def test_login_correct():
-    assert auth_login_v1("bryan.le@gmailcom", "password123")
+def test_login_correct(user_1):
+    assert auth_login_v1("bryan.le@gmailcom", "password123") == user_1
     clear_v1()
