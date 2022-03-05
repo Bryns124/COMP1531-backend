@@ -26,34 +26,39 @@ def private_channel_user2(user_2):
 def joined_channel(user_2, public_channel_user1):
     return channel_join_v1(user_2['auth_user_id'], public_channel_user1['channel_id'])
 
-@pytest.fixture
-def clear_data():
+
+def test_create_public_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'public_channel', True) == {
+        'channel_id': 1
+    }
+    clear_v1()
+    
+
+def test_create_private_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'test_channel', False) == {
+        'channel_id': 1
+    }
     clear_v1()
     
     
-
-
-def test_create_public_channel(clear_data, user_2):
-    '''
-    
-    '''
-    assert channels_create_v1(user_2['u_id'], 'public_channel', True)['channel_id'] == 1
-    
-
-def test_create_private_channel(clear_data, user_2):
-    assert channels_create_v1(user_2['u_id'], 'test_channel', False)['channel_id'] == 1
-    
-    
-def test_create_channel_invalid_name_1(clear_data, user_2):
+def test_create_channel_invalid_name_1(user_2):
     with pytest.raises(InputError):
-        assert channels_create_v1(user_2['u_id'], '', True)['channel_id']
+        assert channels_create_v1(user_2['auth_user_id'], '', True)
+    clear_v1()
         
         
-def test_create_channel_invalid_name_2(clear_data, user_2):
+def test_create_channel_invalid_name_2(user_2):
     with pytest.raises(InputError):
-        assert channels_create_v1(user_2['u_id'], 'abcdefghijklmnopqrstuv', True)['channel_id']
+        assert channels_create_v1(user_2['auth_user_id'], 'abcdefghijklmnopqrstuv', True)
+    clear_v1()
 
-def test_create_multiple_channel(clear_data, user_2):
-        assert channels_create_v1(user_2['u_id'], 'channel_1', True)['channel_id'] == 1
-        assert channels_create_v1(user_2['u_id'], 'channel_2', True)['channel_id'] == 2
+def test_create_multiple_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'channel_1', True) == {
+        'channel_id': 1
+    }
+    assert channels_create_v1(user_2['auth_user_id'], 'channel_2', True) == {
+        'channel_id': 2
+    }
+    clear_v1()
+    
         
