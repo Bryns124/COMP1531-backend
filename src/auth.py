@@ -5,13 +5,6 @@ from src.error import InputError
 store = data_store.get()
 
 def auth_login_v1(email, password):
-    if email_check(email) == False:
-        raise InputError
-    if duplicate_email_check(email) == False:
-        raise InputError
-    if password_check(password) == False:
-        raise InputError
-    
     global store
     for user in store['users']:
         if user['email'] == email:
