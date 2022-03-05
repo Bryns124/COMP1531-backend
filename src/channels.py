@@ -1,23 +1,22 @@
 from src.data_store import data_store
 import src.channels
 from src.error import InputError, AccessError
+from src.channel import channel_join_v1
 
 store = data_store.get()
 
 def channels_list_v1(auth_user_id):
     global store
-    output_list = []
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
-            create_list_dictionary(output_list, accounts)
-        print(accounts)
-        
+            output_list = create_list_dictionary(accounts)        
     return {
         'channels': output_list
     }
 
-def create_list_dictionary(output_list, accounts):
+def create_list_dictionary(accounts):
+    output_list = []
     for owned in accounts['channels_owned']:
             channel = {
                 'channel_id': owned['channel_id'],
@@ -31,6 +30,8 @@ def create_list_dictionary(output_list, accounts):
             'channel_name': joined['channel_name']
         }
         output_list.append(channel)
+    return output_list
+
 
 def channels_listall_v1(auth_user_id):
     return {
@@ -65,6 +66,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
     
     store['channels'].append(new_channel)
+    #this might be the issue to the whole problem
+    channel_join_v1(auth_user_id, new_channel['channel_id'])
     data_store.set(store)
     
     return {
