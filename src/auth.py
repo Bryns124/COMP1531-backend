@@ -3,8 +3,26 @@ from src.data_store import data_store
 from src.error import InputError
 
 store = data_store.get()
+
 def auth_login_v1(email, password):
-    pass
+    if email_check(email) == False:
+        raise InputError
+    if duplicate_email_check(email) == False:
+        raise InputError
+    if password_check(password) == False:
+        raise InputError
+    
+    global store
+    for user in store['users']:
+        if user['email'] == email:
+            if user['password'] == password:
+                return {
+                    'auth_user_id': user['u_id']
+                }
+            else:
+                raise InputError("Password is incorrect")
+            
+    raise InputError("Email does not exist")
 
 def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
