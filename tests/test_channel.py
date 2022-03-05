@@ -1,38 +1,36 @@
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1
+from src.other import clear_v1
+from src.error import InputError, AccessError
+import pytest
 
-@fixture
+@pytest.fixture
 def user_1():
     return auth_register_v1("mikey@unsw.com", "test", "Mikey", "Test")
 
-@fixture
+@pytest.fixture
 def user_2():
     return auth_register_v1("miguel@unsw.com", "test", "Miguel", "Test")
 
-@fixture
+@pytest.fixture
 def channel_1():
     return channels_create_v1(user_1["auth_user_id"], "A New Hope", True)
 
-@fixture
+@pytest.fixture
 def channel_2():
     return channels_create_v1(user_2["auth_user_id"], "The Empire Strikes Back", True)
 
-@fixture 
+@pytest.fixture
 def starting_value():
     return 0
 
-@fixture
+@pytest.fixture
 def invalid_channel():
     return {
         'channel_id': -1
     } 
 
-
-# functions to test: channel_details_v1, channel_join_v1
-
-# Assumed that channel ids have form 30001, leading 3
-# Assumed that user ids have form 20005, leading 2 
 '''
 channel_details_v1(auth_user_id, channel_id) 
 
@@ -43,13 +41,13 @@ Given a channel with ID channel_id that the authorised user is a member of, prov
 
 def test_input_error_channel_details_v1():
     # returns InputError when invalid channel_id is provided
-    with pytest.raise(InputError):
+    with pytest.raises(InputError):
         channel_details_v1(user_1['auth_user_id'], invalid_channel['channel_id'])
-    clear_v1()
+
 
 def test_access_error_channel_details_v1():
     # returns AccessError when user is not a member of the channel
-    with pytest.raise(AccessError):
+    with pytest.raises(AccessError):
         channel_details_v1(user_2['auth_user_id'], channel_1['channel_id'])
 
 def test_correct_inputs_channel_details_v1():
@@ -60,6 +58,7 @@ def test_correct_inputs_channel_details_v1():
         [{'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}], 
         [{'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Miikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}]
     )
+    clear_v1()
 
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == (
@@ -73,3 +72,4 @@ def test_correct_inputs_channel_details_v1():
             {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
         ]
     )
+    clear_v1()
