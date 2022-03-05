@@ -31,45 +31,45 @@ def channel_private(user_no_access):
 def invalid_channel_id():
     return -1
    
-# def test_channel_invite_access_error(user_1, channel_private, user_2):    
-#     """
-#     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
-#     but they do not have the access privlieges to do so. 
-#     Args:
-#         user_1 (_type_): _description_
-#         channel_private (_type_): _description_
-#         user_no_access (_type_): _description_
-#     """
-#     with pytest.raises(AccessError):
-#         channel_invite_v1(user_1["auth_user_id"],channel_private['channel_id'], user_2["auth_user_id"])
-#     clear_v1()
+def test_channel_invite_access_error(user_1, channel_private, user_2):    
+    """
+    This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
+    but they do not have the access privlieges to do so. 
+    Args:
+        user_1 (u_id): User who is not apart of the private channel
+        channel_private (channel_id): The private channel_id
+        user_no_access (u_id): User who is going to  be invited 
+    """
+    with pytest.raises(AccessError):
+        channel_invite_v1(user_1["auth_user_id"],channel_private['channel_id'], user_2["auth_user_id"])
+    clear_v1()
 
-# def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
-#     """
-#     This test checks to see that a InputError is raised when attemtping to invite someone to
-#     a channel with a invalid channel_id
-#     Args:
-#         user_1 (_type_): The u_id of the person executing the command and inviting. 
-#         invalid_channel_id (_type_): The invalid channel_id
-#         user_2 (_type_): The u_id of the person being invited
-#     """
-#     with pytest.raises(InputError):
-#         channel_invite_v1(user_1["auth_user_id"], invalid_channel_id, user_2["auth_user_id"])
-#     clear_v1()
+def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
+    """
+    This test checks to see that a InputError is raised when attemtping to invite someone to
+    a channel with a invalid channel_id
+    Args:
+        user_1 (_type_): The u_id of the person executing the command and inviting. 
+        invalid_channel_id (_type_): The invalid channel_id
+        user_2 (_type_): The u_id of the person being invited
+    """
+    with pytest.raises(InputError):
+        channel_invite_v1(user_1["auth_user_id"], invalid_channel_id, user_2["auth_user_id"])
+    clear_v1()
 
-# def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
-#     """
-#     This test checks to see that a InputError is raised when attemtping to invite someone with
-#     an invalid u_id.
-#     Args:
-#          user_1 (u_id): The u_id of the person executing the command and inviting. 
-#         channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
-#         user_invalid (u_id): The invalid u_id
-#     """
-#     with pytest.raises(InputError):
-#         channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_invalid) 
-#         channel_invite_v1(user_invalid, channel_public['channel_id'], user_1['auth_user_id'])
-#     clear_v1()
+def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
+    """
+    This test checks to see that a InputError is raised when attemtping to invite someone with
+    an invalid u_id.
+    Args:
+         user_1 (u_id): The u_id of the person executing the command and inviting. 
+        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
+        user_invalid (u_id): The invalid u_id
+    """
+    with pytest.raises(InputError):
+        channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_invalid) 
+        channel_invite_v1(user_invalid, channel_public['channel_id'], user_1['auth_user_id'])
+    clear_v1()
         
 def test_channel_invite_u_id_member(user_1, channel_public, user_2):
     """

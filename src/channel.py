@@ -30,7 +30,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     for members in store['channels'][channel_id - 1]['all_members']:
         if members == u_id:
             already_member = True
-        if members == auth_user_id:
+        elif members == auth_user_id:
             can_invite = True
     
     if already_member == True:
@@ -39,15 +39,21 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if can_invite == False:
         raise AccessError
         
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            invited_member = user['u_id']
-    
+    # for user in store['users']:
+    #     if u_id == user['u_id']:
+    #         invited_member = user['u_id']
+    #         user['channels_joined'].append(channel_id)
+            
     for channel in store['channels']:
+        for user in store['users']:
+            if u_id == user['u_id']:
+                invited_member = user['u_id']
+                user['channels_joined'].append(channel)
         if channel["channel_id"] == channel_id: 
             channel['all_members'].append(invited_member)
+        
             
-    print(store['channels'])
+    # print(store['channels'])
         
     data_store.set(store)
     return {
