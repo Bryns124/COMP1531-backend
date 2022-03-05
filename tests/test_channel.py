@@ -102,3 +102,4 @@ def test_channel_invite(user_1, channel_public, user_2):
     # print(channels_list_v1(user_2['auth_user_id']))
 clear_v1()
     
+
