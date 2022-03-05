@@ -26,7 +26,7 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [
+    #'users': [
         # {
             # 'u_id' : , check if is ok 
             # 'email': "", check if using empty string is ok 
@@ -34,11 +34,11 @@ initial_object = {
             # 'name_last': "", 
             # 'handle_str': "" , 
             # 'password': "",
-            # 'channels_owned' : , 
-            # 'channels_joined' : ,
+            # 'channels_owned' : [], 
+            # 'channels_joined' : [],
         # }
-    ],
-    'channels': [
+    #],
+    #'channels': [
         # {
         #     'channel_id' : , 
         #     'channel_name' : "",
@@ -57,7 +57,7 @@ initial_object = {
         #     'end' : , 
 
         # }
-    ],
+    #],
 }
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE

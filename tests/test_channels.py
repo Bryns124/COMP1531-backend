@@ -1,5 +1,5 @@
 import pytest
-from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
+from src.channels import channels_listall_v1, channels_create_v1
 from src.auth import auth_register_v1
 from src.channel import channel_join_v1
 from src.other import clear_v1
@@ -26,77 +26,39 @@ def private_channel_user2(user_2):
 def joined_channel(user_2, public_channel_user1):
     return channel_join_v1(user_2['auth_user_id'], public_channel_user1['channel_id'])
 
-@pytest.fixture
-def clear_data():
+
+def test_create_public_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'public_channel', True) == {
+        'channel_id': 1
+    }
+    clear_v1()
+    
+
+def test_create_private_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'test_channel', False) == {
+        'channel_id': 1
+    }
+    clear_v1()
+    
+    
+def test_create_channel_invalid_name_1(user_2):
+    with pytest.raises(InputError):
+        assert channels_create_v1(user_2['auth_user_id'], '', True)
+    clear_v1()
+        
+        
+def test_create_channel_invalid_name_2(user_2):
+    with pytest.raises(InputError):
+        assert channels_create_v1(user_2['auth_user_id'], 'abcdefghijklmnopqrstuv', True)
     clear_v1()
 
-
-
-def test_channel_list_private(clear_data, private_channel_user2):
-    assert channels_list_v1(user_2['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Private'],
-    }]
-    
-
-def test_channel_list_public(clear_data, public_channel_user1):
-    assert channels_list_v1(user_1['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Public'],
-    }]
-    
-def test_channel_list_empty(clear_data, user_2):
-    assert channels_list_v1(user_2['auth_user_id']) == []
-    
-def test_channel_list_multiple_created(clear_data, user_1):
-    channels_create_v1(user_1['auth_user_id'], 'Public', True)
-    channels_create_v1(user_1['auth_user_id'], 'Private', False)
-    
-    assert channels_list_v1(user_1['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Public'],
-    }, 
-    {
-        'channel_id':[2],
-        'name': ['Private'],
-    }, 
-    ]
-    
-
-def test_channel_list_joined(clear_data, joined_channel):
-    assert channels_list_v1(user_2['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Public'],
+def test_create_multiple_channel(user_2):
+    assert channels_create_v1(user_2['auth_user_id'], 'channel_1', True) == {
+        'channel_id': 1
     }
-    ]
+    assert channels_create_v1(user_2['auth_user_id'], 'channel_2', True) == {
+        'channel_id': 2
+    }
+    clear_v1()
     
-    
-def test_channel_list_multiple_joined(clear_data, user_1, user_2):
-    channel_id_1 = channels_create_v1(user_1['auth_user_id'], 'Public', True)
-    channel_id_2 = channels_create_v1(user_1['auth_user_id'], 'Private', False)
-    
-    channel_join_v1(user_2['auth_user_id'], channel_id_1)
-    channel_join_v1(user_2['auth_user_id'], channel_id_2)
-    
-    assert channels_list_v1(user_2['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Public'],
-    },
-    {
-        'channel_id':[2],
-        'name': ['Private'],
-    },
-    ]
-    
-def test_channel_list_multiple_created_joined(clear_data, joined_channel):
-    channels_create_v1(user_1['auth_user_id'], 'Private', False)
-    
-    assert channels_list_v1(user_2['auth_user_id']) == [{
-        'channel_id':[1],
-        'name': ['Public'],
-    },
-    {
-        'channel_id':[2],
-        'name': ['Private'],
-    },
-    ]
+        
