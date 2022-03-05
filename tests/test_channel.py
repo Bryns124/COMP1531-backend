@@ -26,7 +26,7 @@ def channel_public(user_1):
     return channels_create_v1(user_1["auth_user_id"], "Test Channel", True)
 @pytest.fixture
 def channel_private(user_no_access):
-    return channels_create_v1(user_no_access["auth_user_id"], "No Access Test Channel", False)
+    return channels_create_v1(user_no_access["auth_user_id"], "No Access Channel", False)
 @pytest.fixture
 def invalid_channel_id():
     return -1
