@@ -23,14 +23,14 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Email entered has already been registered")
     if len(password) < 6:
         raise InputError("Password entered must be longer than 6 characters")
-    if len(name_first) < 1 and len(name_first) > 50:
+    if len(name_first) < 1 or len(name_first) > 50:
         raise InputError("First name entered must be between 1 and 50 characters inclusive")
-    if len(name_last) < 1 and len(name_last) > 50:
+    if len(name_last) < 1 or len(name_last) > 50:
         raise InputError("Last name entered must be between 1 and 50 characters inclusive")
 
     user = create_user(email, password, name_first, name_last)
     return {
-        'auth_user_id': user['u_id'],
+        'auth_user_id': user['u_id']
     }
 
 # need to be able to actually create a user but not sure how for now
@@ -58,7 +58,7 @@ def create_handle(name_first, name_last):
 ##                 Checking functions                        ##
 ###############################################################
 def email_check(email):
-    regex = r'\b[A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,3}+\b'
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if (re.fullmatch(regex, email)):
         return True
     else:
