@@ -6,3 +6,4 @@
 6. When we join a channel, we will be able to see the message history for the channel.
 7. Messages start value is equal to 0. 
 8. When creating a new channel, isPublic is set to None.
+9. For the functions requiring auth_user_id as an argument, the user_id will always be valid.
