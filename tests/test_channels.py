@@ -75,8 +75,8 @@ def test_channel_list_multiple_joined(clear_data, user_1, user_2):
     channel_id_1 = channels_create_v1(user_1['auth_user_id'], 'Public', True)
     channel_id_2 = channels_create_v1(user_1['auth_user_id'], 'Private', False)
     
-    channels_join_v1(user_2['auth_user_id'], channel_id_1)
-    channels_join_v1(user_2['auth_user_id'], channel_id_2)
+    channel_join_v1(user_2['auth_user_id'], channel_id_1)
+    channel_join_v1(user_2['auth_user_id'], channel_id_2)
     
     assert channels_list_v1(user_2['auth_user_id']) == [{
         'channel_id':[1],
