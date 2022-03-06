@@ -4,11 +4,12 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
 
+# Fixture for testing incorrect login
 @pytest.fixture
 def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
 
-# test when login email is invalid
+# Testing when the login email is invalid
 def test_login_invalid_email():
     with pytest.raises(InputError):
         auth_login_v1("bryanle", "password123")
@@ -22,19 +23,19 @@ def test_login_invalid_email():
         auth_login_v1("", "password123")
     clear_v1()
         
-# test when login email is incorrect
+# Testing when the login email is incorrect
 def test_login_incorrect_email(user_1):
     with pytest.raises(InputError):
         auth_login_v1("notbryan.le@gmail.com", "password123")
     clear_v1()
         
-# test when login password is incorrect
+# Testing when the login password is incorrect
 def test_login_incorrect_password(user_1):
     with pytest.raises(InputError):
         auth_login_v1("bryanle@gmail.com", "password456")
     clear_v1()
     
-# test registered account is logged in correctly
+# Testing if the registered account is logged in correctly
 def test_login_correct(user_1):
     assert auth_login_v1("bryanle@gmail.com", "password123") == user_1
     clear_v1()
