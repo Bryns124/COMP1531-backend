@@ -71,29 +71,30 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
 
-'''
-channel_details_v1(auth_user_id, channel_id) 
+def channel_details_v1(auth_user_id, channel_id):
+    
+    '''
+    channel_details_v1(auth_user_id, channel_id) 
 
-Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 
-returns a dictionary 
-{
-    "channel_name": name of the channel (string),
-    "is_public": whether or not the channel is public (boolean),
-    "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
+    returns a dictionary 
+    {
+        "channel_name": name of the channel (string),
+        "is_public": whether or not the channel is public (boolean),
+        "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: 
+        {
         "u_id": user id (string),
         "email": email (string),
         "name_first": first name (string),
         "name_last": last name (string),
         "handle_str": user handle (string)
+        }
+        "all_members": a list of dictionaries in the same format as owner_members, however containing information 
+        on all members of the channel
     }
-    "all_members": a list of dictionaries in the same format as above, however containing information 
-    on all members of the channel
-}
-'''
+    '''
 
-def channel_details_v1(auth_user_id, channel_id):
-    
     store = data_store.get() # Accessing data_store for data
 
     is_channel = False # Initialising booleans for raising errors
@@ -155,21 +156,24 @@ def channel_details_v1(auth_user_id, channel_id):
         'owner_members': owner_members_details,
         'all_members': all_members_details
     }
-'''
-member_details(user_id)
 
-Given a user_id returns a dictionary containing details regarding that user. Returns None if user is not in data_store.
+def member_details(user_id):
+    '''
+    member_details(user_id)
 
-returns a dictionary of the form: {
+    Given a user_id in data_store returns a dictionary containing details regarding that user. 
+    Returns None if user is not in data_store.
+
+    returns a dictionary of the form: 
+    {
     "u_id": user id (string),
     "email": email (string),
     "name_first": first name (string),
     "name_last": last name (string),
     "handle_str": user handle (string)
-}
+    }
 
-'''
-def member_details(user_id):
+    '''
     store = data_store.get() # retrieves data from data_store
     users = store['users'] # saves list of dictionaries containing information about all users
 
@@ -189,7 +193,7 @@ def member_details(user_id):
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     """_summary_
-    Taking a valid uesr it pulls a list of up to 50 messages from a starting point and returns them. 
+    Taking a valid user it pulls a list of up to 50 messages from a starting point and returns them. 
     Args:
         auth_user_id (_u_id): The valid id of the user calling the messages.
         channel_id (channel_id): The channel_id of the channel which to call the messages from.
