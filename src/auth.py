@@ -2,7 +2,6 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 
-
 def auth_login_v1(email, password):
     if email_check(email) == False:
         raise InputError
