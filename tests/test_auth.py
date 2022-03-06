@@ -77,6 +77,7 @@ def test_last_name_length_more_than_50():
     '''
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn")
+    clear_v1()
 
 def test_handle():
     '''
@@ -97,6 +98,7 @@ def test_handle():
     # Tests that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
+    clear_v1()
 
 def test_login_invalid_email():
     '''
