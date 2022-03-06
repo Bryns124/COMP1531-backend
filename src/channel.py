@@ -274,6 +274,15 @@ def channel_join_v1(auth_user_id, channel_id):
     '''
     store = data_store.get()
         
+    auth_user_exist = False
+    
+    for user in store['users']:
+        if auth_user_id == user['u_id']: 
+            auth_user_exist = True
+    
+    if auth_user_exist == False:
+        raise InputError
+            
     if channel_validity(channel_id, store) == False:
         raise InputError("Channel id is invalid.")
     
