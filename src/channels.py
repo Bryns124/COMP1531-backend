@@ -60,6 +60,7 @@ def channels_listall_v1(auth_user_id):
         'channels': all_channels
     }
 
+
 ''' Function to create a new channel given the correct user id of a authorised user,
     the name of the channel and whether or not the channel is public or private. The return
     of this function is the id of that channel
