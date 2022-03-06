@@ -40,15 +40,22 @@ def invalid_channel():
 '''
 channel_details_v1(auth_user_id, channel_id) 
 
+Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+
 returns a dictionary 
 {
-    "channel_name": name of the channel,
-    "is_public": whether or not the channel is public,
-    "owner_members": ,
-    "all_members":
+    "channel_name": name of the channel (string),
+    "is_public": whether or not the channel is public (boolean),
+    "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
+        "u_id": user id (string),
+        "email": email (string),
+        "name_first": first name (string),
+        "name_last": last name (string),
+        "handle_str": user handle (string)
+    }
+    "all_members": a list of dictionaries in the same format as above, however containing information 
+    on all members of the channel
 }
-
-Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 '''
 
 def test_input_error_channel_details_v1(user_1, invalid_channel):
@@ -65,12 +72,14 @@ def test_access_error_channel_details_v1(user_2, channel_1):
     clear_v1()
 
 def test_wrong_user_id(invalid_user_id, channel_1):
+    # returns InputError when invalid user_id is provided
     with pytest.raises(InputError):
         channel_details_v1(invalid_user_id, channel_1)
     clear_v1()
 
+# Tests for correct inputs
 def test_correct_inputs_channel_details_v1(user_1, channel_1):
-    # Tests for correct inputs
+    
     assert channel_details_v1(user_1['auth_user_id'], channel_1['channel_id']) == {
         'channel_name': "A New Hope", 
         'is_public': True, 
@@ -83,8 +92,12 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
     }
     clear_v1()
 
+# Test channel with multiple users, including non-owners
 def test_multiple_user_channel_details_v1(user_1, channel_2):
-    channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
+    
+    # Adds another user to the channel, who doesn't have owner status
+    channel_join_v1(user_1['auth_user_id'], channel_2['channel_id']) 
+
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
         'channel_name': "Empire Strikes Back", 
         'is_public':  True, 
