@@ -118,50 +118,48 @@ def test_channel_invite(user_1, channel_public, user_2):
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
     clear_v1()
 
-
-'''
-channel_details_v1(auth_user_id, channel_id) 
-
-Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
-
-returns a dictionary 
-{
-    "channel_name": name of the channel (string),
-    "is_public": whether or not the channel is public (boolean),
-    "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
-        "u_id": user id (string),
-        "email": email (string),
-        "name_first": first name (string),
-        "name_last": last name (string),
-        "handle_str": user handle (string)
-    }
-    "all_members": a list of dictionaries in the same format as above, however containing information 
-    on all members of the channel
-}
-'''
-
 def test_input_error_channel_details_v1(user_1, invalid_channel):
-    # returns InputError when invalid channel_id is provided
+    '''
+    This function tests channel_details when the channel_id given is invalid and should raise an InputError
+    Args:
+        user_1: Id of a user trying to find details about a channel
+        invalid_channel: a channel with a channel_id that isn't saved
+    '''
     with pytest.raises(InputError):
         channel_details_v1(user_1['auth_user_id'], invalid_channel['channel_id'])
     clear_v1()
 
 
 def test_access_error_channel_details_v1(user_2, channel_1):
-    # returns AccessError when user is not a member of the channel
+    '''
+    This function tests channel_details when the user_id given is not part of the channel and should raise an AccessError
+    Args:
+        user_2: Id of a user trying to find details about a channel
+        channel_1: a channel that user_2 is not a part of
+    '''
     with pytest.raises(AccessError):
         channel_details_v1(user_2['auth_user_id'], channel_1['channel_id'])
     clear_v1()
 
 def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
-    # returns InputError when invalid user_id is provided
+    '''
+    This function tests channel_details when the user_id given is invalid and should raise an InputError
+    Args:
+        invalid_user_id: Id of a user that doesn't exist
+        channel_1: a channel that is trying to be accessed
+    '''
     with pytest.raises(InputError):
         channel_details_v1(invalid_user_id, channel_1)
     clear_v1()
 
-# Tests for correct inputs
 def test_correct_inputs_channel_details_v1(user_1, channel_1):
-    
+    '''
+    A function that tests channel_details for a channel with only one user is it, the owner, and tests 
+    that the output is correct
+    Args:
+        user_1: Id of owner of channel_1
+        channel_1: Channel trying to be accessed
+    '''
     assert channel_details_v1(user_1['auth_user_id'], channel_1['channel_id']) == {
         'channel_name': "A New Hope", 
         'is_public': True, 
@@ -174,9 +172,14 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
     }
     clear_v1()
 
-# Test channel with multiple users, including non-owners
 def test_multiple_user_channel_details_v1(user_1, channel_2):
-    
+    '''
+    A function that tests channel_details for a channel with multiple users is it, an owner and one non-owner 
+    member and tests that the output is correct
+    Args:
+        user_1: Id of owner of channel_1
+        channel_2: Channel trying to be accessed
+    '''
     # Adds another user to the channel, who doesn't have owner status
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id']) 
 
