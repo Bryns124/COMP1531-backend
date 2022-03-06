@@ -1,7 +1,5 @@
 from src.data_store import data_store
-from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.error import InputError, AccessError
-from src.channel import channel_join_v1
 
 store = data_store.get()
 
@@ -43,14 +41,27 @@ def create_list_dictionary(accounts):
 
 
 def channels_listall_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
+    '''
+    list all the channels that has been created
+
+    Assumption: no access error AKA auth_user_id is valid
+    returns: dictionary with a list of dictionaries of channels
+    '''
+    global store
+    store_channels = store['channels']
+
+    all_channels = []
+    for channel in store_channels:
+        channel_dict = {
+        		'channel_id': channel['channel_id'],
+        		'name': channel['channel_name'],
         	}
-        ],
+        all_channels.append(channel_dict)
+    
+    return {
+        'channels': all_channels
     }
+
 
 ''' Function to create a new channel given the correct user id of a authorised user,
     the name of the channel and whether or not the channel is public or private. The return
@@ -88,5 +99,4 @@ def channels_create_v1(auth_user_id, name, is_public):
     return {
         'channel_id' : store['channels'][-1]['channel_id']
     }
-    
 

@@ -5,7 +5,6 @@ from src.channel import channel_join_v1
 from src.other import clear_v1
 from src.error import AccessError, InputError
 
-
 @pytest.fixture
 def user_1():
     return auth_register_v1('alice@gmail.com', '123456', 'Alice', 'Wan') 
@@ -18,18 +17,71 @@ def user_2():
 def public_channel_user1(user_1):
     return channels_create_v1(user_1['auth_user_id'], 'Public', True)
 
+@pytest.fixture #user2 creates a private channel
+def private_channel_user2(user_2):
+    return channels_create_v1(user_2['auth_user_id'], 'Private', False)
+    
 @pytest.fixture #user1 creates a public channel
 def private_second_channel_user1(user_1):
     return channels_create_v1(user_1['auth_user_id'], 'User_1_Private', False)
 
-@pytest.fixture #user2 creates a private channel
-def private_channel_user2(user_2):
-    return channels_create_v1(user_2['auth_user_id'], 'Private', False)
+        
+def test_listall_no_channel(user_1):
+    '''
+    test for if no channels have been created
+    '''
 
-@pytest.fixture #user2 joined a public channel
-def joined_channel(user_1, user_2, public_channel_user1):
-    return channel_join_v1(user_2['auth_user_id'], public_channel_user1['channel_id'])
+    clear_v1()
+    assert channels_listall_v1(user_1['auth_user_id']) == {
+        'channels' : []
+    }
+    clear_v1()
 
+def test_listall_public(user_1, public_channel_user1):
+    '''
+    test for listing public channels
+    '''
+    assert channels_listall_v1(user_1['auth_user_id']) == {
+        'channels' : [
+            {
+                'channel_id': public_channel_user1['channel_id'],
+                'name': 'Public'
+            }
+        ]
+    }
+    clear_v1()
+
+def test_listall_private(user_2, private_channel_user2):
+    '''
+    test for listing private channel
+    '''
+    assert channels_listall_v1(user_2['auth_user_id']) == {
+        'channels' : [
+            {
+                'channel_id': private_channel_user2['channel_id'],
+                'name': 'Private'
+            }
+        ]
+    }
+    clear_v1()
+
+def test_listall_both(user_1, user_2, public_channel_user1, private_channel_user2):
+    '''
+    test if two channels are created by separate users
+    '''
+    assert channels_listall_v1(user_1['auth_user_id']) == {
+        'channels' : [
+            {
+                'channel_id': public_channel_user1['channel_id'],
+                'name': 'Public'
+            },
+            {
+                'channel_id': private_channel_user2['channel_id'],
+                'name': 'Private'
+            }
+        ]
+    }
+    clear_v1()
 
 def test_create_public_channel(user_2):
     '''
@@ -146,45 +198,6 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
                 'channel_id': private_second_channel_user1['channel_id'],
                 'channel_name': 'User_1_Private',
             }
-        ]
-    }
-    clear_v1()
-    
-
-def test_channel_list_joined(user_2, public_channel_user1, joined_channel):
-    '''
-    Test to check if a list of dictionary containing channel details is correctly generated, 
-    when the user has joined a public channel
-    Assumption: The auth_user_id is correct
-    '''
-    assert channels_list_v1(user_2['auth_user_id']) == {
-        'channels': [
-            {
-                'channel_id': public_channel_user1['channel_id'],
-                'channel_name': 'Public',
-            }
-        ]
-    }
-    clear_v1()
-
-    
-def test_channel_list_multiple_created_joined(user_1, user_2, private_channel_user2, joined_channel):
-    '''
-    Test to check if a list of dictionaries containing channel details is correctly generated, 
-    when the user has created a channel and joined another channel
-    Assumption: The auth_user_id is correct
-    '''
-    
-    assert channels_list_v1(user_2['auth_user_id']) == {
-        'channels': [
-            {
-                'channel_id': 1,
-                'channel_name': 'Private',
-            },
-            {
-                'channel_id': 2,
-                'channel_name': 'Public',
-            },
         ]
     }
     clear_v1()
