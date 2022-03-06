@@ -1,27 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 
-'''
-channel_details_v1(auth_user_id, channel_id) 
-
-Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
-
-returns a dictionary 
-{
-    "channel_name": name of the channel (string),
-    "is_public": whether or not the channel is public (boolean),
-    "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
-        "u_id": user id (string),
-        "email": email (string),
-        "name_first": first name (string),
-        "name_last": last name (string),
-        "handle_str": user handle (string)
-    }
-    "all_members": a list of dictionaries in the same format as above, however containing information 
-    on all members of the channel
-}
-'''
-
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
     Allows a authorized user to invite another user to a channel they are apart of.
@@ -92,7 +71,26 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 def channel_details_v1(auth_user_id, channel_id):
-    
+    '''
+    channel_details_v1(auth_user_id, channel_id) 
+
+    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+
+    returns a dictionary 
+    {
+    "channel_name": name of the channel (string),
+    "is_public": whether or not the channel is public (boolean),
+    "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
+        "u_id": user id (string),
+        "email": email (string),
+        "name_first": first name (string),
+        "name_last": last name (string),
+        "handle_str": user handle (string)
+    }
+    "all_members": a list of dictionaries in the same format as above, however containing information 
+    on all members of the channel
+}
+'''
     store = data_store.get() # Accessing data_store for data
 
     is_channel = False # Initialising booleans for raising errors
