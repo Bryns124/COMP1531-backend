@@ -4,22 +4,25 @@ from src.error import InputError
 
 def auth_login_v1(email, password):
     '''
-    Logs in a registered user given an email and password
+    Logs in a registered user given an email and password.
     
     :param email: the user's email
     :param password: the user's password
+    :return: the user's user ID
+    :rtype: dictionary
     '''
     store = data_store.get()
-    
+    # Check if user exists.
     for user in store['users']:
         if user['email'] == email:
+            # Check if user's password entered is correct.
             if user['password'] == password:
                 return {
                     'auth_user_id': user['u_id']
                 }
             else:
                 raise InputError("Password entered is incorrect")
-            
+
     raise InputError("Email entered does not exist")
 
 def auth_register_v1(email, password, name_first, name_last):
@@ -33,6 +36,7 @@ def auth_register_v1(email, password, name_first, name_last):
     :return: the user's user ID
     :rtype: dictionary
     '''
+    # Check if user's details are valid.
     if email_check(email) == False:
         raise InputError("Email entered is not a valid email")
     if duplicate_email_check(email) == True:
@@ -94,6 +98,8 @@ def create_handle(name_first, name_last):
     handle = name_first.lower() + name_last.lower()
     handle = handle[:20]
     
+    # Check if the user's handle already exists.
+    # Append the smallest number to the handle if handle already exists.
     i = 0
     for user in store['users']:
         if user['handle_str'] == handle:
@@ -129,26 +135,9 @@ def duplicate_email_check(email):
     :rtype: boolean
     '''
     store = data_store.get()
-    
+    # Check if user's email already exists
     for user in store['users']:
         if user['email'] == email:
             return True
-        else:
-            return False
-
-def password_check(password):
-    '''
-    Checks if the password entered has been registered.
-    If the password has been registered, return the user. Otherwise, return False. 
-    
-    :password: the user's password
-    :return: the user if matches. Otherwise, return false
-    :rtype: dictionary, boolean
-    '''
-    store = data_store.get()
-    
-    for user in store['users']:
-        if user['password'] == password:
-            return user
         else:
             return False
