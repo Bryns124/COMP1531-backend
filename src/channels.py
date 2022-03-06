@@ -1,5 +1,5 @@
 from src.data_store import data_store
-import src.channels
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.error import InputError, AccessError
 from src.channel import channel_join_v1
 
