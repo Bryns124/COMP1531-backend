@@ -1,5 +1,5 @@
 from enum import auto
-from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1
+from src.channel import channel_messages_v1, channel_invite_v1, channel_details_v1, channel_join_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import AccessError, InputError 
@@ -25,13 +25,16 @@ def user_invalid():
 def channel_public(user_1):
     return channels_create_v1(user_1["auth_user_id"], "Test Channel", True)
 @pytest.fixture
-def channel_private(user_no_access):
+def channel_private_access(user_no_access):
     return channels_create_v1(user_no_access["auth_user_id"], "No Access Channel", False)
+@pytest.fixture
+def channel_private(user_1):
+    return channels_create_v1(user_1["auth_user_id"], "Private Channel", False)
 @pytest.fixture
 def invalid_channel_id():
     return -1
    
-def test_channel_invite_access_error(user_1, channel_private, user_2):    
+def test_channel_invite_access_error(user_1, channel_private_access, user_2):    
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
     but they do not have the access privlieges to do so. 
@@ -41,7 +44,7 @@ def test_channel_invite_access_error(user_1, channel_private, user_2):
         user_no_access (u_id): User who is going to  be invited 
     """
     with pytest.raises(AccessError):
-        channel_invite_v1(user_1["auth_user_id"],channel_private['channel_id'], user_2["auth_user_id"])
+        channel_invite_v1(user_1["auth_user_id"],channel_private_access['channel_id'], user_2["auth_user_id"])
     clear_v1()
 
 def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
@@ -97,5 +100,44 @@ def test_channel_invite(user_1, channel_public, user_2):
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
     clear_v1()
-    
 
+def test_channel_join_invalid_channel(user_1):
+    '''
+    channel_id does not refer to a valid channel
+    '''
+    with pytest.raises(InputError):
+        channel_join_v1(user_1['auth_user_id'], -1)
+    clear_v1()
+
+def test_channel_join_already_member(user_1, channel_public, channel_private):
+    '''
+    the authorised user is already a member of the channel
+    '''
+    with pytest.raises(InputError):
+        channel_join_v1(user_1['auth_user_id'], channel_public['channel_id'])
+        channel_join_v1(user_1['auth_user_id'], channel_private['channel_id'])
+    clear_v1()
+
+def test_channel_join_access_private(user_1, user_2, channel_private):
+    '''
+    channel_id refers to a channel that is private 
+    and the authorised user is not already a channel member 
+    and is not a global owner
+    '''
+    with pytest.raises(AccessError):
+        channel_join_v1(user_2['auth_user_id'], channel_private['channel_id'])
+    clear_v1()
+
+def test_channel_join_success(user_1, user_2, channel_public):
+    '''
+    user successfully joins a public channel
+
+    Assumption: the joined channel will be added sequentially as the last added one
+    to channels list
+    '''
+    channel_join_v1(user_2['auth_user_id'], channel_public['channel_id'])
+    user_2_channels = channels_list_v1(user_2['auth_user_id'])
+    joined_channel = user_2_channels['channels'][-1]
+    assert channel_public['channel_id'] == joined_channel['channel_id']
+
+    clear_v1()
