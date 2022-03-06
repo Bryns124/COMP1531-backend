@@ -5,6 +5,8 @@ from src.other import clear_v1
 from src.error import InputError, AccessError
 import pytest
 
+
+# Adding fixtures for users and channels, including invalids to use for tests 
 @pytest.fixture
 def user_1():
     return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
@@ -38,7 +40,13 @@ def invalid_channel():
 '''
 channel_details_v1(auth_user_id, channel_id) 
 
-returns (name, is_public, owner_members, all_members)
+returns a dictionary 
+{
+    "channel_name": name of the channel,
+    "is_public": whether or not the channel is public,
+    "owner_members": ,
+    "all_members":
+}
 
 Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 '''
@@ -75,7 +83,7 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
     }
     clear_v1()
 
-def test_private_channel_details_v1(user_1, channel_2):
+def test_multiple_user_channel_details_v1(user_1, channel_2):
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
         'channel_name': "Empire Strikes Back", 
