@@ -66,6 +66,7 @@ def channels_listall_v1(auth_user_id):
     of this function is the id of that channel
 '''
 def channels_create_v1(auth_user_id, name, is_public):
+    
     store = data_store.get()
     
     if len(name) > 20:
