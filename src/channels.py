@@ -66,6 +66,7 @@ def channels_listall_v1(auth_user_id):
     of this function is the id of that channel
 '''
 def channels_create_v1(auth_user_id, name, is_public):
+    
     store = data_store.get()
     
     if len(name) > 20:
@@ -73,8 +74,11 @@ def channels_create_v1(auth_user_id, name, is_public):
     
     if len(name) < 1:
         raise InputError("The name of the channel cannot be less than 1 character.")
-
-    new_channel_id = len(store['channels']) + 1
+    
+    if store == {}:
+        new_channel_id = 1
+    else:
+        new_channel_id = len(store['channels']) + 1
     
     new_channel = {
         'channel_id' : new_channel_id, 
