@@ -44,6 +44,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': 50,
     }
 
+'''
+    Function to join and become a member of another channel,
+    given that the channel exists and is not private.
+    This function has no return
+'''
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
         
@@ -70,14 +75,24 @@ def channel_join_v1(auth_user_id, channel_id):
     data_store.set(store)
     return
 
-
+'''
+    Helper function:
+    to check if the channel id 
+    input to channel_join funciton is valid and exists
+    It return True if the id is valid and False otherwise.
+'''
 def channel_validity(channel_id, store):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
             return True
     return False
 
-
+'''
+    Helper function:
+    to check if the user trying to join a new channel is 
+    already a member of that channel.
+    It returns True if the user is already a member and False otherwise
+'''
 def already_member(auth_user_id, channel_id, store):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
@@ -85,7 +100,10 @@ def already_member(auth_user_id, channel_id, store):
                 return True    
     return False
 
-
+'''
+    Helper function:
+    to copy the channel details given a particular channel id
+'''
 def extract_channel_details(channel_id, store):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
