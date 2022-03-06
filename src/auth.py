@@ -2,9 +2,25 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 
-store = data_store.get()
 def auth_login_v1(email, password):
-    pass
+    if email_check(email) == False:
+        raise InputError
+    if duplicate_email_check(email) == False:
+        raise InputError
+    if password_check(password) == False:
+        raise InputError
+    
+    store = data_store.get()
+    for user in store['users']:
+        if user['email'] == email:
+            if user['password'] == password:
+                return {
+                    'auth_user_id': user['u_id']
+                }
+            else:
+                raise InputError("Password is incorrect")
+            
+    raise InputError("Email does not exist")
 
 def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
@@ -25,8 +41,9 @@ def auth_register_v1(email, password, name_first, name_last):
 
 # need to be able to actually create a user but not sure how for now
 def create_user(email, password, name_first, name_last):
-    global store
+    store = data_store.get()
     new_id = len(store['users']) + 1
+    
     user = {
         'u_id' : new_id, 
         'email': email, 
@@ -37,12 +54,13 @@ def create_user(email, password, name_first, name_last):
         'channels_owned' : [], 
         'channels_joined' : [],
     }
+    
     store['users'].append(user)
     data_store.set(store)
     return user
 
 def create_handle(name_first, name_last):
-    global store
+    store = data_store.get()
     
     handle = name_first.lower() + name_last.lower()
     handle = handle[:20]
@@ -66,7 +84,8 @@ def email_check(email):
         return False
     
 def duplicate_email_check(email):
-    global store
+    store = data_store.get()
+    
     for user in store['users']:
         if user['email'] == email:
             return True
@@ -74,7 +93,8 @@ def duplicate_email_check(email):
             return False
 
 def password_check(password):
-    global store
+    store = data_store.get()
+    
     for user in store['users']:
         if user['password'] == password:
             return user
