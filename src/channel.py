@@ -44,7 +44,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': 50,
     }
 
-def channel_join_v1(auth_user_id, channel_id):
+ef channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
         
     if channel_validity(channel_id, store) == False:
@@ -91,3 +91,4 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details    
+
