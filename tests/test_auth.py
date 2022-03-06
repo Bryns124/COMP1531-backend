@@ -62,6 +62,24 @@ def test_last_name_length_more_than_50():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn")
 
+# Testing that the handle is generated correctly 
+def test_handle():
+    store = data_store.get()
+    auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
+    auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
+    auth_register_v1("bryanle4@gmail.com", "password123", "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
+    auth_register_v1("bryanle4@gmail.com", "password123", "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
+    handle_str1 = store['users'][0]['handle_str']
+    handle_str2 = store['users'][1]['handle_str']
+    handle_str3 = store['users'][2]['handle_str']
+    handle_str4 = store['users'][3]['handle_str']
+    # Testing that the handle cuts off at more than 20 characters
+    assert len(handle_str1) <= 20
+    assert len(handle_str3) <= 20
+    # Testing that a unique handle is created for a new user with the same first name and last name
+    assert handle_str1 != handle_str2
+    assert handle_str3 != handle_str4
+
 # Testing when login email is invalid
 def test_login_invalid_email():
     with pytest.raises(InputError):
@@ -92,21 +110,3 @@ def test_login_incorrect_password():
 def test_login_correct(user_1):
     assert auth_login_v1("bryanle@gmail.com", "password123") == user_1
     clear_v1()
-    
-# Testing that the handle is generated correctly 
-def test_handle():
-    store = data_store.get()
-    auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle4@gmail.com", "password123", "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
-    auth_register_v1("bryanle4@gmail.com", "password123", "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
-    handle_str1 = store['users'][0]['handle_str']
-    handle_str2 = store['users'][1]['handle_str']
-    handle_str3 = store['users'][2]['handle_str']
-    handle_str4 = store['users'][3]['handle_str']
-    # Testing that the handle cuts off at more than 20 characters
-    assert len(handle_str1) <= 20
-    assert len(handle_str3) <= 20
-    # Testing that a unique handle is created for a new user with the same first name and last name
-    assert handle_str1 != handle_str2
-    assert handle_str3 != handle_str4
