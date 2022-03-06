@@ -10,7 +10,6 @@ import pytest
 @pytest.fixture
 def user_1():
     return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
-
 @pytest.fixture
 def user_2():
     return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
