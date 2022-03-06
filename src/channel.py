@@ -1,4 +1,7 @@
-import src.data_store
+from src.data_store import data_store
+from src.error import InputError, AccessError
+
+
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
@@ -42,7 +45,55 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+    '''
+    function allows user to join another channel based on the channel ID
+    will give input error if the channel id is invalid or if the user is already in the channel
+    will give access error if the channel ID is one for a private channel
+    '''
     store = data_store.get()
-    store['channels'][channel_id]['channel_members'].append(auth_user_id)
-    store['users'][auth_user_id]['channels_joined'].append(channel_id)
+        
+    if channel_validity(channel_id, store) == False:
+        raise InputError("Channel id is invalid.")
+    
+    if already_member(auth_user_id, channel_id, store) == True:
+        raise InputError("The user is already a member of this channel.")
+    
+    current_channel = extract_channel_details(channel_id, store)
+    if current_channel['is_public'] == False:
+        raise AccessError("This is a private channel, user does not have access.")
+
+
+    for user_accounts in store['users']:
+        if user_accounts['u_id'] == auth_user_id:
+            new_member = user_accounts
+            user_accounts['channels_joined'].append(current_channel)
+    
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id:
+            channels['all_members'].append(new_member)
+            
+    data_store.set(store)
     return
+
+
+def channel_validity(channel_id, store):
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id:
+            return True
+    return False
+
+
+def already_member(auth_user_id, channel_id, store):
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id:
+            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
+                return True    
+    return False
+
+
+def extract_channel_details(channel_id, store):
+    for channels in store['channels']:
+        if channels['channel_id'] == channel_id:
+            channel_details = channels
+    return channel_details    
+
