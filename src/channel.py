@@ -38,11 +38,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     
     if can_invite == False:
         raise AccessError
-        
-    # for user in store['users']:
-    #     if u_id == user['u_id']:
-    #         invited_member = user['u_id']
-    #         user['channels_joined'].append(channel_id)
             
     for channel in store['channels']:
         for user in store['users']:
