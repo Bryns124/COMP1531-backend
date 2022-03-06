@@ -6,11 +6,11 @@ from src.error import InputError, AccessError
 import pytest
 
 
-# Adding fixtures for users and channels, including invalids to use for tests 
-@pytest.fixture
+"""Users"""
+@pytest.fixture()
 def user_1():
     return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
-@pytest.fixture
+@pytest.fixture 
 def user_2():
     return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
 @pytest.fixture
@@ -23,40 +23,34 @@ def user_invalid():
 def invalid_user_id():
     return -1
 
+"""Channels"""
 @pytest.fixture
-def channel_1(user_1):
-    return channels_create_v1(user_1["auth_user_id"], "A New Hope", True)
-
+def channel_public(user_1):
+    return channels_create_v1(user_1["auth_user_id"], "Test Channel", True)
 @pytest.fixture
-def channel_2(user_2):
-    return channels_create_v1(user_2["auth_user_id"], "Empire Strikes Back", True)
-
-@pytest.fixture
-def invalid_user_id():
-    return -1
-
+def channel_private_access(user_no_access):
+    return channels_create_v1(user_no_access["auth_user_id"], "No Access Channel", False)
 @pytest.fixture
 def channel_private(user_1):
     return channels_create_v1(user_1["auth_user_id"], "Private Channel", False)
-
+@pytest.fixture
+def invalid_channel_id():
+    return -1
+@pytest.fixture
+def channel_1(user_1):
+    return channels_create_v1(user_1["auth_user_id"], "A New Hope", True)
+@pytest.fixture
+def channel_2(user_2):
+    return channels_create_v1(user_2["auth_user_id"], "Empire Strikes Back", True)
 @pytest.fixture
 def invalid_channel():
     return {
         'channel_id' : -1
     }
 @pytest.fixture
-def invalid_channel_id():
-    return -1
-@pytest.fixture
 def starting_value():
     return 0
 
-@pytest.fixture
-def invalid_channel():
-    return {
-        'channel_id': -1
-    } 
-   
 def test_channel_invite_access_error(user_1, channel_private_access, user_2):    
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
@@ -205,6 +199,7 @@ def test_channel_join_invalid_channel(user_1):
     '''
     with pytest.raises(InputError):
         channel_join_v1(user_1['auth_user_id'], -1)
+    clear_v1()
 
 def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
