@@ -26,13 +26,14 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
+
     #'users': [
         # {
             # 'u_id' : , check if is ok 
             # 'email': "", check if using empty string is ok 
             # 'name_first': "", 
             # 'name_last': "", 
-            # 'handle_str': "" , 
+            # 'handle_str': "" ,        
             # 'password': "",
             # 'channels_owned' : [], 
             # 'channels_joined' : [],
@@ -59,6 +60,7 @@ initial_object = {
         # }
     #],
 }
+
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 ## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
