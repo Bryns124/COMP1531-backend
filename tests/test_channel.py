@@ -161,7 +161,7 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
     }
     clear_v1()
 
-def test_private_channel_details_v1(user_1, channel_2):
+def test_correct_inputs_channel_details_v1(user_1, channel_2):
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
         'channel_name': "Empire Strikes Back", 
