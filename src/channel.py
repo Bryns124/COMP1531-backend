@@ -45,6 +45,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+    '''
+    function allows user to join another channel based on the channel ID
+    will give input error if the channel id is invalid or if the user is already in the channel
+    will give access error if the channel ID is one for a private channel
+    '''
     store = data_store.get()
         
     if channel_validity(channel_id, store) == False:
