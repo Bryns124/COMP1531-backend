@@ -1,7 +1,6 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 
-
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     store = data_store.get()
     
@@ -92,5 +91,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+    store = data_store.get()
+    store['channels'][channel_id]['channel_members'].append(auth_user_id)
+    store['users'][auth_user_id]['channels_joined'].append(channel_id)
+    return
