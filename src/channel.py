@@ -2,6 +2,23 @@ from src.data_store import data_store
 from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    """
+    Allows a authorized user to invite another user to a channel they are apart of.
+
+    Args:
+        auth_user_id (u_id): A valid user who is apart of the channel/
+        channel_id (channel_id): The channel id auth_user is inviting to.
+        u_id (u_id): A valid second user who is being invited
+
+    Raises:
+        InputError: u_id dos not exist in datastore.
+        InputError: channel_id does not exist in datastore.
+        InputError: the invited user is already part of the channel.
+        AccessError: the auth_user is not in the channel they are inviting to.
+
+    Returns:
+        dictionary: nothing! nothing is returned after a invite 
+    """
     store = data_store.get()
     
     auth_user_exist = False

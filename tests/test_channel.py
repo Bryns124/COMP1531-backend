@@ -96,11 +96,6 @@ def test_channel_invite(user_1, channel_public, user_2):
     """
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
-    # #however need to test that the user was added sucessfully so need to check the channel details and find the user in the list of users in the channel 
-    # print(channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'])
-    # print(channels_list_v1(user_2['auth_user_id'])['channels'][-1])
-    # print(channels_list_v1(user_2['auth_user_id'])['channels'])
-    # print(channels_list_v1(user_2['auth_user_id']))
     clear_v1()
     
 
