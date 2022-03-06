@@ -6,7 +6,6 @@ from src.error import AccessError, InputError
 from src.other import clear_v1
 import pytest
 
-
 """Users"""
 @pytest.fixture()
 def user_1():
@@ -20,6 +19,9 @@ def user_no_access():
 @pytest.fixture
 def user_invalid():
     return "invalid"
+@pytest.fixture
+def invalid_user_id():
+    return -1
 
 """Channels"""
 @pytest.fixture
@@ -34,17 +36,21 @@ def channel_1(user_1):
 @pytest.fixture
 def channel_2(user_2):
     return channels_create_v1(user_2["auth_user_id"], "Empire Strikes Back", True)
+@pytest.fixture
 def channel_private(user_1):
     return channels_create_v1(user_1["auth_user_id"], "Private Channel", False)
 @pytest.fixture
+def invalid_channel():
+    return {
+        'channel_id' : -1
+    }
+@pytest.fixture
 def invalid_channel_id():
     return -1
-
 @pytest.fixture
 def starting_value():
     return 0
 
-   
 def test_channel_invite_access_error(user_1, channel_private_access, user_2):    
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
@@ -189,6 +195,8 @@ def test_channel_join_invalid_channel(user_1):
     '''
     channel_id does not refer to a valid channel
     '''
+    with pytest.raises(InputError):
+        channel_join_v1(user_1['auth_user_id'], -1)
 
 def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
