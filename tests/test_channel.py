@@ -71,7 +71,7 @@ def test_access_error_channel_details_v1(user_2, channel_1):
         channel_details_v1(user_2['auth_user_id'], channel_1['channel_id'])
     clear_v1()
 
-def test_wrong_user_id(invalid_user_id, channel_1):
+def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
     # returns InputError when invalid user_id is provided
     with pytest.raises(InputError):
         channel_details_v1(invalid_user_id, channel_1)
