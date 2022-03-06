@@ -8,7 +8,7 @@ from src.other import clear_v1
 def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
     
-# Testing when the registering email is invalid
+# Tests when the registering email is invalid
 def test_register_invalid_email():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmailcom", "password123", "Bryan", "Le")
@@ -21,48 +21,48 @@ def test_register_invalid_email():
         auth_register_v1("", "password123", "Bryan", "Le")
     clear_v1()
 
-# Testing when the registering email has already been used by another user
+# Tests when the registering email has already been used by another user
 def test_register_email_already_used():
     auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
     clear_v1()
 
-# Testing when a new email is registered that it returns a unique user ID
+# Tests when a new email is registered that it returns a unique user ID
 def test_register_returns_unique_ID():
     assert auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le") != auth_register_v1("jamesnguyen@gmail.com", "password789", "James", "Nguyen")
     clear_v1()
 
-# Testing when the registered len(password) < 6 characters
+# Tests when the registered len(password) < 6 characters
 def test_password_length_less_than_6():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "pass", "Bryan", "Le")
     clear_v1()
 
-# Testing when the registered name_first < 1
+# Tests when the registered name_first < 1
 def test_first_name_length_less_than_1():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "", "Le")
     clear_v1()
         
-# Testing when the registered name_first > 50
+# Tests when the registered name_first > 50
 def test_first_name_length_more_than_50():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn", "Le")
     clear_v1()
         
-# Testing when the registered name_last < 1
+# Tests when the registered name_last < 1
 def test_last_name_length_less_than_1():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "")
     clear_v1()
 
-# Testing when the registered name_last > 50
+# Tests when the registered name_last > 50
 def test_last_name_length_more_than_50():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn")
 
-# Testing that the handle is generated correctly 
+# Tests that the handle is generated correctly 
 def test_handle():
     store = data_store.get()
     auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
@@ -73,14 +73,14 @@ def test_handle():
     handle_str2 = store['users'][1]['handle_str']
     handle_str3 = store['users'][2]['handle_str']
     handle_str4 = store['users'][3]['handle_str']
-    # Testing that the handle cuts off at more than 20 characters
+    # Tests that the handle cuts off at more than 20 characters
     assert len(handle_str1) <= 20
     assert len(handle_str3) <= 20
-    # Testing that a unique handle is created for a new user with the same first name and last name
+    # Tests that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
 
-# Testing when login email is invalid
+# Tests when login email is invalid
 def test_login_invalid_email():
     with pytest.raises(InputError):
         auth_login_v1("bryanle", "password123")
@@ -94,19 +94,19 @@ def test_login_invalid_email():
         auth_login_v1("", "password123")
     clear_v1()
         
-# Testing when login email is incorrect
+# Tests when login email is incorrect
 def test_login_incorrect_email():
     with pytest.raises(InputError):
         auth_login_v1("notbryan.le@gmail.com", "password123")
     clear_v1()
         
-# Testing when login password is incorrect
+# Tests when login password is incorrect
 def test_login_incorrect_password():
     with pytest.raises(InputError):
         auth_login_v1("bryanle@gmail.com", "password456")
     clear_v1()
     
-# Testing registered account is logged in correctly
+# Tests registered account is logged in correctly
 def test_login_correct(user_1):
     assert auth_login_v1("bryanle@gmail.com", "password123") == user_1
     clear_v1()
