@@ -8,11 +8,11 @@ from src.other import clear_v1
 
 @pytest.fixture
 def user_1():
-    return auth_register_v1("mikey@unsw.com", "test", "Mikey", "Test")
+    return auth_register_v1("mikey@unsw.com", "test_channel", "Mikey", "Test")
 
 @pytest.fixture 
 def user_2():
-    return auth_register_v1("miguel@unsw.com", "test", "Miguel", "Test")
+    return auth_register_v1("miguel@unsw.com", "test_channel", "Miguel", "Test")
 
 @pytest.fixture
 def channel_public(user_1):
@@ -58,8 +58,7 @@ def test_channel_join_success(user_1, user_2, channel_public):
     '''
     channel_join_v1(user_2['auth_user_id'], channel_public['channel_id'])
     user_2_channels = channels_list_v1(user_2['auth_user_id'])
-    joined_channel = user_2_channels[-1]
-    assert channel_public['channel_id'] == joined_channel[-1]['channel_id']
+    joined_channel = user_2_channels['channels'][-1]
+    assert channel_public['channel_id'] == joined_channel['channel_id']
 
     clear_v1()
-
