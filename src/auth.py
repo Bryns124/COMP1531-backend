@@ -18,9 +18,9 @@ def auth_login_v1(email, password):
                     'auth_user_id': user['u_id']
                 }
             else:
-                raise InputError("Password is incorrect")
+                raise InputError("Password entered is incorrect")
             
-    raise InputError("Email does not exist")
+    raise InputError("Email entered oes not exist")
 
 def auth_register_v1(email, password, name_first, name_last):
     if email_check(email) == False:
