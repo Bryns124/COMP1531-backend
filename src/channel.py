@@ -75,7 +75,6 @@ def channel_details_v1(auth_user_id, channel_id):
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             is_valid_u_id = True
-            break
     
     if not is_valid_u_id:
         raise InputError("Invalid User ID")
@@ -84,29 +83,52 @@ def channel_details_v1(auth_user_id, channel_id):
         if channel['channel_id'] == channel_id:
             is_channel = True
             active_channel = channel
-            break
     
     if not is_channel:
-        raise InputError()
+        raise InputError("Invalid Channel ID")
 
     for member in active_channel['all_members']:
         if member == auth_user_id:
             is_member = True
-            #break
         
     if not is_member:
         raise AccessError()
 
+    owner_members_details = []
+    all_members_details = []
+
+    for owner_id in active_channel['owner_members']:
+        owner_current = member_details(owner_id)
+        owner_members_details.append(owner_current)
+
+    for member_id in active_channel['all_members']:
+        member_current = member_details(member_id)
+        all_members_details.append(member_current)
+     
     return {
         'channel_name': active_channel['channel_name'],
         'is_public': active_channel['is_public'],
-        'owner_members': active_channel['owner_members'],
-        'all_members': active_channel['all_members']
+        'owner_members': owner_members_details,
+        'all_members': all_members_details
     }
 
+def member_details(user_id):
+    store = data_store.get()
+    users = store['users']
+
+    for user in users:
+        if user['u_id'] == user_id:
+            return {
+                'u_id': user['u_id'],
+                'email': user['email'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last'],
+                'handle_str': user['handle_str']
+            }
+    return
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
-    store['channels'][channel_id]['channel_members'].append(auth_user_id)
+    store['channels'][channel_id - 1]['all_members'].append(auth_user_id)
     store['users'][auth_user_id]['channels_joined'].append(channel_id)
     return
 
