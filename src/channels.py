@@ -99,3 +99,4 @@ def channels_create_v1(auth_user_id, name, is_public):
     return {
         'channel_id' : store['channels'][-1]['channel_id']
     }
+
