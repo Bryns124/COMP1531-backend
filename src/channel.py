@@ -1,83 +1,14 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from src.channels import channels_list_v1
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
-    """
-    Allows a authorized user to invite another user to a channel they are apart of.
+'''
+channel_details_v1(auth_user_id, channel_id) 
 
-    Args:
-        auth_user_id (u_id): A valid user who is apart of the channel/
-        channel_id (channel_id): The channel id auth_user is inviting to.
-        u_id (u_id): A valid second user who is being invited
+Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 
-    Raises:
-        InputError: u_id dos not exist in datastore.
-        InputError: channel_id does not exist in datastore.
-        InputError: the invited user is already part of the channel.
-        AccessError: the auth_user is not in the channel they are inviting to.
-
-    Returns:
-        dictionary: nothing! nothing is returned after a invite 
-    """
-    store = data_store.get()
-    
-    auth_user_exist = False
-    user_exist = False
-    
-    for user in store['users']:
-        if auth_user_id == user['u_id']: 
-            auth_user_exist = True
-        elif u_id == user['u_id']:        
-            user_exist = True
-            
-    if auth_user_exist == False or user_exist == False:
-        raise InputError
-    
-    channel_exist = False
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel_exist = True
-            
-    if channel_exist == False:
-        raise InputError
-        
-    already_member = False
-    can_invite = False
-    for members in store['channels'][channel_id - 1]['all_members']:
-        if members == u_id:
-            already_member = True
-        elif members == auth_user_id:
-            can_invite = True
-    
-    if already_member == True:
-        raise InputError
-    
-    if can_invite == False:
-        raise AccessError
-            
-    for channel in store['channels']:
-        for user in store['users']:
-            if u_id == user['u_id']:
-                invited_member = user['u_id']
-                user['channels_joined'].append(channel)
-        if channel["channel_id"] == channel_id: 
-            channel['all_members'].append(invited_member)
-        
-            
-    # print(store['channels'])
-        
-    data_store.set(store)
-    return {
-    }
-
-def channel_details_v1(auth_user_id, channel_id):
-    '''
-    channel_details_v1(auth_user_id, channel_id) 
-
-    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
-
-    returns a dictionary 
-    {
+returns a dictionary 
+{
     "channel_name": name of the channel (string),
     "is_public": whether or not the channel is public (boolean),
     "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: {
@@ -91,6 +22,9 @@ def channel_details_v1(auth_user_id, channel_id):
     on all members of the channel
 }
 '''
+
+def channel_details_v1(auth_user_id, channel_id):
+    
     store = data_store.get() # Accessing data_store for data
 
     is_channel = False # Initialising booleans for raising errors
@@ -184,6 +118,7 @@ def member_details(user_id):
     # returns None if user is not found, 
     return
 
+
 def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
     store['channels'][channel_id - 1]['all_members'].append(auth_user_id)
@@ -234,61 +169,10 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
                 user['channels_joined'].append(channel)
         if channel["channel_id"] == channel_id: 
             channel['all_members'].append(invited_member)
-         
+        
+            
     # print(store['channels'])
         
     data_store.set(store)
     return {
     }
-    '''
-    function allows user to join another channel based on the channel ID
-    will give input error if the channel id is invalid or if the user is already in the channel
-    will give access error if the channel ID is one for a private channel
-    '''
-    store = data_store.get()
-        
-    if channel_validity(channel_id, store) == False:
-        raise InputError("Channel id is invalid.")
-    
-    if already_member(auth_user_id, channel_id, store) == True:
-        raise InputError("The user is already a member of this channel.")
-    
-    current_channel = extract_channel_details(channel_id, store)
-    if current_channel['is_public'] == False:
-        raise AccessError("This is a private channel, user does not have access.")
-
-
-    for user_accounts in store['users']:
-        if user_accounts['u_id'] == auth_user_id:
-            new_member = user_accounts
-            user_accounts['channels_joined'].append(current_channel)
-    
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            channels['all_members'].append(new_member)
-            
-    data_store.set(store)
-    return
-
-
-def channel_validity(channel_id, store):
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            return True
-    return False
-
-
-def already_member(auth_user_id, channel_id, store):
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
-                return True    
-    return False
-
-
-def extract_channel_details(channel_id, store):
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            channel_details = channels
-    return channel_details    
-
