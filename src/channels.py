@@ -1,8 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
-store = data_store.get()
-
 '''
     This function returns the list of dictionaries containing the details
     of the channels that the user is a member or owner of.
@@ -47,7 +45,7 @@ def channels_listall_v1(auth_user_id):
     Assumption: no access error AKA auth_user_id is valid
     returns: dictionary with a list of dictionaries of channels
     '''
-    global store
+    store = data_store.get()
     store_channels = store['channels']
 
     all_channels = []
@@ -68,6 +66,7 @@ def channels_listall_v1(auth_user_id):
     of this function is the id of that channel
 '''
 def channels_create_v1(auth_user_id, name, is_public):
+    
     store = data_store.get()
     
     if len(name) > 20:
@@ -75,8 +74,11 @@ def channels_create_v1(auth_user_id, name, is_public):
     
     if len(name) < 1:
         raise InputError("The name of the channel cannot be less than 1 character.")
-
-    new_channel_id = len(store['channels']) + 1
+    
+    if store == {}:
+        new_channel_id = 1
+    else:
+        new_channel_id = len(store['channels']) + 1
     
     new_channel = {
         'channel_id' : new_channel_id, 

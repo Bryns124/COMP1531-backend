@@ -1,9 +1,72 @@
 from src.data_store import data_store
-from src.error import InputError, AccessError
-
-
+from src.error import AccessError, InputError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    """
+    Allows a authorized user to invite another user to a channel they are apart of.
+
+    Args:
+        auth_user_id (u_id): A valid user who is apart of the channel/
+        channel_id (channel_id): The channel id auth_user is inviting to.
+        u_id (u_id): A valid second user who is being invited
+
+    Raises:
+        InputError: u_id dos not exist in datastore.
+        InputError: channel_id does not exist in datastore.
+        InputError: the invited user is already part of the channel.
+        AccessError: the auth_user is not in the channel they are inviting to.
+
+    Returns:
+        dictionary: nothing! nothing is returned after a invite 
+    """
+    store = data_store.get()
+    
+    auth_user_exist = False
+    user_exist = False
+    
+    for user in store['users']:
+        if auth_user_id == user['u_id']: 
+            auth_user_exist = True
+        elif u_id == user['u_id']:        
+            user_exist = True
+            
+    if auth_user_exist == False or user_exist == False:
+        raise InputError
+    
+    channel_exist = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel_exist = True
+            
+    if channel_exist == False:
+        raise InputError
+        
+    already_member = False
+    can_invite = False
+    for members in store['channels'][channel_id - 1]['all_members']:
+        if members == u_id:
+            already_member = True
+        elif members == auth_user_id:
+            can_invite = True
+    
+    if already_member == True:
+        raise InputError
+    
+    if can_invite == False:
+        raise AccessError
+            
+    for channel in store['channels']:
+        for user in store['users']:
+            if u_id == user['u_id']:
+                invited_member = user['u_id']
+                user['channels_joined'].append(channel)
+        if channel["channel_id"] == channel_id: 
+            channel['all_members'].append(invited_member)
+        
+            
+    # print(store['channels'])
+        
+    data_store.set(store)
     return {
     }
 
