@@ -1,5 +1,7 @@
-import src.data_store
+from src.data_store import data_store
 from src.error import InputError, AccessError
+
+
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
@@ -43,16 +45,15 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
-    global store
     store = data_store.get()
         
-    if channel_validity(channel_id) == False:
+    if channel_validity(channel_id, store) == False:
         raise InputError("Channel id is invalid.")
     
-    if already_member(auth_user_id, channel_id) == True:
+    if already_member(auth_user_id, channel_id, store) == True:
         raise InputError("The user is already a member of this channel.")
     
-    current_channel = extract_channel_details(channel_id)
+    current_channel = extract_channel_details(channel_id, store)
     if current_channel['is_public'] == False:
         raise AccessError("This is a private channel, user does not have access.")
 
@@ -70,24 +71,22 @@ def channel_join_v1(auth_user_id, channel_id):
     return
 
 
-def channel_validity(channel_id):
-    store = data_store.get()
+def channel_validity(channel_id, store):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
             return True
     return False
 
 
-def already_member(user_id, channel_id):
-    store = data_store.get()
+def already_member(auth_user_id, channel_id, store):
     for channels in store['channels']:
-        if channels['channel_id'] == channel_id and user_id in channels['all_members']:
-            return True    
+        if channels['channel_id'] == channel_id:
+            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
+                return True    
     return False
 
 
-def extract_channel_details(channel_id):
-    store = data_store.get()
+def extract_channel_details(channel_id, store):
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
             channel_details = channels

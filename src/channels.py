@@ -6,7 +6,7 @@ from src.channel import channel_join_v1
 store = data_store.get()
 
 def channels_list_v1(auth_user_id):
-    global store
+    store = data_store.get()
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
@@ -44,7 +44,7 @@ def channels_listall_v1(auth_user_id):
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
-    global store
+    store = data_store.get()
     
     if len(name) > 20:
         raise InputError("The name of the channel cannot be more than 20 characters.")
@@ -65,9 +65,13 @@ def channels_create_v1(auth_user_id, name, is_public):
         'end' : 50,
     }
     
+    for users in store['users']:
+        if users['u_id'] == auth_user_id:
+            users['channels_owned'].append(new_channel)
+            
     store['channels'].append(new_channel)
     #this might be the issue to the whole problem
-    channel_join_v1(auth_user_id, new_channel['channel_id'])
+    # channel_join_v1(auth_user_id, new_channel['channel_id'])
     data_store.set(store)
     
     return {
