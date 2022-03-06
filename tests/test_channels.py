@@ -30,8 +30,6 @@ def test_listall_no_channel(user_1):
     '''
     test for if no channels have been created
     '''
-
-    clear_v1()
     assert channels_listall_v1(user_1['auth_user_id']) == {
         'channels' : []
     }
