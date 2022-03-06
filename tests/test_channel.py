@@ -78,14 +78,14 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
 def test_private_channel_details_v1(user_1, channel_2):
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
-        'channel_name': "The Empire Strikes Back", 
+        'channel_name': "Empire Strikes Back", 
         'is_public':  True, 
         'owner_members': [
-            {'u_id': 1, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'}
+            {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'}
         ], 
         'all_members': [
-            {'u_id': 1, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'},
-            {'u_id': 2, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
+            {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'},
+            {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
         ]
     }
     clear_v1()
