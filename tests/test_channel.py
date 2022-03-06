@@ -35,7 +35,6 @@ def invalid_channel_id():
 #     return 0
 """Clearing Datastore"""
 
-
 def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
     This function tests that a id_error is raised when the user is trying to access the messages for 
