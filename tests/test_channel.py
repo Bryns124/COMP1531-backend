@@ -100,7 +100,6 @@ def test_channel_invite(user_1, channel_public, user_2):
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     assert channels_list_v1(user_2['auth_user_id'])['channels'][-1]['channel_id'] == channel_public['channel_id']
     clear_v1()
-    
 
 def test_channel_join_invalid_channel(user_1):
     '''
