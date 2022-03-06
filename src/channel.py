@@ -44,7 +44,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': 50,
     }
 
-ef channel_join_v1(auth_user_id, channel_id):
+def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
         
     if channel_validity(channel_id, store) == False:
