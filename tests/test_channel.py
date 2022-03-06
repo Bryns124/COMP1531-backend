@@ -19,7 +19,7 @@ def channel_1(user_1):
 
 @pytest.fixture
 def channel_2(user_2):
-    return channels_create_v1(user_2["auth_user_id"], "The Empire Strikes Back", True)
+    return channels_create_v1(user_2["auth_user_id"], "Empire Strikes Back", True)
 
 @pytest.fixture
 def invalid_user_id():
