@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore/.hypothesis/examples')
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collecting ... collected 43 items
+
+tests/test_auth.py::test_register_invalid_email PASSED                   [  2%]
+tests/test_auth.py::test_register_email_already_used PASSED              [  4%]
+tests/test_auth.py::test_register_returns_unique_ID PASSED               [  6%]
+tests/test_auth.py::test_password_length_less_than_6 PASSED              [  9%]
+tests/test_auth.py::test_first_name_length_less_than_1 PASSED            [ 11%]
+tests/test_auth.py::test_first_name_length_more_than_50 PASSED           [ 13%]
+tests/test_auth.py::test_last_name_length_less_than_1 PASSED             [ 16%]
+tests/test_auth.py::test_last_name_length_more_than_50 PASSED            [ 18%]
+tests/test_auth.py::test_handle PASSED                                   [ 20%]
+tests/test_auth.py::test_login_invalid_email PASSED                      [ 23%]
+tests/test_auth.py::test_login_incorrect_email PASSED                    [ 25%]
+tests/test_auth.py::test_login_incorrect_password PASSED                 [ 27%]
+tests/test_auth.py::test_login_correct PASSED                            [ 30%]
+tests/test_channel.py::test_channel_invite_access_error PASSED           [ 32%]
+tests/test_channel.py::test_channel_invite_channel_id_error PASSED       [ 34%]
+tests/test_channel.py::test_channel_invite_u_id_error PASSED             [ 37%]
+tests/test_channel.py::test_channel_invite_u_id_member PASSED            [ 39%]
+tests/test_channel.py::test_channel_invite PASSED                        [ 41%]
+tests/test_channel.py::test_input_error_channel_details_v1 PASSED        [ 44%]
+tests/test_channel.py::test_access_error_channel_details_v1 PASSED       [ 46%]
+tests/test_channel.py::test_wrong_user_id_channel_details_v1 PASSED      [ 48%]
+tests/test_channel.py::test_correct_inputs_channel_details_v1 PASSED     [ 51%]
+tests/test_channel.py::test_multiple_user_channel_details_v1 PASSED      [ 53%]
+tests/test_channel.py::test_channel_join_invalid_channel PASSED          [ 55%]
+tests/test_channel.py::test_channel_messages_v1_channel_id_error PASSED  [ 58%]
+tests/test_channel.py::test_channel_messages_v1_access_error PASSED      [ 60%]
+tests/test_channel.py::test_channel_messages_v1 PASSED                   [ 62%]
+tests/test_channels.py::test_listall_no_channel PASSED                   [ 65%]
+tests/test_channels.py::test_listall_public PASSED                       [ 67%]
+tests/test_channels.py::test_listall_private PASSED                      [ 69%]
+tests/test_channels.py::test_listall_both PASSED                         [ 72%]
+tests/test_channels.py::test_create_public_channel PASSED                [ 74%]
+tests/test_channels.py::test_create_private_channel PASSED               [ 76%]
+tests/test_channels.py::test_create_channel_invalid_name_1 PASSED        [ 79%]
+tests/test_channels.py::test_create_channel_invalid_name_2 PASSED        [ 81%]
+tests/test_channels.py::test_create_multiple_channel PASSED              [ 83%]
+tests/test_channels.py::test_channel_list_private PASSED                 [ 86%]
+tests/test_channels.py::test_channel_list_public PASSED                  [ 88%]
+tests/test_channels.py::test_channel_list_empty PASSED                   [ 90%]
+tests/test_channels.py::test_channel_list_multiple_created PASSED        [ 93%]
+tests/test_other.py::test_clear_empty PASSED                             [ 95%]
+tests/test_other.py::test_clear_user PASSED                              [ 97%]
+tests/test_other.py::test_clear_channel PASSED                           [100%]
+
+====== Marks recorded: 43.00 ======
+
+
+============================== 43 passed in 0.19s ==============================
