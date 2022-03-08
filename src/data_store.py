@@ -42,7 +42,7 @@ initial_object = {
     #'channels': [
         # {
         #     'channel_id' : , 
-        #     'channel_name' : "",
+        #     'name' : "",
         #     'is_public' : None, #check if we can use None
         #     'owner_members' : ['users'], #check again if this is leagal 
         #     'all_members' : ['users'],
