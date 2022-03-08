@@ -41,21 +41,21 @@ initial_object = {
     #],
     #'channels': [
         # {
-        #     'channel_id' : , 
-        #     'name' : "",
-        #     'is_public' : None, #check if we can use None
-        #     'owner_members' : ['users'], #check again if this is leagal 
-        #     'all_members' : ['users'],
-        #     'messages' : [
-        #         {
-        #             'message_id' : , #similarly check if legal
-        #             'u_id' : , 
-        #             'message': "",
-        #             'time_created': ,
-        #         }
-        #     ],
-        #     'start' : , #ditto 
-        #     'end' : , 
+            # 'channel_id' : , 
+            # 'name' : "",
+            # 'is_public' : None, #check if we can use None
+            # 'owner_members' : ['users'], #check again if this is leagal 
+            # 'all_members' : ['users'],
+            # 'messages' : [
+            #     {
+            #         'message_id' : , #similarly check if legal
+            #         'u_id' : , 
+            #         'message': "",
+            #         'time_created': ,
+            #     }
+            # ],
+            # 'start' : , #ditto 
+            # 'end' : , 
 
         # }
     #],
