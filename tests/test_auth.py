@@ -87,23 +87,23 @@ def test_handles_appends_correctly():
     handle2 = 'abcdef0'
     handle3 = 'abcdef1'
 
-    u_id1 = auth_register_v1('bryanle1@email.com', 'password123', first, last)['auth_user_id']
-    u_id2 = auth_register_v1('bryanle2@email.com', 'password456', first, last)['auth_user_id']
-    u_id3 = auth_register_v1('bryanle3@email.com', 'password789', first, last)['auth_user_id']
+    u_id1 = auth_register_v1('abcdef1@email.com', 'password123', first, last)['auth_user_id']
+    u_id2 = auth_register_v1('abcdef2@email.com', 'password456', first, last)['auth_user_id']
+    u_id3 = auth_register_v1('abcdef3@email.com', 'password789', first, last)['auth_user_id']
 
     for k in store['users']:
         if k['u_id'] == u_id1:
-            assert k['email'] == 'bryanle1@email.com'
+            assert k['email'] == 'abcdef1@email.com'
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle1
         if k['u_id'] == u_id2:
-            assert k['email'] == 'bryanle2@email.com'
+            assert k['email'] == 'abcdef2@email.com'
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle2
         if k['u_id'] == u_id3:
-            assert k['email'] == 'bryanle3@email.com'
+            assert k['email'] == 'abcdef3@email.com'
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle3
