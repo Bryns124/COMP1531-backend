@@ -31,7 +31,10 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         elif u_id == user['u_id']:        
             user_exist = True
             
-    if auth_user_exist == False or user_exist == False:
+    if auth_user_exist == False: 
+        raise AccessError
+    
+    if user_exist == False:
         raise InputError
     
     channel_exist = False
@@ -80,7 +83,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     returns a dictionary 
     {
-        "channel_name": name of the channel (string),
+        "name": name of the channel (string),
         "is_public": whether or not the channel is public (boolean),
         "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: 
         {
@@ -99,18 +102,17 @@ def channel_details_v1(auth_user_id, channel_id):
 
     is_channel = False # Initialising booleans for raising errors
     is_member = False
-    is_valid_u_id = False
-    
+    is_valid_auth_user_id = False
     all_channels = store['channels'] # Saving list of channels as a local variable
 
     # Iterates over all users and checks if the provided user id is in the system
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            is_valid_u_id = True # if the user id is found the boolean for valid user is set to True
+            is_valid_auth_user_id = True # if the user id is found the boolean for valid user is set to True
     
     # if the user id is not in the system, raises an InputError
-    if not is_valid_u_id: 
-        raise InputError("Invalid User ID")
+    if not is_valid_auth_user_id: 
+        raise AccessError("Invalid User ID")
 
     # Iterates over all the channels and check if the provided channel id is in the system
     for channel in all_channels:
@@ -151,7 +153,7 @@ def channel_details_v1(auth_user_id, channel_id):
     
     # returns a dictionary with the format specified in the docstring for this function
     return {
-        'channel_name': active_channel['channel_name'],
+        'name': active_channel['name'],
         'is_public': active_channel['is_public'],
         'owner_members': owner_members_details,
         'all_members': all_members_details
@@ -219,7 +221,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
     
     channel_exist = False
     for channel in store['channels']:
@@ -331,5 +333,4 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details    
-
 

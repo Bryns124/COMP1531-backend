@@ -15,7 +15,7 @@ def channels_list_v1(auth_user_id):
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
@@ -34,14 +34,14 @@ def create_list_dictionary(accounts):
     for owned in accounts['channels_owned']:
             channel = {
                 'channel_id': owned['channel_id'],
-                'channel_name': owned['channel_name']
+                'name': owned['name']
             }
             output_list.append(channel)
         
     for joined in accounts['channels_joined']:
         channel = {
             'channel_id': joined['channel_id'],
-            'channel_name': joined['channel_name']
+            'name': joined['name']
         }
         output_list.append(channel)
     return output_list
@@ -60,17 +60,17 @@ def channels_listall_v1(auth_user_id):
     auth_user_exist = False
     
     for user in store['users']:
-        if auth_user_id == user['u_id']: 
+        if auth_user_id == user['u_id']:
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
 
     all_channels = []
     for channel in store_channels:
         channel_dict = {
         		'channel_id': channel['channel_id'],
-        		'name': channel['channel_name'],
+        		'name': channel['name'],
         	}
         all_channels.append(channel_dict)
     
@@ -94,7 +94,7 @@ def channels_create_v1(auth_user_id, name, is_public):
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
     
     if len(name) > 20:
         raise InputError("The name of the channel cannot be more than 20 characters.")
@@ -109,7 +109,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     
     new_channel = {
         'channel_id' : new_channel_id, 
-        'channel_name' : name,
+        'name' : name,
         'is_public' : is_public,
         'owner_members' : [auth_user_id], 
         'all_members' : [auth_user_id],
