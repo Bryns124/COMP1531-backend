@@ -15,7 +15,7 @@ def channels_list_v1(auth_user_id):
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
@@ -60,11 +60,11 @@ def channels_listall_v1(auth_user_id):
     auth_user_exist = False
     
     for user in store['users']:
-        if auth_user_id == user['u_id']: 
+        if auth_user_id == user['u_id']:
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
 
     all_channels = []
     for channel in store_channels:
@@ -94,7 +94,7 @@ def channels_create_v1(auth_user_id, name, is_public):
             auth_user_exist = True
     
     if auth_user_exist == False:
-        raise InputError
+        raise AccessError
     
     if len(name) > 20:
         raise InputError("The name of the channel cannot be more than 20 characters.")
