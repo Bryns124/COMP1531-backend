@@ -143,12 +143,12 @@ def test_access_error_channel_details_v1(user_2, channel_1):
 
 def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
     '''
-    This function tests channel_details when the user_id given is invalid and should raise an InputError
+    This function tests channel_details when the user_id given is invalid and should raise an AccessError
     Args:
         invalid_user_id: Id of a user that doesn't exist
         channel_1: a channel that is trying to be accessed
     '''
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_details_v1(invalid_user_id, channel_1)
     clear_v1()
 
