@@ -95,8 +95,11 @@ def create_handle(name_first, name_last):
     
     i = 0
     for user in store['users']:
-        if user['handle_str'] == handle:
+        if i == 0 and user['handle_str'] == handle:
             handle += (str(i))
+            i += 1
+        elif user['handle_str'] == handle:
+            handle = handle[:-1] + str(i)
             i += 1
             
     return handle

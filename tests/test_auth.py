@@ -77,3 +77,42 @@ def test_handle():
     # Testing that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
+
+def test_handles_generated_correctly():
+    store = data_store.get()
+    email1 = 'blah1@email.com'
+    email2 = 'blah2@email.com'
+    email3 = 'blah3@email.com'
+    first1 = 'abc'
+    first2 = 'abc'
+    first3 = 'abc' 
+    last1 = 'def'
+    last2 = 'def'
+    last3 = 'def'
+    handle1 = 'abcdef'
+    handle2 = 'abcdef0'
+    handle3 = 'abcdef1'
+
+    u_id1 = auth_register_v1(email1, 'password1', first1, last1)['auth_user_id']
+    
+    u_id2 = auth_register_v1(email2, 'password1', first2, last2)['auth_user_id']
+    
+    u_id3 = auth_register_v1(email3, 'password1', first3, last3)['auth_user_id']
+
+    for k in store['users']:
+        if k['u_id'] == u_id1:
+            assert k['email'] == email1
+            assert k['name_first'] == first1
+            assert k['name_last'] == last1
+            assert k['handle_str'] == handle1
+        if k['u_id'] == u_id2:
+            assert k['email'] == email2
+            assert k['name_first'] == first2
+            assert k['name_last'] == last2
+            assert k['handle_str'] == handle2
+        if k['u_id'] == u_id3:
+            assert k['email'] == email3
+            assert k['name_first'] == first3
+            assert k['name_last'] == last3
+            assert k['handle_str'] == handle3
+            
