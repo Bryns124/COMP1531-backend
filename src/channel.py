@@ -83,7 +83,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     returns a dictionary 
     {
-        "channel_name": name of the channel (string),
+        "name": name of the channel (string),
         "is_public": whether or not the channel is public (boolean),
         "owner_members": a list of dictionaries containing owner users, each dictionary being of the form: 
         {
@@ -153,7 +153,7 @@ def channel_details_v1(auth_user_id, channel_id):
     
     # returns a dictionary with the format specified in the docstring for this function
     return {
-        'channel_name': active_channel['channel_name'],
+        'name': active_channel['name'],
         'is_public': active_channel['is_public'],
         'owner_members': owner_members_details,
         'all_members': all_members_details
