@@ -81,36 +81,30 @@ def test_handle_generated_correctly():
 # Testing that the handle appends the number correctly for more than once instance of the handle
 def test_handles_appends_correctly():
     store = data_store.get()
-    first1 = 'abc'
-    first2 = 'abc'
-    first3 = 'abc' 
-    last1 = 'def'
-    last2 = 'def'
-    last3 = 'def'
+    first = 'abc'
+    last = 'def'
     handle1 = 'abcdef'
     handle2 = 'abcdef0'
     handle3 = 'abcdef1'
 
-    u_id1 = auth_register_v1('bryanle1@email.com', 'password123', first1, last1)['auth_user_id']
-    
-    u_id2 = auth_register_v1('bryanle2@email.com', 'password456', first2, last2)['auth_user_id']
-    
-    u_id3 = auth_register_v1('bryanle3@email.com', 'password789', first3, last3)['auth_user_id']
+    u_id1 = auth_register_v1('bryanle1@email.com', 'password123', first, last)['auth_user_id']
+    u_id2 = auth_register_v1('bryanle2@email.com', 'password456', first, last)['auth_user_id']
+    u_id3 = auth_register_v1('bryanle3@email.com', 'password789', first, last)['auth_user_id']
 
     for k in store['users']:
         if k['u_id'] == u_id1:
             assert k['email'] == 'bryanle1@email.com'
-            assert k['name_first'] == first1
-            assert k['name_last'] == last1
+            assert k['name_first'] == first
+            assert k['name_last'] == last
             assert k['handle_str'] == handle1
         if k['u_id'] == u_id2:
             assert k['email'] == 'bryanle2@email.com'
-            assert k['name_first'] == first2
-            assert k['name_last'] == last2
+            assert k['name_first'] == first
+            assert k['name_last'] == last
             assert k['handle_str'] == handle2
         if k['u_id'] == u_id3:
             assert k['email'] == 'bryanle3@email.com'
-            assert k['name_first'] == first3
-            assert k['name_last'] == last3
+            assert k['name_first'] == first
+            assert k['name_last'] == last
             assert k['handle_str'] == handle3
             
