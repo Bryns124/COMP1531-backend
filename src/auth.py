@@ -52,8 +52,6 @@ def auth_register_v1(email, password, name_first, name_last):
         'auth_user_id': user['u_id']
     }
 
-# need to be able to actually create a user but not sure how for now
-
 
 def create_user(email, password, name_first, name_last):
     '''
