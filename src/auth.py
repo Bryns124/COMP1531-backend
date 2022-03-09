@@ -32,9 +32,9 @@ def auth_register_v1(email, password, name_first, name_last):
     :return: the user's user ID
     :rtype: dictionary
     '''
-    if email_check(email) == False:
+    if not email_check(email):
         raise InputError("Email entered is not a valid email")
-    if duplicate_email_check(email) == True:
+    if duplicate_email_check(email):
         raise InputError("Email entered has already been registered")
     if len(password) < 6:
         raise InputError("Password entered must be longer than 6 characters")
@@ -101,7 +101,9 @@ def create_handle(name_first, name_last):
         elif user['handle_str'] == handle:
             handle = handle[:-1] + str(i)
             i += 1
-            
+        elif i == 10:
+            handle += str(0)
+
     return handle
     
 ###############################################################
