@@ -85,7 +85,8 @@ def channel_details_v1(auth_user_id, channel_id):
     {
         "channel_name": name of the channel (string),
         "is_public": whether or not the channel is public (boolean),
-        "owner_members": a list of dictionaries containing owner users, each dictionary being of the form:
+        "owner_members": a list of dictionaries containing owner users, each
+        dictionary being of the form:
         {
         "u_id": user id (string),
         "email": email (string),
@@ -93,7 +94,8 @@ def channel_details_v1(auth_user_id, channel_id):
         "name_last": last name (string),
         "handle_str": user handle (string)
         }
-        "all_members": a list of dictionaries in the same format as owner_members, however containing information
+        "all_members": a list of dictionaries in the same format as owner_members,
+        however containing information
         on all members of the channel
     }
     '''
@@ -108,26 +110,32 @@ def channel_details_v1(auth_user_id, channel_id):
     # Iterates over all users and checks if the provided user id is in the system
     for user in store['users']:
         if user['u_id'] == auth_user_id:
-            is_valid_auth_user_id = True # if the user id is found the boolean for valid user is set to True
+            is_valid_auth_user_id = True # if the user id is found the boolean for
+            # valid user is set to True
 
     # if the user id is not in the system, raises an InputError
     if not is_valid_auth_user_id:
         raise AccessError("Invalid User ID")
 
-    # Iterates over all the channels and check if the provided channel id is in the system
+    # Iterates over all the channels and check if the provided channel id is in
+    # the system
     for channel in all_channels:
         if channel['channel_id'] == channel_id:
-            is_channel = True # if the channel id is found the boolean for valid channel is set to True
-            active_channel = channel # sets the given channel as active channel to use it later in the function
+            is_channel = True # if the channel id is found the boolean for valid
+            # channel is set to True
+            active_channel = channel # sets the given channel as active channel
+            # to use it later in the function
 
     # if the channel id is not in the system, raises an InputError
     if not is_channel:
         raise InputError("Invalid Channel ID")
 
-    # Iterates over all members in the channel to check if the provided user id is a member of the channel
+    # Iterates over all members in the channel to check if the provided user id
+    # is a member of the channel
     for member in active_channel['all_members']:
         if member == auth_user_id:
-            is_member = True # if the user is found in the channel, the boolean saving if the user is a channel member is set to True
+            is_member = True # if the user is found in the channel, the boolean
+            # saving if the user is a channel member is set to True
 
     # if the user is not a member of the channel, raises an InputError
     if not is_member:
@@ -137,21 +145,25 @@ def channel_details_v1(auth_user_id, channel_id):
     owner_members_details = []
     all_members_details = []
 
-    # Iterates over every id in the list of owner members/all members respectively
+    # Iterates over every id in the list of owner members/all members
+    # respectively
     for owner_id in active_channel['owner_members']:
-        # saves a dictionary containing details about a owner in owner_current and appends that to the list containing details
+        # saves a dictionary containing details about a owner in owner_current
+        # and appends that to the list containing details
         # about every owner
         owner_current = member_details(owner_id)
         owner_members_details.append(owner_current)
 
     for member_id in active_channel['all_members']:
         # does the same as previous but for all members
-        # saves a dictionary containing details about a member in member_current and appends that to the list containing details
+        # saves a dictionary containing details about a member in member_current
+        # and appends that to the list containing details
         # about every member
         member_current = member_details(member_id)
         all_members_details.append(member_current)
 
-    # returns a dictionary with the format specified in the docstring for this function
+    # returns a dictionary with the format specified in the docstring for this
+    # function
     return {
         'channel_name': active_channel['channel_name'],
         'is_public': active_channel['is_public'],
@@ -163,7 +175,8 @@ def member_details(user_id):
     '''
     member_details(user_id)
 
-    Given a user_id in data_store returns a dictionary containing details regarding that user.
+    Given a user_id in data_store returns a dictionary containing details
+    regarding that user.
     Returns None if user is not in data_store.
 
     returns a dictionary of the form:
@@ -177,12 +190,15 @@ def member_details(user_id):
 
     '''
     store = data_store.get() # retrieves data from data_store
-    users = store['users'] # saves list of dictionaries containing information about all users
+    users = store['users'] # saves list of dictionaries containing information
+    # about all users
 
-    # iterates over all users and finds the user that matches the provided user_id
+    # iterates over all users and finds the user that matches the provided
+    # user_id
     for user in users:
         if user['u_id'] == user_id:
-            # returns the required information in a dictionary specified in the docstring
+            # returns the required information in a dictionary specified in
+            # the docstring
             return {
                 'u_id': user['u_id'],
                 'email': user['email'],
@@ -195,16 +211,19 @@ def member_details(user_id):
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     """_summary_
-    Taking a valid user it pulls a list of up to 50 messages from a starting point and returns them.
+    Taking a valid user it pulls a list of up to 50 messages from a starting
+    point and returns them.
     Args:
         auth_user_id (_u_id): The valid id of the user calling the messages.
-        channel_id (channel_id): The channel_id of the channel which to call the messages from.
+        channel_id (channel_id): The channel_id of the channel which to call the
+        messages from.
         start (int): A starting index value.
 
     Raises:
         InputError: u_id does not exist in data store.
         InputError: channel_id does not exist in data store.
-        InputError: the starting index is greater than the messages in the channel.
+        InputError: the starting index is greater than the messages in the
+        channel.
         AccessError: u_id does not have access to the channel
 
     Returns:
