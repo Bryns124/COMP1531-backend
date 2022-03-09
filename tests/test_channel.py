@@ -161,7 +161,7 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
         channel_1: Channel trying to be accessed
     '''
     assert channel_details_v1(user_1['auth_user_id'], channel_1['channel_id']) == {
-        'channel_name': "A New Hope", 
+        'name': "A New Hope", 
         'is_public': True, 
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
@@ -184,7 +184,7 @@ def test_multiple_user_channel_details_v1(user_1, channel_2):
     channel_join_v1(user_1['auth_user_id'], channel_2['channel_id']) 
 
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
-        'channel_name': "Empire Strikes Back", 
+        'name': "Empire Strikes Back", 
         'is_public':  True, 
         'owner_members': [
             {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'}

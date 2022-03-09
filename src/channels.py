@@ -1,20 +1,43 @@
+"""Channels has the 3 functions: create, list, listall
+
+Functions:
+    channels_create: creates a channel
+    channels_list: list the channels a certain user is a part of
+    channels_listall: lists all the channels
+"""
+
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
-'''
-    This function returns the list of dictionaries containing the details
-    of the channels that the user is a member or owner of.
-'''
 def channels_list_v1(auth_user_id):
-    store = data_store.get()
+    """ Lists all the channels that only the given user is a part of
+    either as a ownder or member
 
+    Args:
+        auth_user_id (u_id): A valid user that has been registered
+
+    Raises:
+        AccessError: the auth_user is not a registered user
+
+    Returns:
+        Dictionary containing list of dictionaries:
+        {
+            'channels': [list of dictionaries containing the channel names]
+        }
+    """
+
+    store = data_store.get()
     auth_user_exist = False
 
     for user in store['users']:
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
+<<<<<<< HEAD
     if auth_user_exist == False:
+=======
+    if not auth_user_exist:
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         raise AccessError
 
     for accounts in store['users']:
@@ -24,36 +47,74 @@ def channels_list_v1(auth_user_id):
         'channels': output_list
     }
 
+<<<<<<< HEAD
 ''' Helper function:
     Appends the list of dictionaries stored in the 'channels_owned'
+=======
+def create_list_dictionary(accounts):
+    """ Appends the list of dictionaries stored in the 'channels_owned'
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
     and 'channels_joined' dictionaries in the data store, representing all
     the channels the user is associated with.
-'''
-def create_list_dictionary(accounts):
+
+    Args:
+        Accounts:
+    Raises:
+        None
+
+    Returns:
+        List of dictionaries: [
+            {
+                'name': (channel name)
+            }
+        ]
+    """
+
     output_list = []
     for owned in accounts['channels_owned']:
+<<<<<<< HEAD
             channel = {
                 'channel_id': owned['channel_id'],
                 'channel_name': owned['channel_name']
             }
             output_list.append(channel)
+=======
+        channel = {
+            'channel_id': owned['channel_id'],
+            'name': owned['name']
+        }
+        output_list.append(channel)
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
 
     for joined in accounts['channels_joined']:
         channel = {
             'channel_id': joined['channel_id'],
-            'channel_name': joined['channel_name']
+            'name': joined['name']
         }
         output_list.append(channel)
     return output_list
 
 
 def channels_listall_v1(auth_user_id):
-    '''
-    list all the channels that has been created
+    """ Lists all the channels created, both private and public
 
-    Assumption: no access error AKA auth_user_id is valid
-    returns: dictionary with a list of dictionaries of channels
-    '''
+    Args:
+        auth_user_id (u_id): A valid user that has been registered
+
+    Raises:
+        AccessError: the auth_user is not a registered user
+
+    Returns:
+        Dictionary containing list of dictionaries:
+        {
+            'channels': [
+                {
+                    'name': (channel name)
+                }
+            ]
+        }
+    """
+
     store = data_store.get()
     store_channels = store['channels']
 
@@ -63,37 +124,65 @@ def channels_listall_v1(auth_user_id):
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
+<<<<<<< HEAD
     if auth_user_exist == False:
+=======
+    if not auth_user_exist:
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         raise AccessError
 
     all_channels = []
     for channel in store_channels:
         channel_dict = {
         		'channel_id': channel['channel_id'],
-        		'name': channel['channel_name'],
+        		'name': channel['name'],
         	}
         all_channels.append(channel_dict)
 
     return {
         'channels': all_channels
-    }
+        }
 
-
-''' Function to create a new channel given the correct user id of a authorised user,
+def channels_create_v1(auth_user_id, name, is_public):
+    """ Function to create a new channel given the correct user id of a authorised user,
     the name of the channel and whether or not the channel is public or private. The return
     of this function is the id of that channel
+<<<<<<< HEAD
 '''
 def channels_create_v1(auth_user_id, name, is_public):
 
     store = data_store.get()
 
+=======
+
+    Args:
+        auth_user_id (u_id): A valid user that intends to create the channel
+        name: the desired name for the channel to be created
+        is_public: either True for it its public or False if private
+
+    Raises:
+        AccessError: the auth_user is not a registered user
+
+    Returns:
+        Dictionary:
+        {
+            'channel_id': (channel id)
+        }
+    """
+
+    store = data_store.get()
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
     auth_user_exist = False
 
     for user in store['users']:
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
+<<<<<<< HEAD
     if auth_user_exist == False:
+=======
+    if not auth_user_exist:
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         raise AccessError
 
     if len(name) > 20:
@@ -109,7 +198,11 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     new_channel = {
         'channel_id' : new_channel_id,
+<<<<<<< HEAD
         'channel_name' : name,
+=======
+        'name' : name,
+>>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         'is_public' : is_public,
         'owner_members' : [auth_user_id],
         'all_members' : [auth_user_id],
@@ -128,4 +221,3 @@ def channels_create_v1(auth_user_id, name, is_public):
     return {
         'channel_id' : store['channels'][-1]['channel_id']
     }
-

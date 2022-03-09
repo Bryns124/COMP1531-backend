@@ -78,7 +78,8 @@ def channel_details_v1(auth_user_id, channel_id):
     '''
     channel_details_v1(auth_user_id, channel_id)
 
-    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+    Given a channel with ID channel_id that the authorised user is a member of, provide
+    basic details about the channel.
 
     returns a dictionary
     {

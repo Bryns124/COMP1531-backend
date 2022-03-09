@@ -79,10 +79,8 @@ def test_last_name_length_more_than_50():
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn")
     clear_v1()
 
-def test_handle():
-    '''
-    Tests that the handle is generated correctly
-    '''
+# Testing that the handle is generated correctly 
+def test_handle_generated_correctly():
     store = data_store.get()
     auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
     auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
@@ -98,43 +96,34 @@ def test_handle():
     # Tests that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
-    clear_v1()
 
-def test_login_invalid_email():
-    '''
-    Tests when login email is invalid
-    '''
-    with pytest.raises(InputError):
-        auth_login_v1("bryanle", "password123")
-        auth_login_v1("bryanle@gmailcom", "password123")
-        auth_login_v1("bryanle@gmial.com", "password123")
-        auth_login_v1("bryan..le@gmail.com", "password123")
-        auth_login_v1("bryanle@gmail", "password123")
-        auth_login_v1("bryan/le@gmail.com", "password123")
-        auth_login_v1("bryanle-@gmail.com", "password123")
-        auth_login_v1("@gmail", "password123")
-        auth_login_v1("", "password123")
-    clear_v1()
-        
-def test_login_incorrect_email():
-    '''
-    Tests when login email is incorrect
-    '''
-    with pytest.raises(InputError):
-        auth_login_v1("notbryan.le@gmail.com", "password123")
-    clear_v1()
+# Testing that the handle appends the number correctly for more than once instance of the handle
+def test_handles_appends_correctly():
+    store = data_store.get()
+    first = 'abc'
+    last = 'def'
+    handle1 = 'abcdef'
+    handle2 = 'abcdef0'
+    handle3 = 'abcdef1'
 
-def test_login_incorrect_password():
-    '''
-    Tests when login password is incorrect
-    '''
-    with pytest.raises(InputError):
-        auth_login_v1("bryanle@gmail.com", "password456")
-    clear_v1()
-    
-def test_login_correct(user_1):
-    '''
-    Tests registered account is logged in correctly
-    '''
-    assert auth_login_v1("bryanle@gmail.com", "password123") == user_1
-    clear_v1()
+    u_id1 = auth_register_v1('abcdef1@email.com', 'password123', first, last)['auth_user_id']
+    u_id2 = auth_register_v1('abcdef2@email.com', 'password456', first, last)['auth_user_id']
+    u_id3 = auth_register_v1('abcdef3@email.com', 'password789', first, last)['auth_user_id']
+
+    for k in store['users']:
+        if k['u_id'] == u_id1:
+            assert k['email'] == 'abcdef1@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle1
+        if k['u_id'] == u_id2:
+            assert k['email'] == 'abcdef2@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle2
+        if k['u_id'] == u_id3:
+            assert k['email'] == 'abcdef3@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle3
+            
