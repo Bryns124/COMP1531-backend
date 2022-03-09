@@ -33,11 +33,8 @@ def channels_list_v1(auth_user_id):
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
-<<<<<<< HEAD
-    if auth_user_exist == False:
-=======
     if not auth_user_exist:
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
+
         raise AccessError
 
     for accounts in store['users']:
@@ -47,13 +44,9 @@ def channels_list_v1(auth_user_id):
         'channels': output_list
     }
 
-<<<<<<< HEAD
-''' Helper function:
-    Appends the list of dictionaries stored in the 'channels_owned'
-=======
+
 def create_list_dictionary(accounts):
     """ Appends the list of dictionaries stored in the 'channels_owned'
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
     and 'channels_joined' dictionaries in the data store, representing all
     the channels the user is associated with.
 
@@ -72,19 +65,11 @@ def create_list_dictionary(accounts):
 
     output_list = []
     for owned in accounts['channels_owned']:
-<<<<<<< HEAD
-            channel = {
-                'channel_id': owned['channel_id'],
-                'channel_name': owned['channel_name']
-            }
-            output_list.append(channel)
-=======
         channel = {
             'channel_id': owned['channel_id'],
             'name': owned['name']
         }
         output_list.append(channel)
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
 
     for joined in accounts['channels_joined']:
         channel = {
@@ -124,11 +109,7 @@ def channels_listall_v1(auth_user_id):
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
-<<<<<<< HEAD
-    if auth_user_exist == False:
-=======
     if not auth_user_exist:
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         raise AccessError
 
     all_channels = []
@@ -147,13 +128,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     """ Function to create a new channel given the correct user id of a authorised user,
     the name of the channel and whether or not the channel is public or private. The return
     of this function is the id of that channel
-<<<<<<< HEAD
-'''
-def channels_create_v1(auth_user_id, name, is_public):
-
-    store = data_store.get()
-
-=======
 
     Args:
         auth_user_id (u_id): A valid user that intends to create the channel
@@ -171,18 +145,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     """
 
     store = data_store.get()
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
     auth_user_exist = False
 
     for user in store['users']:
         if auth_user_id == user['u_id']:
             auth_user_exist = True
 
-<<<<<<< HEAD
-    if auth_user_exist == False:
-=======
     if not auth_user_exist:
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         raise AccessError
 
     if len(name) > 20:
@@ -198,11 +167,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     new_channel = {
         'channel_id' : new_channel_id,
-<<<<<<< HEAD
-        'channel_name' : name,
-=======
         'name' : name,
->>>>>>> 7acd217df8c06f04581ba537e0eab909c13d2814
         'is_public' : is_public,
         'owner_members' : [auth_user_id],
         'all_members' : [auth_user_id],
