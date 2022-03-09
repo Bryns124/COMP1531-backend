@@ -98,7 +98,7 @@ def create_handle(name_first, name_last):
         if i == 0 and user['handle_str'] == handle:
             handle += str(0)
             i += 1
-        if user['handle_str'] == handle:
+        elif user['handle_str'] == handle:
             handle = handle[:-1] + str(i)
             i += 1
             if i % 10 == 2 and i > 10:
