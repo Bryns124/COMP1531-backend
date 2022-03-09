@@ -105,10 +105,28 @@ def test_handles_appends_correctly():
     handle1 = 'abcdef'
     handle2 = 'abcdef0'
     handle3 = 'abcdef1'
+    handle4 = 'abcdef2'
+    handle5 = 'abcdef3'
+    handle6 = 'abcdef4'
+    handle7 = 'abcdef5'
+    handle8 = 'abcdef6'
+    handle9 = 'abcdef7'
+    handle10 = 'abcdef8'
+    handle11 = 'abcdef9'
+    handle12 = 'abcdef10'
 
     u_id1 = auth_register_v1('abcdef1@email.com', 'password123', first, last)['auth_user_id']
     u_id2 = auth_register_v1('abcdef2@email.com', 'password456', first, last)['auth_user_id']
     u_id3 = auth_register_v1('abcdef3@email.com', 'password789', first, last)['auth_user_id']
+    u_id4 = auth_register_v1('abcdef4@email.com', 'password123', first, last)['auth_user_id']
+    u_id5 = auth_register_v1('abcdef5@email.com', 'password456', first, last)['auth_user_id']
+    u_id6 = auth_register_v1('abcdef6@email.com', 'password789', first, last)['auth_user_id']
+    u_id7 = auth_register_v1('abcdef7@email.com', 'password123', first, last)['auth_user_id']
+    u_id8 = auth_register_v1('abcdef8@email.com', 'password456', first, last)['auth_user_id']
+    u_id9 = auth_register_v1('abcdef9@email.com', 'password789', first, last)['auth_user_id']
+    u_id10 = auth_register_v1('abcdef10@email.com', 'password789', first, last)['auth_user_id']
+    u_id11 = auth_register_v1('abcdef11@email.com', 'password789', first, last)['auth_user_id']
+    u_id12 = auth_register_v1('abcdef12@email.com', 'password789', first, last)['auth_user_id']
 
     for k in store['users']:
         if k['u_id'] == u_id1:
@@ -126,4 +144,49 @@ def test_handles_appends_correctly():
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle3
+        if k['u_id'] == u_id4:    
+            assert k['email'] == 'abcdef4@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle4
+        if k['u_id'] == u_id5:
+            assert k['email'] == 'abcdef5@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle5
+        if k['u_id'] == u_id6:
+            assert k['email'] == 'abcdef6@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle6
+        if k['u_id'] == u_id7:
+            assert k['email'] == 'abcdef7@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle7
+        if k['u_id'] == u_id8:
+            assert k['email'] == 'abcdef8@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle8
+        if k['u_id'] == u_id9:
+            assert k['email'] == 'abcdef9@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle9
+        if k['u_id'] == u_id10:
+            assert k['email'] == 'abcdef10@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle10
+        if k['u_id'] == u_id11:
+            assert k['email'] == 'abcdef11@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle11
+        if k['u_id'] == u_id12:
+            assert k['email'] == 'abcdef12@email.com'
+            assert k['name_first'] == first
+            assert k['name_last'] == last
+            assert k['handle_str'] == handle12
             
