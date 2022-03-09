@@ -30,8 +30,6 @@ def test_listall_no_channel(user_1):
     '''
     test for if no channels have been created
     '''
-
-    clear_v1()
     assert channels_listall_v1(user_1['auth_user_id']) == {
         'channels' : []
     }
@@ -148,7 +146,7 @@ def test_channel_list_private(user_2, private_channel_user2):
         'channels': [
             {
                 'channel_id': private_channel_user2['channel_id'],
-                'channel_name': 'Private',
+                'name': 'Private',
             }
         ]
     }
@@ -165,7 +163,7 @@ def test_channel_list_public(user_1, public_channel_user1):
         'channels': [
             {
                 'channel_id': public_channel_user1['channel_id'],
-                'channel_name': 'Public',
+                'name': 'Public',
             }
         ]
     }
@@ -192,11 +190,11 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
         'channels': [
             {
                 'channel_id':public_channel_user1['channel_id'],
-                'channel_name': 'Public',
+                'name': 'Public',
             }, 
             {
                 'channel_id': private_second_channel_user1['channel_id'],
-                'channel_name': 'User_1_Private',
+                'name': 'User_1_Private',
             }
         ]
     }
