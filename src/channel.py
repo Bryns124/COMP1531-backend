@@ -32,16 +32,16 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
             user_exist = True
 
     if not user_exist:
-        raise InputError
+        raise InputError("The input u_id does not exist in the datastore.")
 
     if not channel_validity(channel_id,store):
-        raise InputError
+        raise InputError("The input channel_id does not exist in the datastore.")
 
     if already_member(u_id, channel_id, store):
-        raise InputError
+        raise InputError("The member you are trying to invite is already apart of the channel.")
 
     if not already_member(auth_user_id, channel_id, store):
-        raise AccessError
+        raise AccessError("You are not apart of the channel you are trying to invite to.")
 
     for channel in store['channels']:
         for user in store['users']:
@@ -118,7 +118,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     # if the user is not a member of the channel, raises an AccessError
     if not is_member:
-        raise AccessError()
+        raise AccessError("You are not a member of the channel.")
 
     # initialising lists to save details about each owner/member respectively
     owner_members_details = []
@@ -219,10 +219,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             channel_exist = True
 
     if not channel_exist:
-        raise InputError
+        raise InputError("The input channel_id does not exist in the datastore.")
 
     if len(store['channels'][channel_id - 1]['messages']) < start:
-        raise InputError
+        raise InputError("Your start value is greater than the messages in the channel.")
 
     in_channel = False
 
@@ -231,7 +231,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             in_channel = True
 
     if not in_channel:
-        raise AccessError
+        raise AccessError ("You are not part of that channel.")
     returned_messages = {'messages' : [], 'start': start, 'end': ""}
     returned_full = False
     for messages in store['channels'][channel_id - 1]['messages']:
