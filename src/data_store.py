@@ -26,36 +26,36 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-
     #'users': [
         # {
-            # 'u_id' : , check if is ok 
-            # 'email': "", check if using empty string is ok 
-            # 'name_first': "", 
-            # 'name_last': "", 
-            # 'handle_str': "" ,        
+            # 'u_id' : , check if is ok
+            # 'email': "", check if using empty string is ok
+            # 'name_first': "",
+            # 'name_last': "",
+            # 'handle_str': "" ,
             # 'password': "",
-            # 'channels_owned' : [], 
+            # 'channels_owned' : [],
             # 'channels_joined' : [],
         # }
     #],
     #'channels': [
         # {
-        #     'channel_id' : , 
-        #     'name' : "",
+        #     'channel_id' : ,
+        #     'channel_name' : "",
         #     'is_public' : None, #check if we can use None
-        #     'owner_members' : ['users'], #check again if this is leagal 
+        #     'owner_members' : ['users'], #check again if this is leagal
         #     'all_members' : ['users'],
         #     'messages' : [
         #         {
         #             'message_id' : , #similarly check if legal
-        #             'u_id' : , 
+        #             'u_id' : ,
         #             'message': "",
         #             'time_created': ,
         #         }
         #     ],
-        #     'start' : , #ditto 
-        #     'end' : , 
+        #     'start' : , #ditto
+        #     'end' : ,
+
         # }
     #],
 }
