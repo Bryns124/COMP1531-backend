@@ -25,41 +25,22 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
     store = data_store.get()
 
-    auth_user_exist = False
     user_exist = False
-
+    valid_auth_user_id(auth_user_id)
     for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-        elif u_id == user['u_id']:
+        if u_id == user['u_id']:
             user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError
 
     if not user_exist:
         raise InputError
 
-    channel_exist = False
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel_exist = True
-
-    if not channel_exist:
+    if not channel_validity(channel_id,store):
         raise InputError
 
-    is_member = False
-    can_invite = False
-    for members in store['channels'][channel_id - 1]['all_members']:
-        if members == u_id:
-            is_member = True
-        elif members == auth_user_id:
-            can_invite = True
-
-    if is_member:
+    if already_member(u_id, channel_id, store):
         raise InputError
 
-    if not can_invite:
+    if not already_member(auth_user_id, channel_id, store):
         raise AccessError
 
     for channel in store['channels']:
@@ -108,18 +89,12 @@ def channel_details_v1(auth_user_id, channel_id):
 
     is_channel = False # Initialising booleans for raising errors
     is_member = False
-    is_valid_auth_user_id = False
     all_channels = store['channels'] # Saving list of channels as a local variable
 
     # Iterates over all users and checks if the provided user id is in the system
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            is_valid_auth_user_id = True
-            # if the user id is found the boolean for valid user is set to True
-
+    valid_auth_user_id(auth_user_id)
+    # if the user id is found the boolean for valid user is set to True
     # if the user id is not in the system, raises an InputError
-    if not is_valid_auth_user_id:
-        raise AccessError("Invalid User ID")
 
     # Iterates over all the channels and check if the provided channel id is in
     # the system
@@ -141,7 +116,7 @@ def channel_details_v1(auth_user_id, channel_id):
             is_member = True # if the user is found in the channel, the boolean
             # saving if the user is a channel member is set to True
 
-    # if the user is not a member of the channel, raises an InputError
+    # if the user is not a member of the channel, raises an AccessError
     if not is_member:
         raise AccessError()
 
@@ -211,7 +186,7 @@ def member_details(user_id):
                 'handle_str': user['handle_str']
             }
     # returns None if user is not found,
-    return
+    return {'name','is_public','owner_members',"all_members" }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     """_summary_
@@ -236,15 +211,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     store = data_store.get()
 
     # print(store)
-
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError
+    valid_auth_user_id(auth_user_id)
 
     channel_exist = False
     for channel in store['channels']:
@@ -303,14 +270,7 @@ def channel_join_v1(auth_user_id, channel_id):
     '''
     store = data_store.get()
 
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise InputError
+    valid_auth_user_id(auth_user_id)
 
     if not channel_validity(channel_id, store):
         raise InputError("Channel id is invalid.")
@@ -333,8 +293,27 @@ def channel_join_v1(auth_user_id, channel_id):
             channels['all_members'].append(new_member)
 
     data_store.set(store)
-    return
+    return {}
 
+def valid_auth_user_id(auth_user_id):
+    """_summary_
+    Validates that the input auth_user_id exists in the datastore
+    Args:
+        auth_user_id (u_id): The input u_id
+
+    Raises:
+        AccessError: If the u_id input does not exist in the system, an access error is raised.
+    """
+    store = data_store.get()
+
+    auth_user_exist = False
+
+    for user in store['users']:
+        if auth_user_id == user['u_id']:
+            auth_user_exist = True
+
+    if not auth_user_exist:
+        raise AccessError("This auth_user_id does not exist in the datastore.")
 
 def channel_validity(channel_id, store):
     """_summary_
@@ -372,6 +351,15 @@ def already_member(auth_user_id, channel_id, store):
 
 
 def extract_channel_details(channel_id, store):
+    """_summary_
+    A method which coppies the data in the input_channel and returns it.
+    Args:
+        channel_id (_type_): _description_
+        store (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     for channels in store['channels']:
         if channels['channel_id'] == channel_id:
             channel_details = channels

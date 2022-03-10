@@ -114,15 +114,15 @@ def create_handle(name_first, name_last):
                 handle += str(0)
                 i += 1
                 continue
-            elif i == 10:
+            if i == 10:
                 handle = handle[:-1] + str(i)
                 i += 1
                 continue
-            elif i % 10 == 1 and i > 10:
+            if i % 10 == 1 and i > 10:
                 handle = handle[:-2] + str(i)
                 i += 1
                 continue
-            elif i % 10 == 0:
+            if i % 10 == 0:
                 handle = handle[:-2] + str(i)
                 i += 1
                 continue
