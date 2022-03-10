@@ -34,7 +34,6 @@ def channels_list_v1(auth_user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
-
         raise AccessError
 
     for accounts in store['users']:
@@ -43,7 +42,6 @@ def channels_list_v1(auth_user_id):
     return {
         'channels': output_list
     }
-
 
 def create_list_dictionary(accounts):
     """ Appends the list of dictionaries stored in the 'channels_owned'
@@ -131,8 +129,8 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     Args:
         auth_user_id (u_id): A valid user that intends to create the channel
-        name: the desired name for the channel to be created
-        is_public: either True for it its public or False if private
+        name (channel_id): the desired name for the channel to be created
+        is_public (boolean): either True for it its public or False if private
 
     Raises:
         AccessError: the auth_user is not a registered user
