@@ -29,6 +29,8 @@ def channels_list_v1(auth_user_id):
     store = data_store.get()
     auth_user_exist = False
 
+    # REMARK: You already have a helper function for this that is being used in
+    # channel.py
     for user in store['users']:
         if auth_user_id == user['u_id']:
             auth_user_exist = True

@@ -20,6 +20,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         InputError: the invited user is already part of the channel.
         AccessError: the auth_user is not in the channel they are inviting to.
 
+    # REMARK: If it returns nothing, just get rid of this!
     Returns:
         dictionary: nothing! nothing is returned after a invite
     """
@@ -27,11 +28,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     user_exist = False
     valid_auth_user_id(auth_user_id)
+    # REMARK: You should find a better way to do nested loops like this
+    # they clutter up your functions
     for user in store['users']:
         if u_id == user['u_id']:
             user_exist = True
 
     if not user_exist:
+        # REMARK: When you raise an exception, always give a message along with
+        # it, since that will help with debugging if the exception is ever
+        # being raised wrongly
+        # eg: raise InputError("User not found")
         raise InputError
 
     if not channel_validity(channel_id,store):
@@ -44,6 +51,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise AccessError
 
     for channel in store['channels']:
+        # REMARK: This nested loop is unnecessary - try to find a better
+        # way to remove all these loops from your main logic
         for user in store['users']:
             if u_id == user['u_id']:
                 invited_member = user['u_id']
@@ -83,6 +92,7 @@ def channel_details_v1(auth_user_id, channel_id):
         however containing information
         on all members of the channel
     }
+    # REMARK: This docstring is nice!
     '''
 
     store = data_store.get() # Accessing data_store for data

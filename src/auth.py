@@ -21,6 +21,8 @@ def auth_login_v1(email, password):
 
     :param email: the user's email
     :param password: the user's password
+
+    # REMARK: Nested loops for checks like this are yucky
     '''
     store = data_store.get()
     for user in store['users']:
@@ -155,6 +157,8 @@ def duplicate_email_check(email):
     :email: the user's email
     :return: whether the email is new or already has been registered
     :rtype: boolean
+
+    # REMARK: This looks buggy, since it will return the first time
     '''
     store = data_store.get()
 
