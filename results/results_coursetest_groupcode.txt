@@ -1,0 +1,120 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.0, pytest-7.0.1, pluggy-1.0.0 -- /home/migue/Source/COMP/project-automarking/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/migue/Source/COMP/project-automarking/tempstore, configfile: pytest.ini
+collecting ... collected 71 items
+
+tests/auth_tests/auth_login_test.py::test_successful_login PASSED        [  1%]
+tests/auth_tests/auth_login_test.py::test_unregistered_user PASSED       [  2%]
+tests/auth_tests/auth_login_test.py::test_registered_but_incorrect_password PASSED [  4%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[@gmail.com] PASSED [  5%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob] PASSED   [  7%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob@bob@bob.com] PASSED [  8%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[12345] PASSED [  9%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[] PASSED   [ 11%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[] PASSED [ 12%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 14%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[] PASSED  [ 15%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb] PASSED [ 16%]
+tests/auth_tests/auth_register_test.py::test_duplicate_email PASSED      [ 18%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_normal PASSED [ 19%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_short PASSED [ 21%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_long PASSED [ 22%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_short PASSED [ 23%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_long PASSED [ 25%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_password PASSED [ 26%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_name PASSED [ 28%]
+tests/channel_tests/channel_details_test.py::test_channel_owner_can_get_details PASSED [ 29%]
+tests/channel_tests/channel_details_test.py::test_channel_member_can_get_details PASSED [ 30%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrs-abcdefghijklmnopqrs-abcdefghij-klmnopqrs-abcdefghijklmnopqrs0] PASSED [ 32%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrst-abcdefghijklmnopqrst-abcdefghij-klmnopqrst-abcdefghijklmnopqrst0] PASSED [ 33%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[@bcdefgh!j-klmn opqrst-bcdefghjklmnopqrst-bcdefghj-klmnopqrst-bcdefghjklmnopqrst0] PASSED [ 35%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abc-def0-abcdef0-abc-def-abcdef1] PASSED [ 36%]
+tests/channel_tests/channel_details_test.py::test_non_channel_member_cant_get_details PASSED [ 38%]
+tests/channel_tests/channel_details_test.py::test_invalid_channel_id PASSED [ 39%]
+tests/channel_tests/channel_details_test.py::test_invalid_token PASSED   [ 40%]
+tests/channel_tests/channel_invite_test.py::test_error_when_already_member PASSED [ 42%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_owner PASSED [ 43%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_member PASSED [ 45%]
+tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member PASSED [ 46%]
+tests/channel_tests/channel_invite_test.py::test_channel_id_invalid PASSED [ 47%]
+tests/channel_tests/channel_invite_test.py::test_u_id_invalid PASSED     [ 49%]
+tests/channel_tests/channel_invite_test.py::test_invalid_token PASSED    [ 50%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_private_channel FAILED [ 52%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_public_channel PASSED [ 53%]
+tests/channel_tests/channel_join_test.py::test_global_member_can_join_public_channel PASSED [ 54%]
+tests/channel_tests/channel_join_test.py::test_global_member_cant_join_private_channel PASSED [ 56%]
+tests/channel_tests/channel_join_test.py::test_already_joined_channel PASSED [ 57%]
+tests/channel_tests/channel_join_test.py::test_join_invalid_channel_id PASSED [ 59%]
+tests/channel_tests/channel_join_test.py::test_invalid_token PASSED      [ 60%]
+tests/channel_tests/channel_messages_test.py::test_successful_no_messages PASSED [ 61%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_start_greater_than_message_num PASSED [ 63%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_user_is_non_member PASSED [ 64%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_channel_id_invalid PASSED [ 66%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_invalid_token_given PASSED [ 67%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[True-andys room] PASSED [ 69%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[False-andys room] PASSED [ 70%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-] PASSED [ 71%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 73%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-] PASSED [ 74%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 76%]
+tests/channels_tests/channels_create_test.py::test_invalid_token PASSED  [ 77%]
+tests/channels_tests/channels_list_test.py::test_when_member_is_in_no_channels PASSED [ 78%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[True-andy] PASSED [ 80%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[False-andy] PASSED [ 81%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[True-andy] PASSED [ 83%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[False-andy] PASSED [ 84%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-True-ZERG-andy] PASSED [ 85%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-False-ZERG-andy] PASSED [ 87%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-True-ZERG-andy] PASSED [ 88%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-False-ZERG-andy] PASSED [ 90%]
+tests/channels_tests/channels_list_test.py::test_invalid_token PASSED    [ 91%]
+tests/channels_tests/channels_listall_test.py::test_when_no_channels PASSED [ 92%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_private PASSED [ 94%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_public PASSED [ 95%]
+tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist PASSED [ 97%]
+tests/channels_tests/channels_listall_test.py::test_invalid_token PASSED [ 98%]
+tests/other_tests/clear_test.py::test_cant_login_after_clear PASSED      [100%]
+
+====== Marks recorded: 34.29 ======
+
+
+=================================== FAILURES ===================================
+__________________ test_global_owner_can_join_private_channel __________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[2], all_members=[])
+
+    def test_global_owner_can_join_private_channel(user_woody, zergs_private_lair):
+>       channel_join_v1(user_woody.token, zergs_private_lair.channel_id)
+
+tests/channel_tests/channel_join_test.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 1, channel_id = 1
+
+    def channel_join_v1(auth_user_id, channel_id):
+        '''
+        function allows user to join another channel based on the channel ID
+        will give input error if the channel id is invalid or if the user is already in the channel
+        will give access error if the channel ID is one for a private channel
+        '''
+        store = data_store.get()
+    
+        valid_auth_user_id(auth_user_id)
+    
+        if not channel_validity(channel_id, store):
+            raise InputError("Channel id is invalid.")
+    
+        if already_member(auth_user_id, channel_id, store):
+            raise InputError("The user is already a member of this channel.")
+    
+        current_channel = extract_channel_details(channel_id, store)
+        if not current_channel['is_public']:
+>           raise AccessError("This is a private channel, user does not have access.")
+E           src.error.AccessError: This is a private channel, user does not have access.
+
+src/channel.py:283: AccessError
+=========================== short test summary info ============================
+FAILED tests/channel_tests/channel_join_test.py::test_global_owner_can_join_private_channel
+========================= 1 failed, 70 passed in 0.18s =========================

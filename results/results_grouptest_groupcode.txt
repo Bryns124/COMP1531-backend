@@ -1,0 +1,51 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.0, pytest-7.0.1, pluggy-1.0.0 -- /home/migue/Source/COMP/project-automarking/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/migue/Source/COMP/project-automarking/tempstore, configfile: pytest.ini
+collecting ... collected 40 items
+
+tests/test_auth.py::test_register_invalid_email PASSED                   [  2%]
+tests/test_auth.py::test_register_email_already_used PASSED              [  5%]
+tests/test_auth.py::test_register_returns_unique_ID PASSED               [  7%]
+tests/test_auth.py::test_password_length_less_than_6 PASSED              [ 10%]
+tests/test_auth.py::test_first_name_length_less_than_1 PASSED            [ 12%]
+tests/test_auth.py::test_first_name_length_more_than_50 PASSED           [ 15%]
+tests/test_auth.py::test_last_name_length_less_than_1 PASSED             [ 17%]
+tests/test_auth.py::test_last_name_length_more_than_50 PASSED            [ 20%]
+tests/test_auth.py::test_handle_generated_correctly PASSED               [ 22%]
+tests/test_auth.py::test_handles_appends_correctly PASSED                [ 25%]
+tests/test_channel.py::test_channel_invite_access_error PASSED           [ 27%]
+tests/test_channel.py::test_channel_invite_channel_id_error PASSED       [ 30%]
+tests/test_channel.py::test_channel_invite_u_id_error PASSED             [ 32%]
+tests/test_channel.py::test_channel_invite_u_id_member PASSED            [ 35%]
+tests/test_channel.py::test_channel_invite PASSED                        [ 37%]
+tests/test_channel.py::test_input_error_channel_details_v1 PASSED        [ 40%]
+tests/test_channel.py::test_access_error_channel_details_v1 PASSED       [ 42%]
+tests/test_channel.py::test_wrong_user_id_channel_details_v1 PASSED      [ 45%]
+tests/test_channel.py::test_correct_inputs_channel_details_v1 PASSED     [ 47%]
+tests/test_channel.py::test_multiple_user_channel_details_v1 PASSED      [ 50%]
+tests/test_channel.py::test_channel_join_invalid_channel PASSED          [ 52%]
+tests/test_channel.py::test_channel_messages_v1_channel_id_error PASSED  [ 55%]
+tests/test_channel.py::test_channel_messages_v1_access_error PASSED      [ 57%]
+tests/test_channel.py::test_channel_messages_v1 PASSED                   [ 60%]
+tests/test_channels.py::test_listall_no_channel PASSED                   [ 62%]
+tests/test_channels.py::test_listall_public PASSED                       [ 65%]
+tests/test_channels.py::test_listall_private PASSED                      [ 67%]
+tests/test_channels.py::test_listall_both PASSED                         [ 70%]
+tests/test_channels.py::test_create_public_channel PASSED                [ 72%]
+tests/test_channels.py::test_create_private_channel PASSED               [ 75%]
+tests/test_channels.py::test_create_channel_invalid_name_1 PASSED        [ 77%]
+tests/test_channels.py::test_create_channel_invalid_name_2 PASSED        [ 80%]
+tests/test_channels.py::test_create_multiple_channel PASSED              [ 82%]
+tests/test_channels.py::test_channel_list_private PASSED                 [ 85%]
+tests/test_channels.py::test_channel_list_public PASSED                  [ 87%]
+tests/test_channels.py::test_channel_list_empty PASSED                   [ 90%]
+tests/test_channels.py::test_channel_list_multiple_created PASSED        [ 92%]
+tests/test_other.py::test_clear_empty PASSED                             [ 95%]
+tests/test_other.py::test_clear_user PASSED                              [ 97%]
+tests/test_other.py::test_clear_channel PASSED                           [100%]
+
+====== Marks recorded: 40.00 ======
+
+
+============================== 40 passed in 0.09s ==============================
