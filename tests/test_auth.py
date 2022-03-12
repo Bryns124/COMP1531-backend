@@ -7,7 +7,7 @@ from src.other import clear_v1
 @pytest.fixture
 def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
-    
+
 def test_register_invalid_email():
     '''
     Tests when the registering email is invalid
@@ -36,6 +36,8 @@ def test_register_returns_unique_ID():
     '''
     Tests when a new email is registered that it returns a unique user ID
     '''
+    # REMARK: This line is long. If you put the contents of the assert statement
+    # in parentheses, you can split it over multiple lines
     assert auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le") != auth_register_v1("jamesnguyen@gmail.com", "password789", "James", "Nguyen")
     clear_v1()
 
@@ -54,7 +56,7 @@ def test_first_name_length_less_than_1():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "", "Le")
     clear_v1()
-        
+
 def test_first_name_length_more_than_50():
     '''
     Tests when the registered first name is more than 1
@@ -62,7 +64,7 @@ def test_first_name_length_more_than_50():
     with pytest.raises(InputError):
         auth_register_v1("bryanle@gmail.com", "password123", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn", "Le")
     clear_v1()
-        
+
 def test_last_name_length_less_than_1():
     '''
     Tests when the registered last name is less than 1
@@ -79,7 +81,14 @@ def test_last_name_length_more_than_50():
         auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn")
     clear_v1()
 
-# Testing that the handle is generated correctly 
+
+# REMARK: The following tests aren't blackboxed - you won't be able to reach
+# into the data_store like this in iteration 2, and it's bad design for
+# integration tests to do so (since it's implementation specific). You might
+# want to redo these tests for iteration 2.
+# For how to check handles,take a look at the return value of channel details
+
+# Testing that the handle is generated correctly
 def test_handle_generated_correctly():
     store = data_store.get()
     auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
@@ -144,7 +153,7 @@ def test_handles_appends_correctly():
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle3
-        if k['u_id'] == u_id4:    
+        if k['u_id'] == u_id4:
             assert k['email'] == 'abcdef4@email.com'
             assert k['name_first'] == first
             assert k['name_last'] == last
@@ -189,4 +198,4 @@ def test_handles_appends_correctly():
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle12
-            
+

@@ -93,6 +93,10 @@ def channel_details_v1(auth_user_id, channel_id):
         on all members of the channel
     }
     # REMARK: This docstring is nice!
+    # but other comments throughout this function are a little excessive
+    # generally stick to a single line, and only add comments if they code isn't
+    # already clear. Generally, comments should describe "why" rather than
+    # "what".
     '''
 
     store = data_store.get() # Accessing data_store for data
@@ -109,6 +113,9 @@ def channel_details_v1(auth_user_id, channel_id):
     # Iterates over all the channels and check if the provided channel id is in
     # the system
     for channel in all_channels:
+        # REMARK: only assigning `active_channel` if it is found is a bad idea
+        # IMO - unbound variables are a difficult bug to fix
+        # TBH, a helper function to do all of this for you would be better
         if channel['channel_id'] == channel_id:
             is_channel = True # if the channel id is found the boolean for valid
             # channel is set to True
@@ -257,6 +264,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     # print(returned_messages)
 
     return  returned_messages
+    # REMARK: I like this - it's a neat reminder of what the spec requires
     # {
     #     'messages': [
     #         {

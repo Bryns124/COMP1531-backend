@@ -5,12 +5,13 @@ from src.other import clear_v1
 from src.error import InputError, AccessError
 import pytest
 
-
+# REMARK: Technically, triple quotes aren't a comment. You should only use them
+# for docstrings
 """Users"""
 @pytest.fixture()
 def user_1():
     return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
-@pytest.fixture 
+@pytest.fixture
 def user_2():
     return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
 @pytest.fixture
@@ -51,14 +52,14 @@ def invalid_channel():
 def starting_value():
     return 0
 
-def test_channel_invite_access_error(user_1, channel_private_access, user_2):    
+def test_channel_invite_access_error(user_1, channel_private_access, user_2):
     """
     This test checks to see that a AccessError is raised when attmepting to invite someone to a channel,
-    but they do not have the access privlieges to do so. 
+    but they do not have the access privlieges to do so.
     Args:
         user_1 (u_id): User who is not apart of the private channel
         channel_private (channel_id): The private channel_id
-        user_no_access (u_id): User who is going to  be invited 
+        user_no_access (u_id): User who is going to  be invited
     """
     with pytest.raises(AccessError):
         channel_invite_v1(user_1["auth_user_id"],channel_private_access['channel_id'], user_2["auth_user_id"])
@@ -69,7 +70,7 @@ def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
     This test checks to see that a InputError is raised when attemtping to invite someone to
     a channel with a invalid channel_id
     Args:
-        user_1 (_type_): The u_id of the person executing the command and inviting. 
+        user_1 (_type_): The u_id of the person executing the command and inviting.
         invalid_channel_id (_type_): The invalid channel_id
         user_2 (_type_): The u_id of the person being invited
     """
@@ -82,36 +83,36 @@ def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
     This test checks to see that a InputError is raised when attemtping to invite someone with
     an invalid u_id.
     Args:
-         user_1 (u_id): The u_id of the person executing the command and inviting. 
-        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
+         user_1 (u_id): The u_id of the person executing the command and inviting.
+        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.
         user_invalid (u_id): The invalid u_id
     """
     with pytest.raises(InputError):
-        channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_invalid) 
+        channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_invalid)
         channel_invite_v1(user_invalid, channel_public['channel_id'], user_1['auth_user_id'])
     clear_v1()
-        
+
 def test_channel_invite_u_id_member(user_1, channel_public, user_2):
     """
-    This test checks to see that a InputError is raised when attempting invite someone 
+    This test checks to see that a InputError is raised when attempting invite someone
     to a channel who is already apart of that channel.
     Args:
-        user_1 (u_id): The u_id of the person executing the command and inviting. 
-        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
+        user_1 (u_id): The u_id of the person executing the command and inviting.
+        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.
         user_2 (u_id): The u_id of the person that is already in the channel.
     """
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     with pytest.raises(InputError):
         channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
     clear_v1()
-    
+
 
 def test_channel_invite(user_1, channel_public, user_2):
     """
     This test verifies that when a user is invited to a channel they successfully become a member
     Args:
-        user_1 (u_id): The u_id of the person executing the command and inviting. 
-        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.  
+        user_1 (u_id): The u_id of the person executing the command and inviting.
+        channel_public (channel_id): Takes the channel_id that user_1 is inviting to.
         user_2 (u_id): The u_id of the person being invited.
     """
     channel_invite_v1(user_1['auth_user_id'], channel_public['channel_id'], user_2['auth_user_id'])
@@ -154,18 +155,18 @@ def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
 
 def test_correct_inputs_channel_details_v1(user_1, channel_1):
     '''
-    A function that tests channel_details for a channel with only one user is it, the owner, and tests 
+    A function that tests channel_details for a channel with only one user is it, the owner, and tests
     that the output is correct
     Args:
         user_1: Id of owner of channel_1
         channel_1: Channel trying to be accessed
     '''
     assert channel_details_v1(user_1['auth_user_id'], channel_1['channel_id']) == {
-        'name': "A New Hope", 
-        'is_public': True, 
+        'name': "A New Hope",
+        'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
-            ], 
+            ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
             ]
@@ -174,21 +175,21 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
 
 def test_multiple_user_channel_details_v1(user_1, channel_2):
     '''
-    A function that tests channel_details for a channel with multiple users is it, an owner and one non-owner 
+    A function that tests channel_details for a channel with multiple users is it, an owner and one non-owner
     member and tests that the output is correct
     Args:
         user_1: Id of owner of channel_1
         channel_2: Channel trying to be accessed
     '''
     # Adds another user to the channel, who doesn't have owner status
-    channel_join_v1(user_1['auth_user_id'], channel_2['channel_id']) 
+    channel_join_v1(user_1['auth_user_id'], channel_2['channel_id'])
 
     assert channel_details_v1(user_1['auth_user_id'], channel_2['channel_id']) == {
-        'name': "Empire Strikes Back", 
-        'is_public':  True, 
+        'name': "Empire Strikes Back",
+        'is_public':  True,
         'owner_members': [
             {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'}
-        ], 
+        ],
         'all_members': [
             {'u_id': 2, 'email': 'miguel@unsw.com' , 'name_first': 'Miguel', 'name_last': 'Test', 'handle_str': 'migueltest'},
             {'u_id': 1, 'email': 'mikey@unsw.com' , 'name_first': 'Mikey', 'name_last': 'Test', 'handle_str': 'mikeytest'}
@@ -206,12 +207,12 @@ def test_channel_join_invalid_channel(user_1):
 
 def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     """
-    This function tests that a id_error is raised when the user is trying to access the messages for 
+    This function tests that a id_error is raised when the user is trying to access the messages for
     a invalid channel_id
     Args:
-        user_1 (u_id): Id of the user who is attempting to read a channel's messages 
+        user_1 (u_id): Id of the user who is attempting to read a channel's messages
         invalid_channel_id (channel_id): The invalid channel id
-        start (start): Where the user wants to start indexing the messages from 
+        start (start): Where the user wants to start indexing the messages from
     """
     with pytest.raises(InputError):
         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, 0)
@@ -224,11 +225,11 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
 
 def test_channel_messages_v1_access_error(user_no_access, channel_public):
     """
-    This function tests that a exception is raised when a user tries to read the messages 
-    of a channel they do not have access to. 
+    This function tests that a exception is raised when a user tries to read the messages
+    of a channel they do not have access to.
     Args:
         user_no_access (u_id): Id of the user who has no access to read the channel messages
-        channel_public (channel_id): Id of the channel the user is trying to access 
+        channel_public (channel_id): Id of the channel the user is trying to access
         start start): Starting index
     """
     with pytest.raises(AccessError):
@@ -239,12 +240,12 @@ def test_channel_messages_v1(user_1, channel_public):
     """
     This test checks to see that no messages are present when after creating a channel
     Args:
-        user_1 (u_id): The id of the user trying to read the messages in a channel 
+        user_1 (u_id): The id of the user trying to read the messages in a channel
         channel_public (channel_id): The channel_id the user is trying to access
         first_message (start_): Starting index of the messages
     """
     assert channel_messages_v1(user_1['auth_user_id'], channel_public['channel_id'], 0) == {
-        'messages' : [], 
-        'start' : 0, 
+        'messages' : [],
+        'start' : 0,
         'end' : -1 }
     clear_v1()
