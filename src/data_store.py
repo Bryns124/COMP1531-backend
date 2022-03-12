@@ -45,16 +45,17 @@ initial_object = {
         #     'is_public' : None, #check if we can use None
         #     'owner_members' : ['users'], #check again if this is leagal
         #     'all_members' : ['users'],
-        #     'messages' : [
-        #         {
-        #             'message_id' : , #similarly check if legal
-        #             'u_id' : ,
-        #             'message': "",
-        #             'time_created': ,
-        #         }
-        #     ],
-        #     'start' : , #ditto
-        #     'end' : ,
+        #       'messages': [
+        #        {
+        #           'message_id': 1,
+        #            'u_id': 1,
+        #            'message': 'Hello world',
+        #            'time_sent': 1582426789,
+        #        }
+        #    ],
+        #    'start': 0,
+        #    'end': 50,
+
 
         # }
     #],
