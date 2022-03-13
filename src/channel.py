@@ -163,7 +163,7 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def member_details(user_id):
-    '''
+    """
     member_details(user_id)
 
     Given a user_id in data_store returns a dictionary containing details
@@ -179,7 +179,7 @@ def member_details(user_id):
     "handle_str": user handle (string)
     }
 
-    '''
+    """
     store = data_store.get() # retrieves data from data_store
     users = store['users'] # saves list of dictionaries containing information
     # about all users
@@ -275,11 +275,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
 
 def channel_join_v1(auth_user_id, channel_id):
-    '''
+    """
     function allows user to join another channel based on the channel ID
     will give input error if the channel id is invalid or if the user is already in the channel
     will give access error if the channel ID is one for a private channel
-    '''
+    """
     store = data_store.get()
 
     valid_auth_user_id(auth_user_id)
