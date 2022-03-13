@@ -29,6 +29,7 @@ initial_object = {
     #'users': [
         # {
             # 'u_id' : , check if is ok
+            # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
             # 'email': "", check if using empty string is ok
             # 'name_first': "",
             # 'name_last': "",
