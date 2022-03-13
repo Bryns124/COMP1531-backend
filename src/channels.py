@@ -21,9 +21,6 @@ def channels_list_v1(auth_user_id):
 
     Returns:
         Dictionary containing list of dictionaries:
-        {
-            'channels': [list of dictionaries containing the channel names]
-        }
     """
 
     store = data_store.get()
@@ -42,6 +39,14 @@ def channels_list_v1(auth_user_id):
     return {
         'channels': output_list
     }
+    # {
+    #     'channels': [
+    #         {
+    #             'channel_id': (channel id)
+    #             'name': (channel name)
+    #         }
+    #     ]
+    # }
 
 def create_list_dictionary(accounts):
     """ Appends the list of dictionaries stored in the 'channels_owned'
@@ -49,16 +54,12 @@ def create_list_dictionary(accounts):
     the channels the user is associated with.
 
     Args:
-        Accounts:
+        Accounts: accounts is the account of that given user
     Raises:
         None
 
     Returns:
-        List of dictionaries: [
-            {
-                'name': (channel name)
-            }
-        ]
+        List of dictionaries
     """
 
     output_list = []
@@ -76,7 +77,12 @@ def create_list_dictionary(accounts):
         }
         output_list.append(channel)
     return output_list
-
+    # [
+    #     {
+    #         'channel_id': (channel id),
+    #         'name': (channel name)
+    #     }
+    # ]
 
 def channels_listall_v1(auth_user_id):
     """ Lists all the channels created, both private and public
@@ -89,13 +95,6 @@ def channels_listall_v1(auth_user_id):
 
     Returns:
         Dictionary containing list of dictionaries:
-        {
-            'channels': [
-                {
-                    'name': (channel name)
-                }
-            ]
-        }
     """
 
     store = data_store.get()
@@ -121,6 +120,14 @@ def channels_listall_v1(auth_user_id):
     return {
         'channels': all_channels
         }
+    # {
+    #     'channels': [
+    #         {
+    #             'channel_id': (channel id)
+    #             'name': (channel name)
+    #         }
+    #     ]
+    # }
 
 def channels_create_v1(auth_user_id, name, is_public):
     """ Function to create a new channel given the correct user id of a authorised user,
@@ -136,10 +143,7 @@ def channels_create_v1(auth_user_id, name, is_public):
         AccessError: the auth_user is not a registered user
 
     Returns:
-        Dictionary:
-        {
-            'channel_id': (channel id)
-        }
+        Dictionary
     """
 
     store = data_store.get()
@@ -184,3 +188,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     return {
         'channel_id' : store['channels'][-1]['channel_id']
     }
+
+    # {
+    #     'channel_id': (channel id)
+    # }
