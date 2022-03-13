@@ -26,8 +26,41 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [],
+    #'users': [
+        # {
+            # 'u_id' : , check if is ok
+            # 'email': "", check if using empty string is ok
+            # 'name_first': "",
+            # 'name_last': "",
+            # 'handle_str': "" ,
+            # 'password': "",
+            # 'channels_owned' : [],
+            # 'channels_joined' : [],
+        # }
+    #],
+    #'channels': [
+        # {
+        #     'channel_id' : ,
+        #     'channel_name' : "",
+        #     'is_public' : None, #check if we can use None
+        #     'owner_members' : ['users'], #check again if this is leagal
+        #     'all_members' : ['users'],
+        #       'messages': [
+        #        {
+        #           'message_id': 1,
+        #            'u_id': 1,
+        #            'message': 'Hello world',
+        #            'time_sent': 1582426789,
+        #        }
+        #    ],
+        #    'start': 0,
+        #    'end': 50,
+
+
+        # }
+    #],
 }
+
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 ## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
