@@ -1,10 +1,9 @@
+from src.data_store import data_store
+from src.error import AccessError, InputError
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
 """
-from src.data_store import data_store
-from src.error import AccessError, InputError
-
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
     Allows a authorized user to invite another user to a channel they are apart of.
@@ -50,17 +49,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
                 user['channels_joined'].append(channel)
         if channel["channel_id"] == channel_id:
             channel['all_members'].append(invited_member)
-
-
-    # print(store['channels'])
-
     data_store.set(store)
     return {
     }
 
 def channel_details_v1(auth_user_id, channel_id):
-
-    '''
+    """
     channel_details_v1(auth_user_id, channel_id)
 
     Given a channel with ID channel_id that the authorised user is a member of, provide
@@ -83,10 +77,8 @@ def channel_details_v1(auth_user_id, channel_id):
         however containing information
         on all members of the channel
     }
-    '''
-
+    """
     store = data_store.get() # Accessing data_store for data
-
     is_channel = False # Initialising booleans for raising errors
     is_member = False
     all_channels = store['channels'] # Saving list of channels as a local variable
@@ -144,17 +136,25 @@ def channel_details_v1(auth_user_id, channel_id):
     # returns a dictionary with the format specified in the docstring for this
     # function
     return {
-
-        #'messages': [
-        #    {
-        #        'message_id': 1,
-        #        'u_id': 1,
-        #        'message': 'Hello world',
-        #    }
-        #],
-        #'start': 0,
-        #'end': 50,
-
+        # 'name': 'Hayden',
+        # 'owner_members': [
+        #     {
+        #         'u_id': 1,
+        #         'email': 'example@gmail.com',
+        #         'name_first': 'Hayden',
+        #         'name_last': 'Jacobs',
+        #         'handle_str': 'haydenjacobs',
+        #     }
+        # ],
+        # 'all_members': [
+        #     {
+        #         'u_id': 1,
+        #         'email': 'example@gmail.com',
+        #         'name_first': 'Hayden',
+        #         'name_last': 'Jacobs',
+        #         'handle_str': 'haydenjacobs',
+        #     }
+        # ],
         'name': active_channel['name'],
         'is_public': active_channel['is_public'],
         'owner_members': owner_members_details,
@@ -305,7 +305,9 @@ def channel_join_v1(auth_user_id, channel_id):
             channels['all_members'].append(new_member)
 
     data_store.set(store)
-    return {}
+    return {
+        # empty
+    }
 
 def valid_auth_user_id(auth_user_id):
     """_summary_

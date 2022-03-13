@@ -1,4 +1,7 @@
-'''
+import re
+from src.data_store import data_store
+from src.error import InputError
+"""
 Auth has two main functions: register and login
 
 Functions:
@@ -8,20 +11,15 @@ Functions:
             create_handle: creates handle for new user
         email_check: checks if email is valid
         duplicate_email_check: checks if email has already been registered.
-'''
-
-import re
-from src.data_store import data_store
-from src.error import InputError
-
+"""
 
 def auth_login_v1(email, password):
-    '''
+    """
     Logs in a registered user given an email and password
 
     :param email: the user's email
     :param password: the user's password
-    '''
+    """
     store = data_store.get()
     for user in store['users']:
         if user['email'] == email:
@@ -35,7 +33,7 @@ def auth_login_v1(email, password):
 
 
 def auth_register_v1(email, password, name_first, name_last):
-    '''
+    """
     Registers in a new user given the email, password, first name and last name.
 
     :param email: the user's email
@@ -44,7 +42,7 @@ def auth_register_v1(email, password, name_first, name_last):
     :name_last: the user's last name
     :return: the user's user ID
     :rtype: dictionary
-    '''
+    """
     if not email_check(email):
         raise InputError("Email entered is not a valid email")
     if duplicate_email_check(email):
@@ -63,7 +61,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
 
 def create_user(email, password, name_first, name_last):
-    '''
+    """
     Initialises the user's details and saves it into data_store.
 
     :param email: the user's email
@@ -72,7 +70,7 @@ def create_user(email, password, name_first, name_last):
     :name_last: the user's last name
     :return: the user's details
     :rtype: dictionary
-    '''
+    """
     store = data_store.get()
     new_id = len(store['users']) + 1
     user = {
@@ -90,7 +88,7 @@ def create_user(email, password, name_first, name_last):
     return user
 
 def create_handle(name_first, name_last):
-    '''
+    """
     Creates the user's handle with the first name and last name.
     If the user's handle is more than 20 characters, it is cut off at 20 characters
     If the user's handle already exists, append the handle with the smallest number
@@ -100,7 +98,7 @@ def create_handle(name_first, name_last):
     :name_last: the user's last name
     :return: the user's handle
     :rtype: string
-    '''
+    """
     store = data_store.get()
 
     handle = name_first.lower() + name_last.lower()
@@ -137,25 +135,25 @@ def create_handle(name_first, name_last):
 
 
 def email_check(email):
-    '''
+    """
     Checks if the email entered is valid.
 
     :email: the user's email
     :return: whether the email is valid or not
     :rtype: boolean
-    '''
+    """
     regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     return bool(re.fullmatch(regex, email))
 
 
 def duplicate_email_check(email):
-    '''
+    """
     Checks if the email entered has already been registered.
 
     :email: the user's email
     :return: whether the email is new or already has been registered
     :rtype: boolean
-    '''
+    """
     store = data_store.get()
 
     for user in store['users']:

@@ -1,3 +1,5 @@
+from src.data_store import data_store
+from src.error import InputError, AccessError
 """Channels has the 3 functions: create, list, listall
 
 Functions:
@@ -5,10 +7,6 @@ Functions:
     channels_list: list the channels a certain user is a part of
     channels_listall: lists all the channels
 """
-
-from src.data_store import data_store
-from src.error import InputError, AccessError
-
 def channels_list_v1(auth_user_id):
     """ Lists all the channels that only the given user is a part of
     either as a ownder or member
