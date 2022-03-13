@@ -4,6 +4,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
 
+# Fixture for testing incorrect login
 @pytest.fixture
 def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
