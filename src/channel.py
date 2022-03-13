@@ -144,10 +144,22 @@ def channel_details_v1(auth_user_id, channel_id):
     # returns a dictionary with the format specified in the docstring for this
     # function
     return {
+
+        #'messages': [
+        #    {
+        #        'message_id': 1,
+        #        'u_id': 1,
+        #        'message': 'Hello world',
+        #    }
+        #],
+        #'start': 0,
+        #'end': 50,
+
         'name': active_channel['name'],
         'is_public': active_channel['is_public'],
         'owner_members': owner_members_details,
         'all_members': all_members_details
+
     }
 
 def member_details(user_id):
