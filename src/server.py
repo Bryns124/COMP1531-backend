@@ -12,6 +12,7 @@ def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
 
+
 def defaultHandler(err):
     response = err.get_response()
     print('response', err, err.get_response())
@@ -23,34 +24,40 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
+
 APP = Flask(__name__)
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
-#### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
+# NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
+
+
 @APP.route("/auth/register/v2", methods=['POST'])
 def auth_register_v2():
     data = request.get_json()
-    ret = auth_register_v1(data['email'], data['password'], data['name_first'], data['hname_last'])
+    ret = auth_register_v1(
+        data['email'], data['password'], data['name_first'], data['hname_last'])
     return dumps({
         'auth_user_id': ret[auth_user_id]
     })
+
 
 @APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
     if data == 'echo':
-   	    raise InputError(description='Cannot echo "echo"')
+        raise InputError(description='Cannot echo "echo"')
     return dumps({
         'data': data
     })
-#wow
-#### NO NEED TO MODIFY BELOW THIS POINT
+# wew1
+# NO NEED TO MODIFY BELOW THIS POINT
+
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
+    APP.run(port=config.port)  # Do not edit this port
