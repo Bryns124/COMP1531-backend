@@ -24,22 +24,23 @@ Example usage:
     data_store.set(store)
 '''
 
-## YOU SHOULD MODIFY THIS OBJECT BELOW
+# YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    #'users': [
+    'users': [
         # {
-            # 'u_id' : , check if is ok
-            # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
-            # 'email': "", check if using empty string is ok
-            # 'name_first': "",
-            # 'name_last': "",
-            # 'handle_str': "" ,
-            # 'password': "",
-            # 'channels_owned' : [],
-            # 'channels_joined' : [],
+        # 'u_id' : , check if is ok
+        # 'token': , for now keeping as string to start
+        # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
+        # 'email': "", check if using empty string is ok
+        # 'name_first': "",
+        # 'name_last': "",
+        # 'handle_str': "" ,
+        # 'password': "",
+        # 'channels_owned' : [],
+        # 'channels_joined' : [],
         # }
-    #],
-    #'channels': [
+    ],
+    'channels': [
         # {
         #     'channel_id' : ,
         #     'channel_name' : "",
@@ -59,12 +60,14 @@ initial_object = {
 
 
         # }
-    #],
+    ],
 }
 
-## YOU SHOULD MODIFY THIS OBJECT ABOVE
+# YOU SHOULD MODIFY THIS OBJECT ABOVE
 
-## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+# YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+
+
 class Datastore:
     def __init__(self):
         self.__store = initial_object
@@ -76,6 +79,7 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+
 
 print('Loading Datastore...')
 

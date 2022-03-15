@@ -13,6 +13,7 @@ Functions:
         duplicate_email_check: checks if email has already been registered.
 """
 
+
 def auth_login_v1(email, password):
     """
     Logs in a registered user given an email and password
@@ -50,9 +51,11 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(password) < 6:
         raise InputError("Password entered must be longer than 6 characters")
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError("First name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            "First name entered must be between 1 and 50 characters inclusive")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError("Last name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            "Last name entered must be between 1 and 50 characters inclusive")
 
     user = create_user(email, password, name_first, name_last)
     return {
@@ -86,6 +89,7 @@ def create_user(email, password, name_first, name_last):
     store['users'].append(user)
     data_store.set(store)
     return user
+
 
 def create_handle(name_first, name_last):
     """
@@ -155,6 +159,5 @@ def duplicate_email_check(email):
     :rtype: boolean
     """
     store = data_store.get()
-
     for user in store['users']:
         return bool(user['email'] == email)
