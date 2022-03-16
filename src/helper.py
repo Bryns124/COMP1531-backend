@@ -1,0 +1,2 @@
+def SECRET():
+    return "ANT"
