@@ -26,6 +26,7 @@ def auth_login_v1(email, password):
         if user['email'] == email:
             if user['password'] == password:
                 return {
+                    'token': user['token'],
                     'auth_user_id': user['u_id']
                 }
             raise InputError("Password is incorrect")
@@ -59,6 +60,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     user = create_user(email, password, name_first, name_last)
     return {
+        'token': user['token'],
         'auth_user_id': user['u_id']
     }
 

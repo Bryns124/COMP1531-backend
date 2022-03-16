@@ -30,6 +30,7 @@ initial_object = {
         # {
         # 'u_id' : , check if is ok
         # 'token': , for now keeping as string to start
+        # 'session_id':[],
         # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
         # 'email': "", check if using empty string is ok
         # 'name_first': "",
