@@ -1,6 +1,7 @@
 import re
 from src.data_store import data_store
 from src.error import InputError
+import jwt
 """
 Auth has two main functions: register and login
 
