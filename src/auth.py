@@ -75,17 +75,34 @@ def create_user(email, password, name_first, name_last):
     :rtype: dictionary
     """
     store = data_store.get()
-    new_id = len(store['users']) + 1
-    user = {
-        'u_id': new_id,
-        'email': email,
-        'name_first': name_first,
-        'name_last': name_last,
-        'handle_str': create_handle(name_first, name_last),
-        'password': password,
-        'channels_owned': [],
-        'channels_joined': [],
-    }
+    if (store['users'] == []):
+        new_id = len(store['users']) + 1
+        user = {
+            'u_id': new_id,
+            'token': "",
+            'email': email,
+            'permission_id': 1,
+            'name_first': name_first,
+            'name_last': name_last,
+            'handle_str': create_handle(name_first, name_last),
+            'password': password,
+            'channels_owned': [],
+            'channels_joined': [],
+        }
+    else:
+        new_id = len(store['users']) + 1
+        user = {
+            'u_id': new_id,
+            'token': "",
+            'email': email,
+            'permission_id': 2,
+            'name_first': name_first,
+            'name_last': name_last,
+            'handle_str': create_handle(name_first, name_last),
+            'password': password,
+            'channels_owned': [],
+            'channels_joined': [],
+        }
     store['users'].append(user)
     data_store.set(store)
     return user
