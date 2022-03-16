@@ -4,8 +4,9 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    {"name":"Python: server","type":"python","request":"launch","module":"src.server","justMyCode":true},
         {
-            "name": "Python: Module",
+            "name": "Python: pytest",
             "type": "python",
             "request": "launch",
             "module": "pytest",

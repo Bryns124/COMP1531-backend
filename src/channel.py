@@ -393,7 +393,7 @@ def extract_channel_details(channel_id, store):
 
 
 def validate_token(token):
-    store = data_store['users']
+    store = data_store.get()
     token_valid = False
     for tokens in store['token']:
         if token == tokens['token']:
