@@ -1,5 +1,7 @@
+from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, valid_auth_user_id, extract_channel_details
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
@@ -27,7 +29,7 @@ def channel_invite_v1(token, channel_id, u_id):
     store = data_store.get()
 
     user_exist = False
-    validate_token(token)
+    valid_auth_user_id(decode_token(token)['auth_user_id'])
     for user in store['users']:
         if u_id == user['u_id']:
             user_exist = True
@@ -59,9 +61,9 @@ def channel_invite_v1(token, channel_id, u_id):
     }
 
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v1(token, channel_id):
     """
-    channel_details_v1(auth_user_id, channel_id)
+    channel_details_v1(token, channel_id)
 
     Given a channel with ID channel_id that the authorised user is a member of, provide
     basic details about the channel.
@@ -91,7 +93,7 @@ def channel_details_v1(auth_user_id, channel_id):
     all_channels = store['channels']
 
     # Iterates over all users and checks if the provided user id is in the system
-    valid_auth_user_id(auth_user_id)
+    valid_auth_user_id(decode_token(token)['auth_user_id'])
     # if the user id is found the boolean for valid user is set to True
     # if the user id is not in the system, raises an InputError
 
@@ -111,7 +113,7 @@ def channel_details_v1(auth_user_id, channel_id):
     # Iterates over all members in the channel to check if the provided user id
     # is a member of the channel
     for member in active_channel['all_members']:
-        if member == auth_user_id:
+        if member == decode_token(token)['auth_user_id']:
             is_member = True  # if the user is found in the channel, the boolean
             # saving if the user is a channel member is set to True
 
@@ -250,7 +252,8 @@ def channel_messages_v1(token, channel_id, start):
     in_channel = False
 
     for members in store['channels'][channel_id - 1]['all_members']:
-        if members == token:  # do i need to contunue using tokens or do i need to extract auth_user_id
+        # do i need to contunue using tokens or do i need to extract auth_user_id
+        if members == decode_token(token)['auth_user_id']:
             in_channel = True
 
     if not in_channel:
@@ -284,7 +287,7 @@ def channel_messages_v1(token, channel_id, start):
     # }
 
 
-def channel_join_v1(auth_user_id, channel_id):
+def channel_join_v1(token, channel_id):
     """
     function allows user to join another channel based on the channel ID
     will give input error if the channel id is invalid or if the user is already in the channel
@@ -292,12 +295,12 @@ def channel_join_v1(auth_user_id, channel_id):
     """
     store = data_store.get()
 
-    valid_auth_user_id(auth_user_id)
+    valid_auth_user_id(decode_token(token)['auth_user_id'])
 
     if not channel_validity(channel_id, store):
         raise InputError("Channel id is invalid.")
 
-    if already_member(auth_user_id, channel_id, store):
+    if already_member(decode_token(token)['auth_user_id'], channel_id, store):
         raise InputError("The user is already a member of this channel.")
 
     current_channel = extract_channel_details(channel_id, store)
@@ -306,7 +309,7 @@ def channel_join_v1(auth_user_id, channel_id):
             "This is a private channel, user does not have access.")
 
     for user_accounts in store['users']:
-        if user_accounts['u_id'] == auth_user_id:
+        if user_accounts['u_id'] == decode_token(token)['auth_user_id']:
             new_member = user_accounts['u_id']
             user_accounts['channels_joined'].append(current_channel)
 
@@ -318,86 +321,3 @@ def channel_join_v1(auth_user_id, channel_id):
     return {
         # empty
     }
-
-
-def valid_auth_user_id(auth_user_id):
-    """_summary_
-    Validates that the input auth_user_id exists in the datastore
-    Args:
-        auth_user_id (u_id): The input u_id
-
-    Raises:
-        AccessError: If the u_id input does not exist in the system, an access error is raised.
-    """
-    store = data_store.get()
-
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError("This auth_user_id does not exist in the datastore.")
-
-
-def channel_validity(channel_id, store):
-    """_summary_
-    Checks for a valid channel
-    Args:
-        channel_id (channel_id): _description_
-        store (datastore): _description_
-
-    Returns:
-        _Boolean: Returns if the channel exists or not.
-    """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            return True
-    return False
-
-
-def already_member(auth_user_id, channel_id, store):
-    """_summary_
-    Checks if a user is already a member of a channel
-    Args:
-        auth_user_id (u_id): The user id generated after auth login
-        channel_id (channel_id): The id of the channel generated by channels_create
-        store (datastore): stores the list of dictionaries
-        that contains the details of the user and the accounts
-
-    Returns:
-        Boolean: Returns true if the user already is a member of the channel
-    """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
-                return True
-    return False
-
-
-def extract_channel_details(channel_id, store):
-    """_summary_
-    A method which coppies the data in the input_channel and returns it.
-    Args:
-        channel_id (_type_): _description_
-        store (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            channel_details = channels
-    return channel_details
-
-
-def validate_token(token):
-    store = data_store.get()
-    token_valid = False
-    for tokens in store['token']:
-        if token == tokens['token']:
-            token_valid = True
-
-    if not token_valid:
-        raise AccessError("This token is invalid.")

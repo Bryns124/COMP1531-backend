@@ -2,6 +2,7 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
+from src.helper import generate_token
 """
 Auth has two main functions: register and login
 
@@ -27,7 +28,7 @@ def auth_login_v1(email, password):
         if user['email'] == email:
             if user['password'] == password:
                 return {
-                    'token': user['token'],
+                    'token': generate_token(user['u_id']),
                     'auth_user_id': user['u_id']
                 }
             raise InputError("Password is incorrect")
@@ -61,7 +62,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     user = create_user(email, password, name_first, name_last)
     return {
-        'token': user['token'],
+        'token': generate_token(user['u_id']),
         'auth_user_id': user['u_id']
     }
 
@@ -82,7 +83,7 @@ def create_user(email, password, name_first, name_last):
         new_id = len(store['users']) + 1
         user = {
             'u_id': new_id,
-            'token': "",
+            'session_id': [],
             'email': email,
             'permission_id': 1,
             'name_first': name_first,
@@ -96,7 +97,7 @@ def create_user(email, password, name_first, name_last):
         new_id = len(store['users']) + 1
         user = {
             'u_id': new_id,
-            'token': "",
+            'session_id': [],
             'email': email,
             'permission_id': 2,
             'name_first': name_first,
