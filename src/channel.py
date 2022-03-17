@@ -29,7 +29,8 @@ def channel_invite_v1(token, channel_id, u_id):
     store = data_store.get()
 
     user_exist = False
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
     for user in store['users']:
         if u_id == user['u_id']:
             user_exist = True
@@ -45,7 +46,7 @@ def channel_invite_v1(token, channel_id, u_id):
         raise InputError(
             "The member you are trying to invite is already apart of the channel.")
 
-    if not already_member(token, channel_id, store):
+    if not already_member(auth_user_id, channel_id, store):
         raise AccessError(
             "You are not apart of the channel you are trying to invite to.")
 
@@ -93,7 +94,7 @@ def channel_details_v1(token, channel_id):
     all_channels = store['channels']
 
     # Iterates over all users and checks if the provided user id is in the system
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+    validate_token(token)
     # if the user id is found the boolean for valid user is set to True
     # if the user id is not in the system, raises an InputError
 

@@ -8,6 +8,7 @@ def SECRET():
 
 
 def generate_token(u_id):
+    valid_auth_user_id(u_id)
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == u_id:
@@ -24,11 +25,13 @@ def decode_token(token):
 
 
 def validate_token(token):
+    valid_auth_user_id(decode_token(token)['auth_user_id'])
     store = data_store.get()
     token_valid = False
     for user in store['users']:
-        if decode_token(token)['session_id'] == user['session_id']:
-            token_valid = True
+        for session in user['session_id']:
+            if decode_token(token)['session_id'] == session:
+                token_valid = True
 
     if not token_valid:
         raise AccessError("This token is invalid.")

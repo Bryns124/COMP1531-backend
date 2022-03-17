@@ -16,10 +16,10 @@ def test_user_created_successfully():
     '''
     Tests to see if user was created correctly
     '''
-    auth_register_v1("bryanle@gmail.com",
-                     "password123", "Bryan", "Le")
+
+    auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
     assert auth_login_v1("bryanle@gmail.com",
-                         "password123") == {'auth_user_id': 1}
+                         "password123")['auth_user_id'] == 1
     clear_v1()
 
 

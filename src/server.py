@@ -42,7 +42,7 @@ def auth_register_v2():
     ret = auth_register_v1(
         data['email'], data['password'], data['name_first'], data['hname_last'])
     return dumps({
-        'auth_user_id': ret[auth_user_id]
+        'auth_user_id': ret['auth_user_id']
     })
 
 
