@@ -60,6 +60,16 @@ initial_object = {
         #            'u_id': 1,
         #            'message': 'Hello world',
         #            'time_sent': 1582426789,
+        #            'is_channel': True,
+        #            'channel_id' :
+        #        },
+        #        {
+        #            'message_id': 1,
+        #            'u_id': 1,
+        #            'message': 'Hello world',
+        #            'time_sent': 1582426789,
+        #            'is_channel': False,
+        #            'DM_id' :
         #        }
         #       ],
 }
