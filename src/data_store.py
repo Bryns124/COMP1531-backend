@@ -24,46 +24,61 @@ Example usage:
     data_store.set(store)
 '''
 
-## YOU SHOULD MODIFY THIS OBJECT BELOW
+# YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    #'users': [
+    'users': [
         # {
-            # 'u_id' : , check if is ok
-            # 'email': "", check if using empty string is ok
-            # 'name_first': "",
-            # 'name_last': "",
-            # 'handle_str': "" ,
-            # 'password': "",
-            # 'channels_owned' : [],
-            # 'channels_joined' : [],
+        # 'u_id' : , check if is ok
+        # 'session_id':[],
+        # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
+        # 'email': "", check if using empty string is ok
+        # 'name_first': "",
+        # 'name_last': "",
+        # 'handle_str': "" ,
+        # 'password': "",
+        # 'channels_owned' : [],
+        # 'channels_joined' : [],
         # }
-    #],
-    #'channels': [
+    ],
+    'channels': [
         # {
         #     'channel_id' : ,
         #     'channel_name' : "",
         #     'is_public' : None, #check if we can use None
-        #     'owner_members' : ['users'], #check again if this is leagal
-        #     'all_members' : ['users'],
-        #       'messages': [
-        #        {
-        #           'message_id': 1,
-        #            'u_id': 1,
-        #            'message': 'Hello world',
-        #            'time_sent': 1582426789,
-        #        }
-        #    ],
-        #    'start': 0,
-        #    'end': 50,
+        #     'owner_members' : ['u_id'], #check again if this is leagal
+        #     'all_members' : ['u_id'],
+        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
+        #       'start': 25,
+        #       'end': 75,
 
 
         # }
-    #],
+    ],
+     'messages': [
+        #        {
+        #            'message_id': 1,
+        #            'u_id': 1,
+        #            'message': 'Hello world',
+        #            'time_sent': 1582426789,
+        #            'is_ch_message': True, #this is a channel message
+        #        },
+        #        {
+        #            'message_id': 1,
+        #            'u_id': 1,
+        #            'message': 'Hello world',
+        #            'time_sent': 1582426789,
+        #            'is_ch_message': False, #this is a dm message
+        #        }
+        #       ],
+        # }
+    ],
 }
 
-## YOU SHOULD MODIFY THIS OBJECT ABOVE
+# YOU SHOULD MODIFY THIS OBJECT ABOVE
 
-## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+# YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+
+
 class Datastore:
     def __init__(self):
         self.__store = initial_object
@@ -75,6 +90,7 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+
 
 print('Loading Datastore...')
 
