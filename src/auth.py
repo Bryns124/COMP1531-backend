@@ -1,6 +1,8 @@
 import re
 from src.data_store import data_store
 from src.error import InputError
+import jwt
+from src.helper import generate_token
 """
 Auth has two main functions: register and login
 
@@ -26,6 +28,7 @@ def auth_login_v1(email, password):
         if user['email'] == email:
             if user['password'] == password:
                 return {
+                    'token': generate_token(user['u_id']),
                     'auth_user_id': user['u_id']
                 }
             raise InputError("Password is incorrect")
@@ -59,6 +62,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     user = create_user(email, password, name_first, name_last)
     return {
+        'token': generate_token(user['u_id']),
         'auth_user_id': user['u_id']
     }
 
@@ -75,17 +79,34 @@ def create_user(email, password, name_first, name_last):
     :rtype: dictionary
     """
     store = data_store.get()
-    new_id = len(store['users']) + 1
-    user = {
-        'u_id': new_id,
-        'email': email,
-        'name_first': name_first,
-        'name_last': name_last,
-        'handle_str': create_handle(name_first, name_last),
-        'password': password,
-        'channels_owned': [],
-        'channels_joined': [],
-    }
+    if (store['users'] == []):
+        new_id = len(store['users']) + 1
+        user = {
+            'u_id': new_id,
+            'session_id': [],
+            'email': email,
+            'permission_id': 1,
+            'name_first': name_first,
+            'name_last': name_last,
+            'handle_str': create_handle(name_first, name_last),
+            'password': password,
+            'channels_owned': [],
+            'channels_joined': [],
+        }
+    else:
+        new_id = len(store['users']) + 1
+        user = {
+            'u_id': new_id,
+            'session_id': [],
+            'email': email,
+            'permission_id': 2,
+            'name_first': name_first,
+            'name_last': name_last,
+            'handle_str': create_handle(name_first, name_last),
+            'password': password,
+            'channels_owned': [],
+            'channels_joined': [],
+        }
     store['users'].append(user)
     data_store.set(store)
     return user
@@ -159,6 +180,5 @@ def duplicate_email_check(email):
     :rtype: boolean
     """
     store = data_store.get()
-
     for user in store['users']:
         return bool(user['email'] == email)
