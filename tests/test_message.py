@@ -68,7 +68,55 @@ def invalid_channel_id():
 def starting_value():
     return 0
 
-# Messages
+# may add fixtures for sending messages
+
+
+def test_message_edit(user_1):
+    # craete channel, send message
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "user 1 new message"
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+
+def test_channel_message_remove(user_1):
+    # craete channel, send message
+    r = requests.put(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "user 2 new message",
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+
+def test_dm_message_edit(user_1):
+    # craete Dm, send message
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "user 1 new message"
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+
+def test_dm_message_remove(user_1):
+    # craete Dm, send message
+    r = requests.put(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "user 2 new message",
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
 
 
 @pytest.fixture
@@ -88,7 +136,7 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
         "start": starting_value
     })
     payload = r.json()
-    assert r.status_code ==
+    assert r.status_code == 200
     assert payload['messages']['message_id'] == 1
     assert payload['messages']['u_id'] == 1
     assert payload['messages']['message'] == message_text
