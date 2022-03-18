@@ -28,12 +28,12 @@ def user_no_access():
 
 @pytest.fixture
 def user_invalid():
-    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET(), algorithm="HS256")
+    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
 
 
 @pytest.fixture
 def invalid_user_id():
-    return jwt.encode({'auth_user_id': -1, 'session_id': 1}, SECRET(), algorithm="HS256")
+    return jwt.encode({'auth_user_id': -1, 'session_id': 1}, SECRET, algorithm="HS256")
 
 
 """Channels"""
