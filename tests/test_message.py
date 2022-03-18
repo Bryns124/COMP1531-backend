@@ -31,11 +31,6 @@ def user_invalid():
     return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET(), algorithm="HS256")
 
 
-@pytest.fixture
-def invalid_user_id():
-    return jwt.encode({'auth_user_id': -1, 'session_id': 1}, SECRET(), algorithm="HS256")
-
-
 """Channels"""
 
 
@@ -57,23 +52,6 @@ def channel_private(user_1):
 @pytest.fixture
 def invalid_channel_id():
     return -1
-
-
-@pytest.fixture
-def channel_1(user_1):
-    return channels_create_v1(user_1["token"], "A New Hope", True)
-
-
-@pytest.fixture
-def channel_2(user_2):
-    return channels_create_v1(user_2["token"], "Empire Strikes Back", True)
-
-
-@pytest.fixture
-def invalid_channel():
-    return {
-        'channel_id': -1
-    }
 
 
 @pytest.fixture
