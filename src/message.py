@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 from data_store import data_store
 
 def messages_send_v1(token, channel_id, message):
-    pass
-=======
-from src.data_store import data_store
-
-def message_send_v1(token, channel_id, message):
     pass
 #{message_id}
 
@@ -32,7 +26,3 @@ def message_remove_v1(token, message_id):
     data_store.set(store)
     return {}
 #{}
-
-def do message_remove(message_id):
-    for channel in store['channels']:
->>>>>>> 02b8f6c1cc0e2056ccf9d5e672eedff383aca26e
