@@ -61,7 +61,7 @@ initial_object = {
         #            'message': 'Hello world',
         #            'time_sent': 1582426789,
         #        }
-        #       ],
+              ],
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
