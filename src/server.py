@@ -8,6 +8,7 @@ from src import config
 from src.auth import auth_login_v1, auth_register_v1
 
 
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
