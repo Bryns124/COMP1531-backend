@@ -57,4 +57,49 @@ def invalid_channel_id():
 @pytest.fixture
 def starting_value():
     return 0
->>>>>>> 90b77663923dc3499962bed5e95d38482b93b340
+
+#may add fixtures for sending messages
+def test_message_edit(user_1):
+    #craete channel, send message
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token" : user_1["token"],
+        "message_id" : 1,
+        "message" : "user 1 new message"
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+def test_channel_message_remove(user_1):
+    #craete channel, send message
+    r = requests.put(f"{BASE_URL}/message/remove/v1", json={
+        "token" : user_1["token"],
+        "message_id" : 1,
+        "message" : "user 2 new message",
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+def test_dm_message_edit(user_1):
+    #craete Dm, send message
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token" : user_1["token"],
+        "message_id" : 1,
+        "message" : "user 1 new message"
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
+def test_dm_message_remove(user_1):
+    #craete Dm, send message
+    r = requests.put(f"{BASE_URL}/message/remove/v1", json={
+        "token" : user_1["token"],
+        "message_id" : 1,
+        "message" : "user 2 new message",
+    })
+    payload = r.json()
+    assert payload == {}
+    clear_v1()
+
