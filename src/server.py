@@ -42,17 +42,19 @@ APP.register_error_handler(Exception, defaultHandler)
 def auth_register_v2():
     data = request.get_json()
     ret = auth_register_v1(
-        data['email'], data['password'], data['name_first'], data['hname_last'])
+        data['email'], data['password'], data['name_first'], data['name_last'])
     return dumps({
         'auth_user_id': ret['auth_user_id']
     })
 
 
-@APP.route("/message/send/v1", method=['POST'])
+@APP.route("/message/send/v1", methods=['POST'])
 def message_send():
     body = request.get_json()
     data = messages_send_v1(body['token'], body['channel_id'], body['message'])
-    return {"message_id": data}
+    return dumps({
+        "message_id": data
+    })
 
 
 @APP.route("/echo", methods=['GET'])

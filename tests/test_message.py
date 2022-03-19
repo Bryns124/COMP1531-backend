@@ -22,7 +22,12 @@ BASE_URL = f"http://127.0.0.1:{port}/"
 
 @pytest.fixture()
 def user_1():
-    return auth_register_v1("mikey@unsw.com", "test123456", "Mikey", "Test")
+    return requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "test123456",
+        "name_first": "Mikey",
+        "name_last": "Test"
+    })
 
 
 @pytest.fixture
@@ -166,19 +171,19 @@ def test_channel_messages_channel_id_error():
 
 
 def test_messages_send(user_1, channel_public, message_text, starting_value):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": message_text
     })
     payload = r.json()
-    assert payload['message_id'] == channel_messages_v1(
-        user_1['token'], channel_public, starting_value)['messages'][-1]['message_id']
+    assert channel_messages_v1(user_1['token'], channel_public, starting_value)[
+        'messages'][-1]['message_id'] == payload["message_id"]
     clear_v1()
 
 
 def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
         "message": message_text
@@ -189,7 +194,7 @@ def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text)
 
 
 def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": invalid_message_text
@@ -200,7 +205,7 @@ def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_
 
 
 def test_messages_send_message_lengthshort_error(user_1, channel_public, invalid_message_text_short):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": invalid_message_text_short
@@ -211,7 +216,7 @@ def test_messages_send_message_lengthshort_error(user_1, channel_public, invalid
 
 
 def test_messages_send_access_error(user_2, channel_public, message_text):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_2['token'],
         "channel_id": channel_public,
         "message": message_text
@@ -222,7 +227,7 @@ def test_messages_send_access_error(user_2, channel_public, message_text):
 
 
 def test_messages_send_token_error(user_invalid, channel_public, message_text):
-    r = requests.post(f"{BASE_URL}/messages/send/v1", json={
+    r = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_invalid['token'],
         "channel_id": channel_public,
         "message": message_text
