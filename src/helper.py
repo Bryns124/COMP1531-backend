@@ -3,8 +3,7 @@ from src.error import AccessError, InputError
 import jwt
 
 
-def SECRET():
-    return "ANT"
+SECRET = "ANT"
 
 
 def generate_token(u_id):
