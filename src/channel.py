@@ -93,7 +93,7 @@ def channel_details_v1(token, channel_id):
     is_channel = False 
     is_member = False
     all_channels = store['channels'] 
-
+    auth_user_id = generate_token(token)
     valid_auth_user_id(auth_user_id)
     
     for channel in all_channels:
