@@ -234,13 +234,3 @@ def test_messages_send_token_error(user_invalid, channel_public, message_text):
     })
     assert r.status_code == AccessError.code
     clear_v1()
-
-
-# def test_login():
-#     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-#         "email": "alice@gmail.com",
-#         "password": "123456"
-#     })
-#     payload = r.json()
-#     assert payload["token"] == "token"  # sample token for now
-#     assert payload["token"] == 1

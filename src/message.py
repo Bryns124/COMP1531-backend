@@ -50,9 +50,6 @@ def messages_send_v1(token, channel_id, message):
     }
     store['messages'].append(message_body)
 
-    for channel in store['channel']:
-        if channel['channel_id'] == channel_id:
-            channel['messages_list'].append(message_id)
     data_store.set(store)
     return {"message_id": message_id}
 # {message_id}
