@@ -86,7 +86,7 @@ def channel_details_v1(token, channel_id):
         however containing information
         on all members of the channel
     }
-    '''
+    """
 
     store = data_store.get()
 
@@ -167,8 +167,7 @@ def member_details(user_id):
     "name_last": last name (string),
     "handle_str": user handle (string)
     }
-
-    '''
+    """
     store = data_store.get() 
     users = store['users'] 
     for user in users:
