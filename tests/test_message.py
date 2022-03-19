@@ -71,6 +71,20 @@ def starting_value():
 # may add fixtures for sending messages
 
 
+@pytest.fixture
+def message_text():
+    return "Hello world"
+
+
+@pytest.fixture
+def invalid_message_text_short():
+    return ""
+
+
+def invalid_message_text():
+    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N"
+
+
 def test_message_edit(user_1):
     # craete channel, send message
     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
@@ -117,15 +131,6 @@ def test_dm_message_remove(user_1):
     payload = r.json()
     assert payload == {}
     clear_v1()
-
-
-@pytest.fixture
-def message_text():
-    return "Hello world"
-
-
-def invalid_message_text():
-    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N"
 
 
 def test_channel_messages(user_1, channel_public, starting_value, message_text):
@@ -184,11 +189,22 @@ def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text)
     clear_v1()
 
 
-def test_messages_send_message_length_error(user_1, channel_public, invalid_message_text):
+def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text):
     r = requests.get(f"{BASE_URL}/messages/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": invalid_message_text
+    })
+
+    assert r.status_code == InputError.code
+    clear_v1()
+
+
+def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text_short):
+    r = requests.get(f"{BASE_URL}/messages/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public,
+        "message": invalid_message_text_short
     })
 
     assert r.status_code == InputError.code
