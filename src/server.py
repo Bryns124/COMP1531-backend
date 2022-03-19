@@ -1,3 +1,4 @@
+from operator import methodcaller
 import sys
 import signal
 from json import dumps
@@ -6,7 +7,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.auth import auth_login_v1, auth_register_v1
-
+from src.message import messages_send_v1
 
 
 def quit_gracefully(*args):
@@ -45,6 +46,13 @@ def auth_register_v2():
     return dumps({
         'auth_user_id': ret['auth_user_id']
     })
+
+
+@APP.route("/message/send/v1", method=['POST'])
+def message_send():
+    body = request.get_json()
+    data = messages_send_v1(body['token'], body['channel_id'], body['message'])
+    return {"message_id": data}
 
 
 @APP.route("/echo", methods=['GET'])
