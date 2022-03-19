@@ -3,6 +3,7 @@ from src.data_store import data_store
 from src.error import InputError
 import jwt
 from src.helper import generate_token
+import hashlib
 """
 Auth has two main functions: register and login
 
