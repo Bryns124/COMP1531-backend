@@ -48,7 +48,7 @@ def messages_send_v1(token, channel_id, message):
         "is_ch_message": True,
     }
 
-    return {message_id}
+    return {'message_id' : message_id}
 #{message_id}
 
 #{token, channel_id, message}
