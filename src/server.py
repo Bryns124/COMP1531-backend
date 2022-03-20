@@ -1,3 +1,4 @@
+from operator import methodcaller
 import sys
 import signal
 from json import dumps
@@ -41,11 +42,18 @@ APP.register_error_handler(Exception, defaultHandler)
 def auth_register_v2():
     data = request.get_json()
     ret = auth_register_v1(
-        data['email'], data['password'], data['name_first'], data['hname_last'])
+        data['email'], data['password'], data['name_first'], data['name_last'])
     return dumps({
         'auth_user_id': ret['auth_user_id']
     })
 
+@APP.route("/channels/create/v2", method=['POST'])
+def channels_create_v2():
+    data = request.get_json()
+    body = channels_create_v2(data['token'], data['name'], data['is_public'])
+    return dumps({
+        'channel_id': body(['channel_id'])
+    })
 
 @APP.route("/echo", methods=['GET'])
 def echo():
