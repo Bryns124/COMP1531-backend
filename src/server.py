@@ -1,3 +1,4 @@
+from operator import methodcaller
 from crypt import methods
 import sys
 import signal
@@ -7,6 +8,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.auth import auth_login_v1, auth_register_v1
+from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
 
 
@@ -38,15 +40,38 @@ APP.register_error_handler(Exception, defaultHandler)
 # Example
 
 
-@APP.route("/auth/register/v2", methods=['POST'])
-def auth_register_v2():
+# @APP.route("/auth/register/v2", methods=['POST'])
+# def auth_register_v2():
+#     data = request.get_json()
+#     ret = auth_register_v1(
+#         data['email'], data['password'], data['name_first'], data['name_last'])
+#     return dumps({
+#         'auth_user_id': ret['auth_user_id']
+#     })
+
+@APP.route("/channels/create/v2", method=['POST'])
+def channels_create_v2():
     data = request.get_json()
-    ret = auth_register_v1(
-        data['email'], data['password'], data['name_first'], data['hname_last'])
+    body = channels_create_v1(data['token'], data['name'], data['is_public'])
     return dumps({
-        'auth_user_id': ret['auth_user_id']
+        'channel_id': body(['channel_id'])
     })
 
+@APP.route("/channels/list/v2", method=['POST'])
+def channels_create_v2():
+    data = request.get_json()
+    body = channels_list_v1(data['token'])
+    return dumps({
+        'channels': body(['channels'])
+    })
+
+@APP.route("/channels/listall/v2", method=['POST'])
+def channels_create_v2():
+    data = request.get_json()
+    body = channels_listall_v1(data['token'])
+    return dumps({
+        'channels': body(['channels'])
+    })
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v2():
@@ -54,7 +79,6 @@ def clear_v2():
     return dumps({
 
     })
-
 
 @APP.route("/echo", methods=['GET'])
 def echo():

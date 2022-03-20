@@ -135,7 +135,7 @@ def channels_listall_v1(token):
     # }
 
 
-def channels_create_v1(token, name, is_public):
+def channels_create_v2(token, name, is_public):
     """ Function to create a new channel given the correct user id of a authorised user,
     the name of the channel and whether or not the channel is public or private. The return
     of this function is the id of that channel
@@ -197,7 +197,3 @@ def channels_create_v1(token, name, is_public):
     return {
         'channel_id': store['channels'][-1]['channel_id']
     }
-
-    # {
-    #     'channel_id': (channel id)
-    # }
