@@ -104,7 +104,7 @@ def channel_join_v2():
     })
 
 
-@APP.route("/channel/detail/v2", methods=['POST'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_v2():
     data = request.get_json()
     body = channel_details_v1(data['token'], data['channel_id'])

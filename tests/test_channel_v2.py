@@ -21,32 +21,35 @@ BASE_URL = f"http://127.0.0.1:{port}/"
 
 @pytest.fixture()
 def user_1():
-    return requests.post(f"{BASE_URL}/auth/register/v2", json={
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "mikey@unsw.com",
         "password": "test123456",
         "name_first": "Mikey",
         "name_last": "Test"
     })
+    return r.json()
 
 
 @pytest.fixture
 def user_2():
-    return requests.post(f"{BASE_URL}/auth/register/v2", json={
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "miguel@unsw.com",
         "password": "test123456",
         "name_first": "Miguel",
         "name_last": "Test"
     })
+    return r.json()
 
 
 @pytest.fixture
 def user_no_access():
-    return requests.post(f"{BASE_URL}/auth/register/v2", json={
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "error@unsw.com",
         "password": "no_access1235667",
         "name_first": "no_access",
         "name_last": "no_access"
     })
+    return r.json()
 
 
 @pytest.fixture
@@ -85,28 +88,37 @@ def test_channel_details_input_error(user_1, invalid_channel_id):
         "channel_id": invalid_channel_id
     })
     assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_details_access_error(user_2, channel_public):
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_details_wrong_u_id(user_invalid, channel_public):
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
-        "token": user_invalid['token'],
-        "channel_id": channel_public
+        "token": user_invalid,
+        "channel_id": channel_public['channel_id']
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_details(user_1, channel_public):
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     data = r.json()
     assert data['channels'] == {
@@ -118,22 +130,23 @@ def test_channel_details(user_1, channel_public):
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'},
-            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest'}
         ]
     }
     assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_details_multiple_users(user_1, channel_public, user_2):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     data = r.json()
     assert data['channels'] == {
@@ -151,6 +164,9 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         ]
     }
     assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join_channel_id_error(user_1, invalid_channel_id):
@@ -159,54 +175,69 @@ def test_channel_join_channel_id_error(user_1, invalid_channel_id):
         "channel_id": invalid_channel_id
     })
     assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join_already_member_error(user_1, channel_public):
     r = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_1['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join_access_error(user_2, channel_private):
     r = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_private
+        "channel_id": channel_private['channel_id']
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join_invalid_token(user_invalid, channel_public):
     r = requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_invalid['token'],
-        "channel_id": channel_public
+        "token": user_invalid,
+        "channel_id": channel_public['channel_id']
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join(channel_public, user_2):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_public
+        "channel_id": channel_public['channel_id']
     })
     data = r.json()
     assert data['channels'] == {
-        'name': "Empire Strikes Back",
+        'name': "Test Channel",
         'is_public':  True,
         'owner_members': [
-            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
-        ],
-        'all_members': [
-            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'},
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
                 'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+                'name_last': 'Test', 'handle_str': 'migueltest'}
         ]
     }
     assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
