@@ -54,37 +54,37 @@ def channels_create_v2():
     data = request.get_json()
     body = channels_create_v1(data['token'], data['name'], data['is_public'])
     return dumps({
-        'channel_id': body(['channel_id'])
+        'channel_id': body['channel_id']
     })
 
-@APP.route("/channels/list/v2", method=['POST'])
+@ APP.route("/channels/list/v2", method = ['POST'])
 def channels_list_v2():
-    data = request.get_json()
-    body = channels_list_v1(data['token'])
+    data=request.get_json()
+    body=channels_list_v1(data['token'])
     return dumps({
-        'channels': body(['channels'])
+        'channels': body['channels']
     })
 
-@APP.route("/channels/listall/v2", method=['POST'])
+@ APP.route("/channels/listall/v2", method = ['POST'])
 def channels_listall_v2():
-    data = request.get_json()
-    body = channels_listall_v1(data['token'])
+    data=request.get_json()
+    body=channels_listall_v1(data['token'])
     return dumps({
-        'channels': body(['channels'])
+        'channels': body['channels']
     })
 
-@APP.route("/clear/v1", methods=['DELETE'])
+@ APP.route("/clear/v1", methods = ['DELETE'])
 def clear_v2():
     clear_v1()
     return dumps({
 
     })
 
-@APP.route("/echo", methods=['GET'])
+@ APP.route("/echo", methods = ['GET'])
 def echo():
-    data = request.args.get('data')
+    data=request.args.get('data')
     if data == 'echo':
-        raise InputError(description='Cannot echo "echo"')
+        raise InputError(description = 'Cannot echo "echo"')
     return dumps({
         'data': data
     })
@@ -94,4 +94,4 @@ def echo():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=True)  # Do not edit this port
+    APP.run(port = config.port, debug = True)  # Do not edit this port
