@@ -58,7 +58,7 @@ def channels_create_v2():
     })
 
 @APP.route("/channels/list/v2", method=['POST'])
-def channels_create_v2():
+def channels_list_v2():
     data = request.get_json()
     body = channels_list_v1(data['token'])
     return dumps({
@@ -66,7 +66,7 @@ def channels_create_v2():
     })
 
 @APP.route("/channels/listall/v2", method=['POST'])
-def channels_create_v2():
+def channels_listall_v2():
     data = request.get_json()
     body = channels_listall_v1(data['token'])
     return dumps({
