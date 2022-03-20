@@ -32,12 +32,23 @@ def user_1():
 
 @pytest.fixture
 def user_2():
-    return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
+    return  requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "miguel@unsw.com",
+        "password": "test123456",
+        "name_first": "Miguel",
+        "name_last": "Test"
+    })
+
 
 
 @pytest.fixture
 def user_no_access():
-    return auth_register_v1("error@unsw.com", "no_access1235667", "no_access", "no_access")
+    return  requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "error@unsw.com",
+        "password": "no_access1235667",
+        "name_first": "no_access",
+        "name_last": "no_access"
+    })
 
 
 @pytest.fixture
@@ -171,66 +182,66 @@ def test_channel_messages_channel_id_error():
 
 
 def test_messages_send(user_1, channel_public, message_text, starting_value):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": message_text
     })
-    payload = r.json()
+    payload = request.json()
     assert channel_messages_v1(user_1['token'], channel_public, starting_value)[
         'messages'][-1]['message_id'] == payload["message_id"]
     clear_v1()
 
 
 def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
         "message": message_text
     })
 
-    assert r.status_code == InputError.code
+    assert request.status_code == InputError.code
     clear_v1()
 
 
 def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": invalid_message_text
     })
 
-    assert r.status_code == InputError.code
+    assert request.status_code == InputError.code
     clear_v1()
 
 
 def test_messages_send_message_lengthshort_error(user_1, channel_public, invalid_message_text_short):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public,
         "message": invalid_message_text_short
     })
 
-    assert r.status_code == InputError.code
+    assert request.status_code == InputError.code
     clear_v1()
 
 
 def test_messages_send_access_error(user_2, channel_public, message_text):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_2['token'],
         "channel_id": channel_public,
         "message": message_text
     })
 
-    assert r.status_code == AccessError.code
+    assert request.status_code == AccessError.code
     clear_v1()
 
 
 def test_messages_send_token_error(user_invalid, channel_public, message_text):
-    r = requests.post(f"{BASE_URL}/message/send/v1", json={
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_invalid['token'],
         "channel_id": channel_public,
         "message": message_text
     })
-    assert r.status_code == AccessError.code
+    assert request.status_code == AccessError.code
     clear_v1()
