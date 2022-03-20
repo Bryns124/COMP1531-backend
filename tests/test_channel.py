@@ -192,7 +192,7 @@ def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
         channel_1: a channel that is trying to be accessed
     '''
     with pytest.raises(AccessError):
-        channel_details_v1(invalid_user_id, channel_1)
+        channel_details_v1(invalid_user_id, channel_1['channel_id'])
     clear_v1()
 
 

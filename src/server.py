@@ -38,24 +38,6 @@ APP.register_error_handler(Exception, defaultHandler)
 # Example
 
 
-@APP.route("/auth/register/v2", methods=['POST'])
-def auth_register_v2():
-    data = request.get_json()
-    ret = auth_register_v1(
-        data['email'], data['password'], data['name_first'], data['hname_last'])
-    return dumps({
-        'auth_user_id': ret['auth_user_id']
-    })
-
-
-@APP.route("/clear/v1", methods=['DELETE'])
-def clear_v2():
-    clear_v1()
-    return dumps({
-
-    })
-
-
 @APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
