@@ -266,6 +266,7 @@ def test_dm_remove(user1, user2, user3, create_dm_3_user):
     })
 
     assert response.status_code == 200
+    clear_v1()
 
 def test_dm_remove_invalid_id(user1, user2, user3, create_dm_3_user):
     invalid_id = 200
@@ -275,6 +276,7 @@ def test_dm_remove_invalid_id(user1, user2, user3, create_dm_3_user):
     })
 
     assert response.status_code == InputError.code
+    clear_v1()
 
 
 def test_dm_remove_not_creator(user1, user2, user3, create_dm_3_user):
@@ -284,6 +286,7 @@ def test_dm_remove_not_creator(user1, user2, user3, create_dm_3_user):
     })
 
     assert response.status_code == AccessError.code
+    clear_v1()
 
 def test_dm_remove_not_member(user1, user2, user3, create_dm_3_user):
     request.post(f"{BASE_URL}/dm/leave/v1", json = {
@@ -297,3 +300,4 @@ def test_dm_remove_not_member(user1, user2, user3, create_dm_3_user):
     })
 
     assert response.status_code == AccessError.code
+    clear_v1()

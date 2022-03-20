@@ -11,3 +11,7 @@ Functions:
     dm_leave: user is removed as a member of the DM
     dm_messages: returns upto 50 messsages of the DM associated with the provided DM_id
 """
+
+# def dm_create_v1(token, u_id):
+
+
