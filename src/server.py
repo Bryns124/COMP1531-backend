@@ -48,6 +48,14 @@ def auth_register_v2():
     })
 
 
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear_v2():
+    clear_v1()
+    return dumps({
+
+    })
+
+
 @APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
