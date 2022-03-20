@@ -1,10 +1,8 @@
-from distutils.command.config import config
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
-from src.channels import channels_create_v2, channels_list_v1
+import pytest
+from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
-from src.message import messages_send_v1
 from src.other import clear_v1
-from src.error import InputError, AccessError
+from src.error import AccessError, InputError
 from src.helper import SECRET
 from src.config import port
 import json
@@ -13,91 +11,235 @@ import urllib
 import jwt
 import pytest
 
-##MAY CHANGE PORT LATER##
 BASE_URL = f"http://127.0.0.1:{port}/"
 
-
-# Users
-
-
-@pytest.fixture()
+@pytest.fixture
 def user_1():
-    return requests.post(f"{BASE_URL}/auth/register/v2", json = {
-        "email": "adiyatrahman@unsw.com",
-        "password": "12345678",
-        "name_first": "Adiyat",
-        "name_last": "Rahman"
-    })
-
+    return auth_register_v1("alice@gmail.com", "123456", "Alice", "Wan")
 
 @pytest.fixture
 def user_2():
-    return auth_register_v1("miguel@unsw.com", "test123456", "Miguel", "Test")
+    return auth_register_v1("adi@gmail.com", "abcdef", "Adiyat", "Rahman")
+
+@pytest.fixture #user1 creates a public channel
+def public_channel_user1(user_1):
+    return channels_create_v1(user_1["token"], "Public", True)
+
+@pytest.fixture #user2 creates a private channel
+def private_channel_user2(user_2):
+    return channels_create_v1(user_2["token"], "Private", False)
+
+@pytest.fixture #user1 creates a public channel
+def private_second_channel_user1(user_1):
+    return channels_create_v1(user_1["token"], "User_1_Private", False)
 
 
-@pytest.fixture
-def user_no_access():
-    return auth_register_v1("error@unsw.com", "no_access1235667", "no_access", "no_access")
-
-
-@pytest.fixture
-def user_invalid():
-    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
-
-
-# Channels
-@pytest.fixture
-def channel_public(user_1):
-    return channels_create_v1(user_1["token"], "Test Channel", True)
-
-
-@pytest.fixture
-def channel_private_access(user_no_access):
-    return channels_create_v1(user_no_access["token"], "No Access Channel", False)
-
-
-@pytest.fixture
-def channel_private(user_1):
-    return channels_create_v1(user_1["token"], "Private Channel", False)
-
-
-@pytest.fixture
-def invalid_channel_id():
-    return -1
-
-
-@pytest.fixture
-def starting_value():
-    return 0
-
-# may add fixtures for sending messages
-
-
-@pytest.fixture
-def message_text():
-    return "Hello world"
-
-
-@pytest.fixture
-def invalid_message_text_short():
-    return ""
-
-
-def invalid_message_text():
-    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N"
-
-def test_create_public_channel_v2(user_1):
-    requests.delete(BASE_URL + "clear")
-    user_token = user_1['token']
-
-    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
-        "token": user_token,
-        "name": "Public",
-        "is_public": True
+def test_listall_no_channel(user_1):
+    """
+    test for if no channels have been created
+    """
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+        "token": user_1["token"]
     })
 
+    assert response["channels"] == []
+    clear_v1()
 
-    payload = r.json()
-    assert(payload == {
-        'channel_id': 1
+def test_listall_public(user_1, public_channel_user1):
+    """
+    test for listing public channels
+    """
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+        "token": user_1["token"]
     })
+
+    assert repsonse["channels"] == [{
+        "channel_id" : public_channel_user1["channel_id"],
+        "name" : "Public"
+    }]
+    clear_v1()
+
+def test_listall_private(user_2, private_channel_user2):
+    """
+    test for listing private channel
+    """
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+        "token": user_1["token"]
+    })
+
+    assert repsonse["channels"] == [{
+        "channel_id": private_channel_user2["channel_id"],
+        "name": "Private"
+    }]
+    clear_v1()
+
+def test_listall_both(user_1, user_2, public_channel_user1, private_channel_user2):
+    """
+    test if two channels are created by separate users
+    """
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+        "token": user_1["token"]
+    })
+    assert response["channels"] == [
+        {
+            "channel_id": public_channel_user1["channel_id"],
+            "name": "Public"
+        },
+        {
+            "channel_id": private_channel_user2["channel_id"],
+            "name": "Private"
+        }
+    ]
+
+    clear_v1()
+
+def test_create_public_channel(user_2):
+    """
+    Test to check if creating a new public channel return the channel-id of that channel
+    Assumption: The token is correct
+    """
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "public_channel",
+        "is_public" : True
+    })
+
+    assert response["channel_id"] == 1
+    clear_v1()
+
+
+def test_create_private_channel(user_2):
+    """
+    Test to check if creating a new private channel will return the correct channel_id
+    Assumption: The token is correct
+    """
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "test_channel",
+        "is_public" : False
+    })
+
+    assert response["channel_id"] == 1
+    clear_v1()
+
+
+def test_create_channel_invalid_name_1(user_2):
+    """
+    Test to check if creating a channel with an invalid name of less than 1 character raises an Input Error
+    Assumption: The token is correct
+    """
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "",
+        "is_public" : True
+    })
+
+    assert request.status_code == InputError.code
+    clear_v1()
+
+
+def test_create_channel_invalid_name_2(user_2):
+    """
+    Test to check if creating a new channel with an invalid name of more than 20 characters raises an Input Error
+    Assumption: The token is correct
+    """
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "abcdefghijklmnopqrstuv",
+        "is_public" : True
+    })
+    assert request.status_code == InputError.code
+    clear_v1()
+
+def test_create_multiple_channel(user_2):
+    """
+    Test to check if creating multiple channels will return sequential channel_ids
+    Assumption: the channels will not be sorted by their name in alphabetical order
+    """
+    response1 = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "channel_1",
+        "is_public" : True
+    })
+
+    assert response1["channel_id"] == 1;
+
+    response2 = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1["token"],
+        "name" : "channel_2",
+        "is_public" : True
+    })
+
+    assert response2["channel_id"] == 2
+    clear_v1()
+
+
+def test_channel_list_private(user_2, private_channel_user2):
+    """
+    Test to check if a member of a private channel can list all the channels he is a member of
+    Assumption: The token is correct
+    Assumption: The user is only a member of one channel
+    """
+   response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+        "token": user_1["token"]
+    })
+
+    assert response["channels"] == [
+        {
+            "channel_id" : private_channel_user2["channel_id"],
+            "name ": "Private",
+        }
+    ]
+    clear_v1()
+
+
+def test_channel_list_public(user_1, public_channel_user1):
+    """
+    Test to check if a member of a public channel can list all the channels he is a member of
+    Assumption: The token is correct
+    Assumption: The user is only a member of one channel
+    """
+    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+        "token": user_1["token"]
+    })
+    assert response["channels"] == [
+        {
+            "channel_id" : public_channel_user1["channel_id"],
+            "name" : "Public,"
+        }
+    ]
+    clear_v1()
+
+def test_channel_list_empty(user_2):
+    """
+    Test to check if an empty list of dictionaries is returned if the user is not a member of any channels
+    Assumption: The token is correct
+    """
+    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+        "token": user_2["token"]
+    })
+    assert response["channels"] == []
+    clear_v1()
+
+
+def test_channel_list_multiple_created(user_1, public_channel_user1, private_second_channel_user1):
+    """
+    Test to check if a list of dictionaries containing channel details is correctly generated,
+    when the user creates and is the owner of multiple channels
+    Assumption: The token is correct
+    """
+    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+        "token": user_2["token"]
+    })
+
+    assert response["channels"] == [
+        {
+            "channel_id" : public_channel_user1["channel_id"],
+            "name" : "Public",
+        },
+        {
+            "channel_id" : private_second_channel_user1["channel_id"],
+            "name" : "User_1_Private",
+        }
+    ]
+    clear_v1()
