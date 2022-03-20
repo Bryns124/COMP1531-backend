@@ -62,6 +62,8 @@ def create_dm_3_user(user1, user2, user3):
     })
     return r.json()
 
+
+
 def test_dm_create_2_users(user1, user2):
     r = request.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user1('token'),
@@ -137,7 +139,7 @@ def test_dm_list_empty(user1):
     clear_v1()
 
 
-def test_dm_list_two_users(user1, user2, create_dm_2_users):
+def test_dm_list_two_users(user1, user2, create_dm_2_user):
     response_1 = request.get(f"{BASE_URL}/dm/list/v1", json = {
         "token": user1("token")
     })
@@ -170,7 +172,7 @@ def test_dm_list_two_users(user1, user2, create_dm_2_users):
     clear_v1()
 
 
-def test_dm_list_three_users(user1, user2, user3, create_dm_3_users):
+def test_dm_list_three_users(user1, user2, user3, create_dm_3_user):
     response_1 = request.get(f"{BASE_URL}/dm/list/v1", json = {
         "token": user1("token")
     })
@@ -255,3 +257,43 @@ def test_dm_list_two_dms(user1, user2, user3):
             'end': 75,
     }]
     clear_v1()
+
+
+def test_dm_remove(user1, user2, user3, create_dm_3_user):
+    response = request.delete(f"{BASE_URL}/dm/remove/v1", json = {
+        "token": user1["token"],
+        "DM_id": 1
+    })
+
+    assert response.status_code == 200
+
+def test_dm_remove_invalid_id(user1, user2, user3, create_dm_3_user):
+    invalid_id = 200
+    response = request.delete(f"{BASE_URL}/dm/remove/v1", json = {
+        "token": user1["token"],
+        "DM_id": 200
+    })
+
+    assert response.status_code == InputError.code
+
+
+def test_dm_remove_not_creator(user1, user2, user3, create_dm_3_user):
+    response = request.delete(f"{BASE_URL}/dm/remove/v1", json = {
+        "token": user2["token"],
+        "DM_id": 1
+    })
+
+    assert response.status_code == AccessError.code
+
+def test_dm_remove_not_member(user1, user2, user3, create_dm_3_user):
+    request.post(f"{BASE_URL}/dm/leave/v1", json = {
+        "token": user1["token"],
+        "DM_id": 1
+    })
+
+    response = request.delete(f"{BASE_URL}/dm/remove/v1", json = {
+        "token": user1["token"],
+        "DM_id": 1
+    })
+
+    assert response.status_code == AccessError.code
