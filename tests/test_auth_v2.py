@@ -77,6 +77,71 @@ def channel_public(user_1):
 #     clear_v1()
 
 
+def test_login_invalid_email():
+    with pytest.raises(InputError):
+
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "bryanle",
+            "password": "password123",
+        })
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "bryanle@gmailcom",
+            "password": "password123",
+        })
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "bryanle@gmial.com",
+            "password": "password123",
+        })
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "bryan..le@gmail.com",
+            "password": "password123",
+        })
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+# test when login email is incorrect
+
+
+def test_login_incorrect_email(user_1):
+    with pytest.raises(InputError):
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "notbryan.le@gmail.com",
+            "password": "test123456",
+        })
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+# test when login password is incorrect
+
+
+def test_login_incorrect_password(user_1):
+    with pytest.raises(InputError):
+        requests.post(f"{BASE_URL}/auth/login/v2", json={
+            "email": "bryan.le@gmailcom",
+            "password": "password456",
+        })
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+# test registered account is logged in correctly
+
+
+def test_login_correct(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "bryan.le@gmailcom",
+        "password": "password456",
+    })
+    assert r.json()['auth_user_id'] == 1
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
 def test_auth_register_user_created_sucessfully_v2():
     request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
@@ -90,6 +155,9 @@ def test_auth_register_user_created_sucessfully_v2():
     })
     assert request_register.status_code == 200
     assert request_register.json() == request_login.json()
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_register_invalid_email_v2():
@@ -101,6 +169,9 @@ def test_register_invalid_email_v2():
         "name_last": "Le"
     })
     assert request_register.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_register_email_already_used_v2():
@@ -118,6 +189,9 @@ def test_register_email_already_used_v2():
     })
     assert request_register1.status_code == 200
     assert request_register2.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_register_returns_unique_ID_v2():
@@ -134,6 +208,9 @@ def test_register_returns_unique_ID_v2():
         "name_last": "Nguyen"
     })
     assert request_register1.json() != request_register2.json()
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_password_length_less_than_6_v2():
@@ -144,6 +221,9 @@ def test_password_length_less_than_6_v2():
         "name_last": "Le"
     })
     assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_first_name_length_less_than_1_v2():
@@ -154,6 +234,9 @@ def test_first_name_length_less_than_1_v2():
         "name_last": "Le"
     })
     assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_first_name_length_more_than_50_v2():
@@ -164,6 +247,9 @@ def test_first_name_length_more_than_50_v2():
         "name_last": "Le"
     })
     assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_last_name_length_less_than_1_v2():
@@ -174,6 +260,9 @@ def test_last_name_length_less_than_1_v2():
         "name_last": ""
     })
     assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_last_name_length_more_than_50_v2():
@@ -184,6 +273,9 @@ def test_last_name_length_more_than_50_v2():
         "name_last": "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn"
     })
     assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 @pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
@@ -227,6 +319,9 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
             assert users['name_first'] == name_first_2
             assert users['name_last'] == name_last_2
             assert users['handle_str'] == handle_2
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_handles_appends_correctly(user_1, channel_public):
@@ -249,5 +344,6 @@ def test_handles_appends_correctly(user_1, channel_public):
     })
     for users in data.json()['all_members']:
         assert users['handle_str'] == handles
+    requests.delete(f"{BASE_URL}/clear/v1", json={
 
-def test_login_invalid_email(user_1):
+    })
