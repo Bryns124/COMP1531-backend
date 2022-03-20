@@ -109,7 +109,7 @@ def test_auth_register_user_created_sucessfully_v2():
     })
     # assert response.status_code == 200
     assert request_register.json() == request_login.json()
-    
+
 def test_register_invalid_email_v2():
     # not sure how to fit all the invalid email cases
     request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -119,7 +119,7 @@ def test_register_invalid_email_v2():
         "name_last": name_last
     })
     assert request_register.status_code == InputError.code
-    
+
 
 def test_register_email_already_used_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -160,7 +160,7 @@ def test_password_length_less_than_6_v2():
         "name_last": "Le"
     })
     assert request_register1.status_code == InputError.code
-    
+
 
 def test_first_name_length_less_than_1_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
