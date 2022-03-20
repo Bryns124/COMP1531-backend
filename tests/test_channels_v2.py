@@ -41,8 +41,8 @@ def test_listall_no_channel(user_1):
     response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
         "token": user_1["token"]
     })
-
-    assert response["channels"] == []
+    payload = response.json()
+    assert payload["channels"] == []
     clear_v1()
 
 def test_listall_public(user_1, public_channel_user1):
@@ -52,8 +52,8 @@ def test_listall_public(user_1, public_channel_user1):
     response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
         "token": user_1["token"]
     })
-
-    assert repsonse["channels"] == [{
+    payload = response.json()
+    assert payload["channels"] == [{
         "channel_id" : public_channel_user1["channel_id"],
         "name" : "Public"
     }]
@@ -66,8 +66,8 @@ def test_listall_private(user_2, private_channel_user2):
     response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
         "token": user_1["token"]
     })
-
-    assert repsonse["channels"] == [{
+    payload = response.json()
+    assert payload["channels"] == [{
         "channel_id": private_channel_user2["channel_id"],
         "name": "Private"
     }]
@@ -80,7 +80,8 @@ def test_listall_both(user_1, user_2, public_channel_user1, private_channel_user
     response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
         "token": user_1["token"]
     })
-    assert response["channels"] == [
+    payload = response.json()
+    assert payload["channels"] == [
         {
             "channel_id": public_channel_user1["channel_id"],
             "name": "Public"
@@ -103,8 +104,8 @@ def test_create_public_channel(user_2):
         "name" : "public_channel",
         "is_public" : True
     })
-
-    assert response["channel_id"] == 1
+    payload = response.json()
+    assert payload["channel_id"] == 1
     clear_v1()
 
 
@@ -118,8 +119,8 @@ def test_create_private_channel(user_2):
         "name" : "test_channel",
         "is_public" : False
     })
-
-    assert response["channel_id"] == 1
+    payload = response.json()
+    assert payload["channel_id"] == 1
     clear_v1()
 
 
@@ -133,7 +134,6 @@ def test_create_channel_invalid_name_1(user_2):
         "name" : "",
         "is_public" : True
     })
-
     assert request.status_code == InputError.code
     clear_v1()
 
@@ -148,6 +148,7 @@ def test_create_channel_invalid_name_2(user_2):
         "name" : "abcdefghijklmnopqrstuv",
         "is_public" : True
     })
+
     assert request.status_code == InputError.code
     clear_v1()
 
@@ -161,16 +162,16 @@ def test_create_multiple_channel(user_2):
         "name" : "channel_1",
         "is_public" : True
     })
-
-    assert response1["channel_id"] == 1;
+    payload1 = response1.json()
+    assert payload1["channel_id"] == 1;
 
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json={
         "token": user_1["token"],
         "name" : "channel_2",
         "is_public" : True
     })
-
-    assert response2["channel_id"] == 2
+    payload2 = response2.json()
+    assert payload2["channel_id"] == 2
     clear_v1()
 
 
@@ -183,8 +184,8 @@ def test_channel_list_private(user_2, private_channel_user2):
    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
         "token": user_1["token"]
     })
-
-    assert response["channels"] == [
+    payload = response.json()
+    assert payload["channels"] == [
         {
             "channel_id" : private_channel_user2["channel_id"],
             "name ": "Private",
@@ -202,7 +203,8 @@ def test_channel_list_public(user_1, public_channel_user1):
     response = requests.get(f"{BASE_URL}/channels/list/v2", json={
         "token": user_1["token"]
     })
-    assert response["channels"] == [
+    payload = response.json()
+    assert payload["channels"] == [
         {
             "channel_id" : public_channel_user1["channel_id"],
             "name" : "Public,"
@@ -218,7 +220,8 @@ def test_channel_list_empty(user_2):
     response = requests.get(f"{BASE_URL}/channels/list/v2", json={
         "token": user_2["token"]
     })
-    assert response["channels"] == []
+    payload = response.json()
+    assert payload["channels"] == []
     clear_v1()
 
 
@@ -231,8 +234,8 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
     response = requests.get(f"{BASE_URL}/channels/list/v2", json={
         "token": user_2["token"]
     })
-
-    assert response["channels"] == [
+    payload = response.json()
+    assert payload["channels"] == [
         {
             "channel_id" : public_channel_user1["channel_id"],
             "name" : "Public",
