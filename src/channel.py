@@ -90,16 +90,14 @@ def channel_details_v1(token, channel_id):
 
     store = data_store.get()
 
-    is_channel = False 
+    is_channel = False
     is_member = False
-    all_channels = store['channels'] 
-    auth_user_id = generate_token(token)
-    valid_auth_user_id(auth_user_id)
-    
-    for channel in all_channels:
+    auth_user_id = decode_token(token)['auth_user_id']
+
+    for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            is_channel = True 
-            active_channel = channel # sets the given channel as active channel
+            is_channel = True
+            active_channel = channel  # sets the given channel as active channel
             # to use it later in the function
 
     if not is_channel:
@@ -107,8 +105,8 @@ def channel_details_v1(token, channel_id):
 
     for member in active_channel['all_members']:
         if member == auth_user_id:
-            is_member = True 
-    
+            is_member = True
+
     if not is_member:
         raise AccessError("You are not a member of the channel.")
 
@@ -168,8 +166,8 @@ def member_details(user_id):
     "handle_str": user handle (string)
     }
     """
-    store = data_store.get() 
-    users = store['users'] 
+    store = data_store.get()
+    users = store['users']
     for user in users:
         if user['u_id'] == user_id:
             return {

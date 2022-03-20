@@ -1,3 +1,4 @@
+from operator import truediv
 import re
 from src.data_store import data_store
 from src.error import InputError
@@ -159,8 +160,11 @@ def create_handle(name_first, name_last):
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
+
+
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def email_check(email):
     """
@@ -183,5 +187,8 @@ def duplicate_email_check(email):
     :rtype: boolean
     """
     store = data_store.get()
+    does_email_exist = False
     for user in store['users']:
-        return bool(user['email'] == email)
+        if user['email'] == email:
+            does_email_exist = True
+    return does_email_exist
