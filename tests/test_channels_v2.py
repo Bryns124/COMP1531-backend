@@ -15,24 +15,52 @@ BASE_URL = f"http://127.0.0.1:{port}/"
 
 @pytest.fixture
 def user_1():
-    return auth_register_v1("alice@gmail.com", "123456", "Alice", "Wan")
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "alice@gmail.com",
+        "password": "123456",
+        "name_first": "Alice",
+        "name_last": "Wan"
+    })
+    return r.json
 
 @pytest.fixture
 def user_2():
-    return auth_register_v1("adi@gmail.com", "abcdef", "Adiyat", "Rahman")
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "adi@gmail.com",
+        "password": "abcdef",
+        "name_first": "Adiyat",
+        "name_last": "Rahman"
+    })
+    return r.json
 
 @pytest.fixture #user1 creates a public channel
 def public_channel_user1(user_1):
-    return channels_create_v1(user_1["token"], "Public", True)
+    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token" : user_1["token"],
+        "name" : "Public"
+        "is_public" : True
+    })
+
+    return r.json
 
 @pytest.fixture #user2 creates a private channel
 def private_channel_user2(user_2):
-    return channels_create_v1(user_2["token"], "Private", False)
+    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token" : user_2["token"],
+        "name" : "Private"
+        "is_public" : False
+    })
+
+    return r.json
 
 @pytest.fixture #user1 creates a public channel
 def private_second_channel_user1(user_1):
-    return channels_create_v1(user_1["token"], "User_1_Private", False)
-
+    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token" : user_1["token"],
+        "name" : "User_1_Private"
+        "is_public" : False
+    })
+    return r.json
 
 def test_listall_no_channel(user_1):
     """
