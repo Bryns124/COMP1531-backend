@@ -1,3 +1,4 @@
+from crypt import methods
 import sys
 import signal
 from json import dumps
@@ -6,7 +7,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 from src.auth import auth_login_v1, auth_register_v1
-
+from src.other import clear_v1
 
 
 def quit_gracefully(*args):
@@ -44,6 +45,14 @@ def auth_register_v2():
         data['email'], data['password'], data['name_first'], data['hname_last'])
     return dumps({
         'auth_user_id': ret['auth_user_id']
+    })
+
+
+@APP.route("/clear/v1", methods=['DELETE'])
+def clear_v2():
+    clear_v1()
+    return dumps({
+
     })
 
 
