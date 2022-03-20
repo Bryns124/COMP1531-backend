@@ -133,9 +133,12 @@ def test_login_incorrect_password(user_1):
 def test_login_correct(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
         "email": "bryan.le@gmailcom",
-        "password": "password456",
+        "password": "password456"
     })
-    assert r.json()['auth_user_id'] == 1
+    assert r == {
+        "auth_user_id": 1,
+        "session_id": 1
+    }
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
@@ -154,7 +157,7 @@ def test_auth_register_user_created_sucessfully_v2():
         "password": "password123"
     })
     assert request_register.status_code == 200
-    assert request_register.json() == request_login.json()
+    assert request_register == request_login
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
@@ -298,12 +301,14 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
         "name_first": name_first_2,
         "name_last": name_last_2
     })
+    body = request_1.json()
+    body2 = request_2.json()
     requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": request_1.json()['token'],
+        "token": body['token'],
         "channel_id": channel_public,
     })
     requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": request_2.json()['token'],
+        "token": body2['token'],
         "channel_id": channel_public,
     })
     data = requests.post(f"{BASE_URL}/channel/details/v2", json={
@@ -334,8 +339,9 @@ def test_handles_appends_correctly(user_1, channel_public):
             "name_first": "abc",
             "name_last": "def"
         })
+        body = request.json()
         requests.post(f"{BASE_URL}/channel/join/v2", json={
-            "token": request.json()['token'],
+            "token": body.json()['token'],
             "channel_id": channel_public,
         })
     data = requests.post(f"{BASE_URL}/channel/details/v2", json={

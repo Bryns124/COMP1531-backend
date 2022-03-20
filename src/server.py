@@ -5,7 +5,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config
+from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
 from src.other import clear_v1
 
@@ -38,7 +38,36 @@ APP.register_error_handler(Exception, defaultHandler)
 # Example
 
 
-@APP.route("/echo", methods=['GET'])
+@APP.route("/auth/login/v2", methods=['POST'])
+def login_v2():
+    data = request.get_json()
+    body = auth_login_v1(data["email"], data["password"])
+    return dumps({
+        "token": body['token'],
+        "session_id": body['session_id']
+    })
+
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def auth_register_v2():
+    data = request.get_json()
+    body = auth_register_v1(
+        data['email'], data['password'], data['name_first'], data['name_last'])
+    return dumps({
+        'token': body['token'],
+        'auth_user_id': body['auth_user_id']
+    })
+
+
+@ APP.route("/clear/v1", methods=['DELETE'])
+def clear_v2():
+    clear_v1()
+    return dumps({
+
+    })
+
+
+@ APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
     if data == 'echo':
