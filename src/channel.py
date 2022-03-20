@@ -87,64 +87,42 @@ def channel_details_v1(token, channel_id):
         on all members of the channel
     }
     """
-    store = data_store.get()  # Accessing data_store for data
-    is_channel = False  # Initialising booleans for raising errors
+
+    store = data_store.get()
+
+    is_channel = False 
     is_member = False
-    # Saving list of channels as a local variable
-    all_channels = store['channels']
-
-    # Iterates over all users and checks if the provided user id is in the system
-    validate_token(token)
-    # if the user id is found the boolean for valid user is set to True
-    # if the user id is not in the system, raises an InputError
-
-    # Iterates over all the channels and check if the provided channel id is in
-    # the system
+    all_channels = store['channels'] 
+    auth_user_id = generate_token(token)
+    valid_auth_user_id(auth_user_id)
+    
     for channel in all_channels:
         if channel['channel_id'] == channel_id:
-            is_channel = True  # if the channel id is found the boolean for valid
-            # channel is set to True
-            active_channel = channel  # sets the given channel as active channel
+            is_channel = True 
+            active_channel = channel # sets the given channel as active channel
             # to use it later in the function
 
-    # if the channel id is not in the system, raises an InputError
     if not is_channel:
         raise InputError("Invalid Channel ID")
 
-    # Iterates over all members in the channel to check if the provided user id
-    # is a member of the channel
     for member in active_channel['all_members']:
-        if member == decode_token(token)['auth_user_id']:
-            is_member = True  # if the user is found in the channel, the boolean
-            # saving if the user is a channel member is set to True
-
-    # if the user is not a member of the channel, raises an AccessError
+        if member == auth_user_id:
+            is_member = True 
+    
     if not is_member:
         raise AccessError("You are not a member of the channel.")
 
-    # initialising lists to save details about each owner/member respectively
     owner_members_details = []
     all_members_details = []
 
-    # Iterates over every id in the list of owner members/all members
-    # respectively
     for owner_id in active_channel['owner_members']:
-        # saves a dictionary containing details about a owner in owner_current
-        # and appends that to the list containing details
-        # about every owner
         owner_current = member_details(owner_id)
         owner_members_details.append(owner_current)
 
     for member_id in active_channel['all_members']:
-        # does the same as previous but for all members
-        # saves a dictionary containing details about a member in member_current
-        # and appends that to the list containing details
-        # about every member
         member_current = member_details(member_id)
         all_members_details.append(member_current)
 
-    # returns a dictionary with the format specified in the docstring for this
-    # function
     return {
         # 'name': 'Hayden',
         # 'owner_members': [
@@ -189,18 +167,11 @@ def member_details(user_id):
     "name_last": last name (string),
     "handle_str": user handle (string)
     }
-
     """
-    store = data_store.get()  # retrieves data from data_store
-    users = store['users']  # saves list of dictionaries containing information
-    # about all users
-
-    # iterates over all users and finds the user that matches the provided
-    # user_id
+    store = data_store.get() 
+    users = store['users'] 
     for user in users:
         if user['u_id'] == user_id:
-            # returns the required information in a dictionary specified in
-            # the docstring
             return {
                 'u_id': user['u_id'],
                 'email': user['email'],

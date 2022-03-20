@@ -3,6 +3,7 @@ from src.data_store import data_store
 from src.error import InputError
 import jwt
 from src.helper import generate_token
+import hashlib
 """
 Auth has two main functions: register and login
 
@@ -22,11 +23,12 @@ def auth_login_v1(email, password):
 
     :param email: the user's email
     :param password: the user's password
+    :return: token, u_id
     """
     store = data_store.get()
     for user in store['users']:
         if user['email'] == email:
-            if user['password'] == password:
+            if user['password'] == hash_password(password):
                 return {
                     'token': generate_token(user['u_id']),
                     'auth_user_id': user['u_id']
@@ -44,7 +46,7 @@ def auth_register_v1(email, password, name_first, name_last):
     :param password: the user's password
     :name_first: the user's first name
     :name_last: the user's last name
-    :return: the user's user ID
+    :return: token, u_id
     :rtype: dictionary
     """
     if not email_check(email):
@@ -89,7 +91,7 @@ def create_user(email, password, name_first, name_last):
             'name_first': name_first,
             'name_last': name_last,
             'handle_str': create_handle(name_first, name_last),
-            'password': password,
+            'password': hash_password(password),
             'channels_owned': [],
             'channels_joined': [],
         }
@@ -103,7 +105,7 @@ def create_user(email, password, name_first, name_last):
             'name_first': name_first,
             'name_last': name_last,
             'handle_str': create_handle(name_first, name_last),
-            'password': password,
+            'password': hash_password(password),
             'channels_owned': [],
             'channels_joined': [],
         }
@@ -157,7 +159,8 @@ def create_handle(name_first, name_last):
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
-
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def email_check(email):
     """
