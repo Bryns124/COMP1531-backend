@@ -44,7 +44,7 @@ def login_v2():
     body = auth_login_v1(data["email"], data["password"])
     return dumps({
         "token": body['token'],
-        "session_id": body['session_id']
+        "auth_user_id": body['auth_user_id']
     })
 
 
