@@ -221,10 +221,11 @@ def test_channel_invite(user_1, channel_public, user_2):
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
     })
-    r = requests.post(f"{BASE_URL}/channels/list/v2", json={
+    r = requests.get(f"{BASE_URL}/channels/list/v2", json={
         "token": user_2["token"]
     })
-    assert r['channels'][-1]['channel_id'].json() == channel_public['channel_id']
+    assert r.json()[
+        'channels'][-1]['channel_id'] == channel_public['channel_id']
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
     # channel_invite_v1(user_1['token'], channel_public['channel_id'], user_2['auth_user_id'])
@@ -248,15 +249,6 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     })
     assert request_channel_messages.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# |
-# this was commented out before i started the edits   |
-# v
-# def test_channel_messages_v1_invalid_start(user_1, invalid_channel_id, start):
-#     with pytest.raises(InputError):
-#         channel_messages_v1(user_1["auth_user_id"], invalid_channel_id, start)
-# clear_v1()
 
 
 def test_channel_messages_v1_access_error(user_no_access, channel_public):
@@ -303,7 +295,7 @@ def test_channel_addowner_user_not_in_channel(user_1, user_2, channel_public):
     This test checks to see that a InputError is raised when owner is not a member 
     of that channel.
     """
-    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v2", json={
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
@@ -322,7 +314,7 @@ def test_channel_addowner_user_already_owner(user_1, user_2, channel_public):
         "channel_id": channel_public['channel_id']
     })
 
-    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v2", json={
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
@@ -346,7 +338,7 @@ def test_channel_addowner_user_not_owner(user_1, user_2, channel_public):
         "channel_id": channel_public['channel_id']
     })
 
-    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v2", json={
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
@@ -366,7 +358,7 @@ def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
         "channel_id": channel_public['channel_id'],
     })
 
-    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v2", json={
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
@@ -380,7 +372,7 @@ def test_channel_removeowner_only_one_owner(user_1, user_2, channel_public):
     This test checks to see that an InputError is raised when removing the only
     owner of the channel.
     """
-    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v2", json={
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
