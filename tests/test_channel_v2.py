@@ -1,9 +1,14 @@
+<<<<<<< HEAD
+=======
+from distutils.command.config import config
+>>>>>>> 769bd69fd4cef21f364d2d7bc5812dbd3442e0f9
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 from src.helper import SECRET
+<<<<<<< HEAD
 import jwt
 import pytest
 from src.helper import decode_token, validate_token
@@ -11,6 +16,20 @@ from src.helper import decode_token, validate_token
 BASE_URL = f"http://127.0.0.1:{port}/"
 
 """Users"""
+=======
+from src.config import port
+import json
+import requests
+import urllib
+import jwt
+import pytest
+
+##MAY CHANGE PORT LATER##
+BASE_URL = f"http://127.0.0.1:{port}/"
+
+
+# Users
+>>>>>>> 769bd69fd4cef21f364d2d7bc5812dbd3442e0f9
 
 
 @pytest.fixture()
@@ -48,6 +67,7 @@ def user_no_access():
 
 @pytest.fixture
 def user_invalid():
+<<<<<<< HEAD
     return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET(), algorithm="HS256")
 
 
@@ -57,6 +77,9 @@ def invalid_user_id():
 
 
 """Channels"""
+=======
+    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
+>>>>>>> 769bd69fd4cef21f364d2d7bc5812dbd3442e0f9
 
 
 @pytest.fixture
@@ -70,11 +93,14 @@ def channel_public(user_1):
 
 
 @pytest.fixture
+<<<<<<< HEAD
 def channel_private_access(user_no_access):
     return channels_create_v1(user_no_access["token"], "No Access Channel", False)
 
 
 @pytest.fixture
+=======
+>>>>>>> 769bd69fd4cef21f364d2d7bc5812dbd3442e0f9
 def channel_private(user_1):
     r = requests.post(f"{BASE_URL}/channels/create/v2", json={
         "token": user_1['token'],
@@ -89,6 +115,7 @@ def invalid_channel_id():
     return -1
 
 
+<<<<<<< HEAD
 @pytest.fixture
 def channel_1(user_1):
     return channels_create_v1(user_1["token"], "A New Hope", True)
@@ -383,3 +410,164 @@ def test_channel_only_one_owner(user_1, user_2, channel_public);
     })
     assert request_channel_remove_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+def test_channel_details_input_error(user_1, invalid_channel_id):
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_details_access_error(user_2, channel_public):
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_details_wrong_u_id(user_invalid, channel_public):
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_invalid,
+        "channel_id": channel_public['channel_id']
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_details(user_1, channel_public):
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = r.json()
+    assert data['channels'] == {
+        'name': "Test Channel",
+        'is_public': True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ]
+    }
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_details_multiple_users(user_1, channel_public, user_2):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = r.json()
+    assert data['channels'] == {
+        'name': "Test Channel",
+        'is_public': True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+                'name_last': 'Test', 'handle_str': 'migueltest'}
+        ]
+    }
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_join_channel_id_error(user_1, invalid_channel_id):
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_join_already_member_error(user_1, channel_public):
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_join_access_error(user_2, channel_private):
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_private['channel_id']
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_join_invalid_token(user_invalid, channel_public):
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_invalid,
+        "channel_id": channel_public['channel_id']
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_channel_join(channel_public, user_2):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = r.json()
+    assert data['channels'] == {
+        'name': "Test Channel",
+        'is_public':  True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'}
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+                'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+                'name_last': 'Test', 'handle_str': 'migueltest'}
+        ]
+    }
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+>>>>>>> 769bd69fd4cef21f364d2d7bc5812dbd3442e0f9

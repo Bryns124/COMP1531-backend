@@ -4,6 +4,7 @@ clear: clears datastore
 """
 from src.data_store import data_store
 
+
 def clear_v1():
     """resets all data from data_store to initial stage
 
@@ -15,6 +16,8 @@ def clear_v1():
     store = data_store.get()
     store['users'] = []
     store['channels'] = []
+    store['DM'] = []
+    store['messages'] = []
     data_store.set(store)
 
     return {}
