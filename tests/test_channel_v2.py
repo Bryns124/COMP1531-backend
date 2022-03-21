@@ -24,7 +24,6 @@ def user_1():
     return r.json()
 
 
-
 @pytest.fixture
 def user_2():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -129,11 +128,6 @@ def test_channel_invite_access_error(user_1, channel_private_access, user_2):
     assert request_channel_invite.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-    # with pytest.raises(AccessError):
-    #     channel_invite_v1(
-    #         user_1['token'], channel_private_access['channel_id'], user_2['auth_user_id'])
-    # clear_v1()
-
 
 def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
     """
@@ -151,10 +145,6 @@ def test_channel_invite_channel_id_error(user_1, invalid_channel_id, user_2):
     })
     assert request_channel_invite.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    # with pytest.raises(InputError):
-    #     channel_invite_v1(
-    #         user_1['token'], invalid_channel_id, user_2['auth_user_id'])
-    # clear_v1()
 
 
 def test_channel_invite_u_id_error(user_1, channel_public, user_invalid):
@@ -210,13 +200,7 @@ def test_channel_invite_u_id_member(user_1, channel_public, user_2):
     })
     assert request_channel_invite.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    # channel_invite_v1(
-    #     user_1['token'], channel_public['channel_id'], user_2['auth_user_id'])
-    # with pytest.raises(InputError):
-    #     channel_invite_v1(
-    #         user_1['token'], channel_public['channel_id'], user_2['auth_user_id'])
-    # clear_v1()
-
+    
 
 def test_channel_invite(user_1, channel_public, user_2):
     """
@@ -259,10 +243,7 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
     })
     assert request_channel_messages.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    
-    # with pytest.raises(InputError):
-    #     channel_messages_v1(user_1["token"], invalid_channel_id, 0)
-    # clear_v1()
+
     
 ####################################################  |
 # this was commented out before i started the edits   |
@@ -289,11 +270,6 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public):
     })
     assert request_channel_messages.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    
-    # with pytest.raises(AccessError):
-    #     channel_messages_v1(
-    #         user_no_access['token'], channel_public['channel_id'], 0)
-    # clear_v1()
 
 
 def test_channel_messages_v1(user_1, channel_public):
@@ -314,12 +290,8 @@ def test_channel_messages_v1(user_1, channel_public):
         'start': 0,
         'end': -1}
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    
-    # assert channel_messages_v1(user_1['token'], channel_public['channel_id'], 0) == {
-    #     'messages': [],
-    #     'start': 0,
-    #     'end': -1}
-    # clear_v1()
+
+
 ################################################################################################
 # Tests for channel/addowner
 def test_channel_user_not_part_of_channel(user_1, user_2, channel_public);
@@ -351,7 +323,6 @@ def test_channel_user_already_owner(user_1, user_2, channel_public):
         "channel_id" : channel_public['channel_id'], 
         "u_id" : user_2['auth_user_id']
     })
-    
     assert request_channel_add_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
