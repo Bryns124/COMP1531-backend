@@ -370,3 +370,35 @@ def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
         int(user_3["auth_user_id"])
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_leave_invalid_dm_id(user_1):
+    response = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1
+    })
+    assert response.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_leave_no_access(user_3, create_dm_2_user):
+    response = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+        "token": user_3["token"],
+        "dm_id": 1
+    })
+    assert response.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_leave(user_1, create_dm_2_user):
+    response1 = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1
+    })
+    payload1 = response1.json()
+    assert payload1 == {}
+
+    response2 = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1
+    })
+
+    assert response2.status_code == AccessError.code
+
