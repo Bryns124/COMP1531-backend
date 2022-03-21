@@ -52,7 +52,7 @@ initial_object = {
         #     'end': 75,
         # }
     ],
-    'DM' : [
+    'dms' : [
         # {
         #     'DM_id' : ,
         #     'DM_name' : "",
@@ -63,7 +63,7 @@ initial_object = {
         #     'end': 75,
         # }
     ],
-    'messages': [
+    'messages':[
         #        {
         #            'message_id': 1,
         #            'u_id': 1,
