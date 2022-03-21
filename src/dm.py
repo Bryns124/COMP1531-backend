@@ -9,7 +9,7 @@ Functions:
     dm_remove: remove an existing dm so that all members are no longer in DM.
     dm_details: provide basic details about a particular dm given the dm_id
     dm_leave: user is removed as a member of the DM
-    dm_messages: returns upto 50 messsages of the DM associated with the provided DM_id
+    dm_messages: returns upto 50 messsages of the DM associated with the provided dm_id
 """
 
 def dm_create_v1(token, u_ids):
@@ -42,22 +42,22 @@ def dm_create_v1(token, u_ids):
                 handle_list.append(users['handle_str'])
 
     handle_list.sort()
-    new_dm_name = ', '.join(handle_list)
+    new_name = ', '.join(handle_list)
 
 
     new_dm = {
-        'DM_id': new_dm_id,
-        'DM_name': new_dm_name,
+        'dm_id': new_dm_id,
+        'name': new_name,
         'owner_members': [auth_user_id],
         'all_members': u_ids,
         'messages_list': [],
         'start': 25,
         'end': 75,
     }
-    store['DM'].append(new_dm)
+    store['dms'].append(new_dm)
 
     return {
-        'DM_id': store['DM'][-1]['DM_id']
+        'dm_id': store['dms'][-1]['dm_id']
     }
 
 def check_duplicate(u_id_list):
@@ -90,9 +90,14 @@ def dm_list_v1(token):
 
     dm_list = []
 
-    for dms in store['DM']:
+    for dms in store['dms']:
         if any(auth_user_id in dms['owner_members'], auth_user_id in dms['all_memebers']):
-            dm_list.append(extract_dm_details(store, dms['DM_id']))
+            details_list = (extract_dm_details(store, dms['dm_id']))
+            new = {
+                "dm_id" : details_list["dm_id"],
+                "name" : details_list["name"]
+            }
+            dm_list.append(new)
 
     return {
         'dms': dm_list
@@ -100,8 +105,8 @@ def dm_list_v1(token):
 
 
 def extract_dm_details(store, dm_id):
-    for dms in store['DM']:
-        if dms['DM_id'] == dm_id:
+    for dms in store['dms']:
+        if dms['dm_id'] == dm_id:
             return dms
 
 
@@ -128,9 +133,9 @@ def dm_remove_v1(token, dm_id):
         raise AccessError
 
     count = 0
-    for dms in store['DM']:
-        if dms['DM_id'] == dm_id:
-            store['DM'].pop(count)
+    for dms in store['dms']:
+        if dms['dm_id'] == dm_id:
+            store['dms'].pop(count)
         count += 1
 
     return {
@@ -139,21 +144,44 @@ def dm_remove_v1(token, dm_id):
 
 def valid_dm_id(store, dm_id):
     dm_exist = False
-    for dms in store['DM']:
+    for dms in store['dms']:
         if dm_id == dms['dm_id']:
             dm_exist = True
     return dm_exist
 
 def is_dm_owner(store, auth_user_id, dm_id):
     dm_owner = False
-    for dms in store['DM']:
-        if dms['DM_id'] == dm_id and auth_user_id in dms['owner_members']:
+    for dms in store['dms']:
+        if dms['dm_id'] == dm_id and auth_user_id in dms['owner_members']:
             dm_owner = True
     return dm_owner
 
 def is_dm_member(store, auth_user_id, dm_id):
     dm_member = False
-    for dms in store['DM']:
-        if dms['DM_id'] == dm_id and auth_user_id in dms['all_members']:
+    for dms in store['dms']:
+        if dms['dm_id'] == dm_id and auth_user_id in dms['all_members']:
             dm_member = True
     return dm_member
+
+def dm_details_v1(token, dm_id):
+    store = data_store.get()
+    validate_token(token)
+    u_id = decode_token(token)
+
+    if not valid_dm_id(store, dm_id):
+        raise InputError
+
+    if not is dm_member(store, u_id, dm_id):
+        raise AccessError
+
+    for dms in store['dms']:
+        if dm_id == dm["dm_id"]:
+            name = dm["name"]
+            members = dm["members"]
+
+    return {
+        "name" : name,
+        "members" : members
+    }
+
+#{ name, members }
