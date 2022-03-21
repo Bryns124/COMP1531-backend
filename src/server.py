@@ -9,7 +9,7 @@ from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
 from src.message import messages_send_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1
+from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
 
 
@@ -119,6 +119,19 @@ def channel_details_v2():
 def clear_v2():
     clear_v1()
     return dumps({
+
+    })
+
+
+@APP.route("/channel/message/v2", methods=['GET'])
+def channel_message_v2():
+    data = request.get_json()
+    body = channel_messages_v1(
+        data['token'], data['channel_id'], data['start'])
+    return dumps({
+        "messages": body['messages'],
+        "start": body['start'],
+        "end": body['end']
 
     })
 
