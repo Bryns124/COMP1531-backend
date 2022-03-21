@@ -47,11 +47,20 @@ initial_object = {
         #     'is_public' : None, #check if we can use None
         #     'owner_members' : ['u_id'], #check again if this is leagal
         #     'all_members' : ['u_id'],
-        #     'messages_list': [1,2,3,6,7,8]
-        #       'start': 25,
-        #       'end': 75,
-
-
+        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
+        #     'start': 25,
+        #     'end': 75,
+        # }
+    ],
+    'DM' : [
+        # {
+        #     'DM_id' : ,
+        #     'DM_name' : "",
+        #     'owner_members' : ['u_id'], #check again if this is leagal
+        #     'all_members' : ['u_id'],
+        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
+        #     'start': 25,
+        #     'end': 75,
         # }
     ],
     'messages': [
@@ -60,15 +69,17 @@ initial_object = {
         #            'u_id': 1,
         #            'message': 'Hello world',
         #            'time_sent': 1582426789,
-        #            'is_channel': True,
+        #            'is_ch_message': True, #this is a channel message
         #        },
         #        {
         #            'message_id': 1,
         #            'u_id': 1,
         #            'message': 'Hello world',
         #            'time_sent': 1582426789,
-        #            'is_channel': False,
+        #            'is_ch_message': False, #this is a dm message
         #        }
+        #       ],
+        # }
     ],
 }
 

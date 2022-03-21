@@ -121,6 +121,6 @@ def messages_send_v1(token, channel_id, message):
 
 
 def validate_message(message):
-    if message >= 1 and message <= 1000:
+    if len(message) >= 1 and len(message) <= 1000:
         return
     raise InputError("incorrect message length")

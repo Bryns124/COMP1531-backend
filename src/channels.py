@@ -197,7 +197,3 @@ def channels_create_v1(token, name, is_public):
     return {
         'channel_id': store['channels'][-1]['channel_id']
     }
-
-    # {
-    #     'channel_id': (channel id)
-    # }
