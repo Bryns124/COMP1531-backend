@@ -94,11 +94,16 @@ def dm_list_v1(token):
         if any(auth_user_id in dms['owner_members'], auth_user_id in dms['all_memebers']):
             dm_list.append(extract_dm_details(store, dms['DM_id']))
 
+    return {
+        'dms': dm_list
+    }
+
 
 def extract_dm_details(store, dm_id):
     for dms in store['DM']:
         if dms['DM_id'] == dm_id:
             return dms
+
 
 
 def dm_remove_v1(token, dm_id):

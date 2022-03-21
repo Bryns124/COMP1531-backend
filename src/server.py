@@ -55,6 +55,47 @@ def echo():
     return dumps({
         'data': data
     })
+
+
+@APP.route("/dm/create/v1", methods = ['POST'])
+def dm_create_v1():
+    data = request.get_json()
+    body = dm_create_v1(data['token'], data['u_ids'])
+
+    return dumps({
+        'DM_id': body['dm_id']
+    })
+
+@APP.route("/dm/list/v1", methods = ['GET'])
+def dm_list_v1():
+    data = request.args()
+    body = dm_list_v1(data['token'])
+
+    return dumps({
+        'dms': body['dms']
+    })
+
+
+@APP.route("/dm/remove/v1", methods = ['DELETE'])
+def dm_remove_v1():
+    data = request.get_json()
+    body = dm_list_v1(data['token'], data['dm_id'])
+
+    return dumps({
+
+    })
+
+
+# @ APP.route("/channels/listall/v2", method = ['POST'])
+# def channels_listall_v2():
+#     data=request.get_json()
+#     body=channels_listall_v1(data['token'])
+#     return dumps({
+#         'channels': body['channels']
+#     })
+
+
+
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
 
