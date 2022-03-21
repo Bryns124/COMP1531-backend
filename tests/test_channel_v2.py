@@ -297,7 +297,7 @@ def test_channel_messages_v1(user_1, channel_public):
 
 
 # Tests for channel/addowner
-def test_channel_addowner_user_not_in_channel(user_1, user_2, channel_public);
+def test_channel_addowner_user_not_in_channel(user_1, user_2, channel_public):
     """
     This test checks to see that a InputError is raised when owner is not a member 
     of that channel.
@@ -374,7 +374,7 @@ def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
     
 
-def test_channel_removeowner_only_one_owner(user_1, user_2, channel_public);
+def test_channel_removeowner_only_one_owner(user_1, user_2, channel_public):
     """
     This test checks to see that an InputError is raised when removing the only
     owner of the channel.
