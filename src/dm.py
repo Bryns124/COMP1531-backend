@@ -54,3 +54,28 @@ def dm_create_v1(token, u_ids):
     return {
         'DM_id': store['DM'][-1]['DM_id']
     }
+
+
+def dm_list_v1(token):
+    store = data_store.get()
+    auth_user_exist = False
+    auth_user_id = decode_token(token)['auth_user_id']
+
+    for user in store['users']:
+        if auth_user_id == user['u_id']:
+            auth_user_exist = True
+
+    if not auth_user_exist:
+        raise AccessError
+
+    dm_list = []
+
+    for dms in store['DM']:
+        if any(auth_user_id in dms['owner_members'], auth_user_id in dms['all_memebers']):
+            dm_list.append(extract_dm_details(store, dms['DM_id']))
+
+
+    def extract_dm_details(store, dm_id):
+        for dms in store['DM']:
+            if dms['DM_id'] == dm_id:
+                return dms
