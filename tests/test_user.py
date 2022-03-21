@@ -161,6 +161,7 @@ def test_setemail_valid(user1):
         "email": new_email
     })
     assert requests.status_code == 200
+    clear_v1()
 
 def test_setemail_invalid_1(user1):
     new_email = "alicenew@gmail"
@@ -169,6 +170,7 @@ def test_setemail_invalid_1(user1):
         "email": new_email
     })
     assert requests.status_code == InputError.code
+    clear_v1()
 
 def test_setemail_invalid_2(user1, user2):
     new_email = "adi@gmail.com"
@@ -177,6 +179,7 @@ def test_setemail_invalid_2(user1, user2):
         "email": new_email
     })
     assert requests.status_code == InputError.code
+    clear_v1()
 
 
 def test_sethandle_valid(user1):
@@ -186,6 +189,7 @@ def test_sethandle_valid(user1):
         "handle_str": new_handle
     })
     assert requests.status_code == 200
+    clear_v1()
 
 
 def test_sethandle_invalid_not_alphanumeric(user1):
@@ -195,6 +199,7 @@ def test_sethandle_invalid_not_alphanumeric(user1):
         "handle_str": new_handle
     })
     assert requests.status_code == InputError
+    clear_v1()
 
 def test_sethandle_invalid_length_short(user1):
     new_handle = "un"
@@ -203,6 +208,7 @@ def test_sethandle_invalid_length_short(user1):
         "handle_str": new_handle
     })
     assert requests.status_code == InputError
+    clear_v1()
 
 def test_sethandle_invalid_length_long(user1):
     new_handle = "abcdefjhijklmnopqrtuvwxyz"
@@ -218,5 +224,36 @@ def test_sethandle_invalid_3(user1, user2):
     requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
+    })
+    assert requests.status_code == InputError
+
+def test_setname_valid(user1):
+    new_first_name = "Unfertile"
+    new_last_name = "Egg"
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+        "token": user1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
+    })
+    assert requests.status_code == InputError
+
+def test_setname_firstname_long(user1):
+    new_first_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
+    new_last_name = "Egg"
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+        "token": user1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
+    })
+    assert requests.status_code == InputError
+
+
+def test_setname_lastname_long(user1):
+    new_first_name = "Unfertile"
+    new_last_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
+    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+        "token": user1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
     })
     assert requests.status_code == InputError
