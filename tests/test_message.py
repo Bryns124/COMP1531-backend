@@ -88,7 +88,7 @@ def starting_value():
 
 
 @pytest.fixture
-def invalid_stating_value():
+def invalid_starting_value():
     return 5
 
 # may add fixtures for sending messages
@@ -106,7 +106,7 @@ def invalid_message_text_short():
 
 @pytest.fixture
 def invalid_message_text():
-    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N"
+    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
 
 
 # def test_message_edit(user_1):
@@ -158,9 +158,6 @@ def invalid_message_text():
 
 
 def test_channel_messages(user_1, channel_public, starting_value, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
@@ -173,9 +170,9 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
     })
     payload = r.json()
     assert r.status_code == 200
-    assert payload['messages']['message_id'] == 1
-    assert payload['messages']['u_id'] == 1
-    assert payload['messages']['message'] == message_text
+    assert payload['messages'][-1]['message_id'] == 1
+    assert payload['messages'][-1]['u_id'] == 1
+    assert payload['messages'][-1]['message'] == message_text
     assert payload['start'] == 0
     assert payload['end'] == -1
     # {"messages": [
@@ -189,50 +186,56 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
     #     'start': 0,
     #     'end': -1,
     # }
-
-
-def test_channel_messages_channel_id_error(user_1, invalid_channel_id, invalid_starting_value):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    r = requests.post(f"{BASE_URL}/channel/messages/v2", json={
+
+
+def test_channel_messages_channel_id_error(user_1, invalid_channel_id, invalid_starting_value):
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
         "start": invalid_starting_value
     })
     assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_messages_unauthorised_user(channel_public, user_2, starting_value):
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-    r = requests.post(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
         "token": user_2['token'],
-        "channel_id": channel_public,
+        "channel_id": channel_public['channel_id'],
         "start": starting_value
     })
     assert r.status_code == AccessError.code
-
-
-def test_messages_send(user_1, channel_public, message_text, starting_value):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_messages_send(user_1, channel_public, message_text, starting_value):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
+
     payload = request.json()
-    assert channel_messages_v1(user_1['token'], channel_public, starting_value)[
-        'messages'][-1]['message_id'] == payload["message_id"]
-
-
-def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text):
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": starting_value
+    })
+    body = r.json()
+    assert body['messages'][-1]['message_id'] == payload["message_id"]
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
@@ -240,12 +243,12 @@ def test_messges_send_channel_id_error(user_1, invalid_channel_id, message_text)
     })
 
     assert request.status_code == InputError.code
-
-
-def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_message_text):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
@@ -253,26 +256,24 @@ def test_messages_send_message_lengthlong_error(user_1, channel_public, invalid_
     })
 
     assert request.status_code == InputError.code
-
-
-def test_messages_send_message_lengthshort_error(user_1, channel_public, invalid_message_text_short):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
 
+
+def test_messages_send_message_lengthshort_error(user_1, channel_public, invalid_message_text_short):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "message": invalid_message_text_short
     })
-
     assert request.status_code == InputError.code
-
-
-def test_messages_send_access_error(user_2, channel_public, message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_messages_send_access_error(user_2, channel_public, message_text):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
@@ -280,15 +281,18 @@ def test_messages_send_access_error(user_2, channel_public, message_text):
     })
 
     assert request.status_code == AccessError.code
-
-
-def test_messages_send_token_error(user_invalid, channel_public, message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_messages_send_token_error(user_invalid, channel_public, message_text):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
-        "token": user_invalid['token'],
+        "token": user_invalid,
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
     assert request.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })

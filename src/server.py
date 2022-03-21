@@ -141,7 +141,7 @@ def message_send():
     body = request.get_json()
     data = messages_send_v1(body['token'], body['channel_id'], body['message'])
     return dumps({
-        "message_id": data
+        "message_id": data['message_id']
     })
 
 

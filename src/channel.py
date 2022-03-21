@@ -232,7 +232,7 @@ def channel_messages_v1(token, channel_id, start):
     returned_full = False
     number_of_messages = 0
     for message_id in store['channels'][channel_id - 1]['messages_list'][start: start + 50]:
-        for message in store['message']:
+        for message in store['messages']:
             if message['message_id'] == message_id:
                 returned_messages['messages'].append(message)
                 number_of_messages = + 1

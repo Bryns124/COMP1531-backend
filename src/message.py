@@ -1,3 +1,4 @@
+from ast import In
 from src.data_store import data_store
 from src.helper import decode_token, validate_token, channel_validity, already_member
 from src.error import AccessError, InputError
@@ -21,7 +22,8 @@ def messages_send_v1(token, channel_id, message):
     """
     store = data_store.get()
     validate_token(token)
-    channel_validity(channel_id, store)
+    if not channel_validity(channel_id, store):
+        raise InputError("The channel you have entered is invalid")
     u_id = decode_token(token)['auth_user_id']
 
     if not already_member(u_id, channel_id, store):
@@ -40,6 +42,10 @@ def messages_send_v1(token, channel_id, message):
 
     utc = time.replace(tzinfo=timezone.utc)
     timestamp = utc.timestamp()
+
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel['messages_list'].append(message_id)
 
     message_body = {
         "message_id": message_id,
