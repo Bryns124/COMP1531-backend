@@ -2,6 +2,7 @@ from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, valid_auth_user_id, extract_channel_details
+
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
@@ -291,3 +292,15 @@ def channel_join_v1(token, channel_id):
     return {
         # empty
     }
+
+
+def channel_leave_v1(token, channel_id):
+    pass
+
+
+def channel_addowner_v1(token, channel_id, u_id):
+    pass
+
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    pass
