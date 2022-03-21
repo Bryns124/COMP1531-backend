@@ -12,6 +12,45 @@ Functions:
     dm_messages: returns upto 50 messsages of the DM associated with the provided DM_id
 """
 
-# def dm_create_v1(token, u_id):
+def dm_create_v1(token, u_ids):
+    store = data_store.get()
+    auth_user_exist = False
+    auth_user_id = decode_token(token)['auth_user_id']
+
+    for user in store['users']:
+        if auth_user_id == user['u_id']:
+            auth_user_exist = True
+
+    if not auth_user_exist:
+        raise AccessError
 
 
+    if store == {}:
+        new_dm_id = 1
+    else:
+        new_dm_id = len(store['channels']) + 1
+
+    handle_list = []
+    for ids in u_ids:
+        for users in store['users']:
+            if ids == users['u_id']:
+                handle_list.append(users['handle_str'])
+
+    handle_list.sort()
+    new_dm_name = ', '.join(handle_list)
+
+
+    new_dm = {
+        'DM_id': new_dm_id,
+        'DM_name': new_dm_name,
+        'owner_members': [auth_user_id],
+        'all_members': u_ids,
+        'messages_list': [],
+        'start': 25,
+        'end': 75,
+    }
+    store['DM'].append(new_dm)
+
+    return {
+        'DM_id': store['DM'][-1]['DM_id']
+    }
