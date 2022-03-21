@@ -7,7 +7,7 @@ from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.other import clear_v1
 
 
@@ -68,13 +68,6 @@ def channels_create_v2():
     return dumps({
         'channel_id': body['channel_id']
     })
-# @APP.route("/channels/create/v2", methods=['POST'])
-# def channels_create_v2():
-#     data = request.get_json()
-#     body = channels_create_v1(data['token'], data['name'], data['is_public'])
-#     return dumps({
-#         'channel_id': body(['channel_id'])
-#     })
 
 
 @APP.route("/channels/list/v2", methods=['GET'])
@@ -113,7 +106,61 @@ def channel_details_v2():
     })
 
 
-@ APP.route("/clear/v1", methods=['DELETE'])
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite_v2():
+    data = request.get_json()
+    channel_invite_v1(
+        data['token'], data['channel_id'], data['u_id'])
+    return dumps({
+
+    })
+
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2():
+    data = request.get_json()
+    body = channel_messages_v1(
+        data['token'], data['channel_id'], data['start'])
+    return dumps({
+        'messages': body['messages'],
+        'start': body['start'],
+        'end': body['end']
+    })
+
+# # Havent written the test functions and function
+# @APP.route("/channel/leave/v1", methods=['POST'])
+# def channel_leave_v1():
+#     data = request.get_json()
+#     body = channel_leave_v1(
+#         data['token'], data['channel_id'])
+#     return dumps({
+
+#     })
+
+
+# # Need to write functions for channel addowner and removeowner
+# # and successful tests like addowner and removeowner successfully
+# @APP.route("/channel/addowner/v1", methods=['POST'])
+# def channel_addowner_v1():
+#     data = request.get_json()
+#     body = channel_addowner_v1(
+#         data['token'], data['channel_id'], data['u_id'])
+#     return dumps({
+
+#     })
+
+
+# @APP.route("/channel/removeowner/v1", methods=['POST'])
+# def channel_removeowner_v1():
+#     data = request.get_json()
+#     body = channel_removeowner_v1(
+#         data['token'], data['channel_id'], data['u_id'])
+#     return dumps({
+
+#     })
+
+
+@APP.route("/clear/v1", methods=['DELETE'])
 def clear_v2():
     clear_v1()
     return dumps({
