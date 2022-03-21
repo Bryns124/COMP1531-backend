@@ -66,6 +66,8 @@ def test_users_all_2_users(user1, user2):
         'name_last': "Rahman",
         'handle_str': "adiyatrahman"
         }]
+    clear_v1()
+
 
 def test_users_all_1_user(user1):
     response = request.get(f"{BASE_URL}/users/all/v1", json = {
@@ -80,6 +82,7 @@ def test_users_all_1_user(user1):
         'name_last': "Wan",
         'handle_str': "alicewan"
         }]
+    clear_v1()
 
 def test_users_all_3_users(user1, user2, user3):
     response = request.get(f"{BASE_URL}/users/all/v1", json = {
@@ -108,6 +111,46 @@ def test_users_all_3_users(user1, user2, user3):
         'name_last': "Chai",
         'handle_str': "michaelchai"
         }]
+    clear_v1()
+
+def test_user_profile_valid_user_1(user1):
+    response = request.get(f"{BASE_URL}/user/profile/v1", json = {
+        "token": user1["token"],
+        "u_id": user1["auth_user_id"]
+    })
+    payload = response.json()
+    assert payload == {
+        'u_id' : user1['auth_user_id'],
+        'email': "alice@gmail.com",
+        'name_first': "Alice",
+        'name_last': "Wan",
+        'handle_str': "alicewan"
+        }
+    clear_v1()
+
+def test_user_profile_valid_user_2(user1, user2):
+    response = request.get(f"{BASE_URL}/user/profile/v1", json = {
+        "token": user1["token"],
+        "u_id": user2["auth_user_id"]
+    })
+    payload = response.json()
+    assert payload == {
+        'u_id' : user2['auth_user_id'],
+        'email': "adi@gmail.com",
+        'name_first': "Adiyat",
+        'name_last': "Rahman",
+        'handle_str': "adiyatrahman"
+        }
+    clear_v1()
+
+def test_user_profile_invalid(user1):
+    response = request.get(f"{BASE_URL}/user/profile/v1", json = {
+        "token": user1["token"],
+        "u_id": 200
+    })
+    assert request.status_code == InputError.code
+    clear_v1()
+
 
 
 
