@@ -1,7 +1,9 @@
 import pytest
-from src.dm import dm_create_v1, dm_list_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
-from src.auth import auth_register_v1
-from src.other import clear_v1
+import src.server
+# from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1
+# from src.dm import dm_details_v1, dm_leave_v1, dm_messages_v1
+# from src.auth import auth_register_v1
+# from src.other import clear_v1
 from src.error import AccessError, InputError
 from src.helper import SECRET
 from src.config import port
