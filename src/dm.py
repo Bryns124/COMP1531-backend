@@ -174,7 +174,7 @@ def dm_details_v1(token, dm_id):
     if not is dm_member(store, u_id, dm_id):
         raise AccessError
 
-    for dms in store['dms']:
+    for dm in store['dms']:
         if dm_id == dm["dm_id"]:
             name = dm["name"]
             members = dm["members"]
@@ -184,4 +184,20 @@ def dm_details_v1(token, dm_id):
         "members" : members
     }
 
-#{ name, members }
+def dm_remove(token, dm_id)
+    store = data_store.get()
+    validate_token(token)
+    u_id = decode_token(token)
+
+    if not valid_dm_id(store, dm_id):
+        raise InputError
+
+    if not is dm_member(store, u_id, dm_id):
+        raise AccessError
+
+    for dm in store["dms"]:
+        if dm_id == dm["dm_id"]:
+            dm.rmove(u_id)
+
+    return {}
+
