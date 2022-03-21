@@ -1,3 +1,4 @@
+from re import I
 import pytest
 from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
@@ -177,3 +178,45 @@ def test_setemail_invalid_2(user1, user2):
     })
     assert requests.status_code == InputError.code
 
+
+def test_sethandle_valid(user1):
+    new_handle = "unfertileegg"
+    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+        "token": user1['token'],
+        "handle_str": new_handle
+    })
+    assert requests.status_code == 200
+
+
+def test_sethandle_invalid_not_alphanumeric(user1):
+    new_handle = "unfertile&&egg"
+    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+        "token": user1['token'],
+        "handle_str": new_handle
+    })
+    assert requests.status_code == InputError
+
+def test_sethandle_invalid_length_short(user1):
+    new_handle = "un"
+    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+        "token": user1['token'],
+        "handle_str": new_handle
+    })
+    assert requests.status_code == InputError
+
+def test_sethandle_invalid_length_long(user1):
+    new_handle = "abcdefjhijklmnopqrtuvwxyz"
+    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+        "token": user1['token'],
+        "handle_str": new_handle
+    })
+    assert requests.status_code == InputError
+
+
+def test_sethandle_invalid_3(user1, user2):
+    new_handle = "alicewan"
+    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+        "token": user1['token'],
+        "handle_str": new_handle
+    })
+    assert requests.status_code == InputError
