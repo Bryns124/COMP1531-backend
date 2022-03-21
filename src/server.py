@@ -123,7 +123,7 @@ def clear_v2():
     })
 
 
-@APP.route("/channel/message/v2", methods=['GET'])
+@APP.route("/channel/messages/v2", methods=['GET'])
 def channel_message_v2():
     data = request.get_json()
     body = channel_messages_v1(
