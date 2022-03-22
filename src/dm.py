@@ -13,6 +13,21 @@ Functions:
 """
 
 def dm_create_v1(token, u_ids):
+    """a user creates a dm given a list of u id's
+        the creator of the dm is the owner
+
+    Args:
+        token (string): creator of the dm
+        u_ids (int): users in the dm
+
+    Raises:
+        AccessError: if the user dose not exist
+        InputError: if there are duplicate u id's for the input
+        InputError: invalid id
+
+    Returns:
+        dictionary: contains dm_id
+    """
     store = data_store.get()
     auth_user_exist = False
     auth_user_id = decode_token(token)['auth_user_id']
@@ -22,10 +37,10 @@ def dm_create_v1(token, u_ids):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise AccessError
+        raise AccessError("user does not exist")
 
     if check_duplicate(u_ids):
-        raise InputError
+        raise InputError("there are duplicate u id's")
 
     if check_invalid_id(store, u_ids):
         raise InputError
@@ -77,6 +92,18 @@ def check_invalid_id(store, u_ids):
             return True
 
 def dm_list_v1(token):
+    """given a user, the list of dms the user is a part of
+        is returned
+
+    Args:
+        token (string): user
+
+    Raises:
+        AccessError: _description_
+
+    Returns:
+        dictionary: contains a list of dms user is a part of
+    """
     store = data_store.get()
     auth_user_exist = False
     auth_user_id = decode_token(token)['auth_user_id']
@@ -112,6 +139,23 @@ def extract_dm_details(store, dm_id):
 
 
 def dm_remove_v1(token, dm_id):
+    """removes an existing dm so all members are
+        no longer a part of the dm.
+        this action can only be done by the owner of the dm
+
+    Args:
+        token (string): owner fo the dm
+        dm_id (int): dm to be removed
+
+    Raises:
+        AccessError: _description_
+        InputError: _description_
+        AccessError: _description_
+        AccessError: _description_
+
+    Returns:
+        dictionary: empty
+    """
     store = data_store.get()
     auth_user_exist = False
     auth_user_id = decode_token(token)['auth_user_id']
@@ -164,15 +208,29 @@ def is_dm_member(store, auth_user_id, dm_id):
     return dm_member
 
 def dm_details_v1(token, dm_id):
+    """provides basic details about a specific dm.
+        details are name and members of dm
+
+    Args:
+        token (string): authorised user who is part of the dm
+        dm_id (int): if of dm
+
+    Raises:
+        InputError: if the dm id does not exit
+        AccessError: dm id exists but the user is not a part of the dm
+
+    Returns:
+        dictionary: contains the name and members of the dm
+    """
     store = data_store.get()
     validate_token(token)
     u_id = decode_token(token)
 
     if not valid_dm_id(store, dm_id):
-        raise InputError
+        raise InputError("dm does not exist")
 
-    if not is dm_member(store, u_id, dm_id):
-        raise AccessError
+    if not is_dm_member(store, u_id, dm_id):
+        raise AccessError("user is not part of dm")
 
     for dm in store['dms']:
         if dm_id == dm["dm_id"]:
@@ -184,20 +242,97 @@ def dm_details_v1(token, dm_id):
         "members" : members
     }
 
-def dm_remove(token, dm_id)
+def dm_leave_v1(token, dm_id):
+    """user leaves a certain dm.
+        given dm ID the user is removed from DM
+        a creator can be removed from a dm and it will still exist
+        the name of the dm will remain the same
+
+    Args:
+        token (string): user who is leaving dm
+        dm_id (int): dm user will be leaving
+
+    Raises:
+        InputError: if dm id does not exist
+        AccessError: if user is not a part of the dm
+
+    Returns:
+        dictionary: empty
+    """
     store = data_store.get()
     validate_token(token)
     u_id = decode_token(token)
 
     if not valid_dm_id(store, dm_id):
-        raise InputError
+        raise InputError("dm id does nto exist")
 
-    if not is dm_member(store, u_id, dm_id):
-        raise AccessError
+    if not is_dm_member(store, u_id, dm_id):
+        raise AccessError("user is not part of dm")
 
     for dm in store["dms"]:
         if dm_id == dm["dm_id"]:
-            dm.rmove(u_id)
+            dm.remove(u_id)
 
     return {}
 
+def dm_messages_v1(token, dm_id, start):
+    """returns up to 50 messages in dm based on the start
+
+    Args:
+        token (string): authorised user
+        dm_id (int): given dm
+        start (int): requested start for messages
+
+    Raises:
+        InputError: dm id does not exist
+        AccessError: user is not aprt of dm
+        InputError: start value greater than messages in dm
+
+    Returns:
+        dictionary: contains messages which is a list
+        of dictionary containing the messages id, message,
+        user who made the message and time send. Also contains
+        the start and end for the messages. End will be -1 if
+        it returns less than 50 messages.
+    """
+    store = data_store.get()
+    validate_token(token)
+    u_id = decode_token(token)
+
+    if not valid_dm_id(store, dm_id):
+        raise InputError("dm id does not exist")
+
+    if not is_dm_member(store, u_id, dm_id):
+        raise AccessError("user is not part of dm")
+
+    for dm in store["dms"]:
+        if dm_id == dm["dm_id"]:
+            if len(dm["messages"]) < start:
+                raise InputError(
+                    "start value gerater than messages in dm"
+                )
+            id_list = dm["messages_list"]
+
+    ret = []
+    end = 0
+    for m in store["messages"]:
+        if end >= start + 50:
+            break
+        if id_list[end] == m["message_id"]:
+            ret_dict = {
+                "message_id" : m["message_id"],
+                "u_id" : m["u_id"],
+                "message" : m["message"],
+                "time_sent" : m["time_sent"]
+            }
+            ret.append(ret_dict)
+            end += 1
+
+    if end < start + 50:
+        end = -1
+
+    return {
+        "messages" : ret,
+        "start" : start,
+        "end" : end
+    }
