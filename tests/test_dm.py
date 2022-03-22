@@ -376,7 +376,7 @@ def test_dm_leave_invalid_dm_id(user_1):
         "token": user_1["token"],
         "dm_id": 1
     })
-    assert response.status_code == AccessError.code
+    assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_leave_no_access(user_3, create_dm_2_user):
@@ -401,4 +401,63 @@ def test_dm_leave(user_1, create_dm_2_user):
     })
 
     assert response2.status_code == AccessError.code
+
+def test_dm_messages_input_error(user_1):
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1,
+        "start" : 0
+    })
+    assert response.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_messages_incorrect_start(user_1, create_dm_2_user):
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1,
+        "start" : 12
+    })
+    assert response.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_messages_no_acces(user_3, create_dm_2_user):
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+        "token": user_3["token"],
+        "dm_id": 1,
+        "start" : 0
+    })
+    assert response.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_messages(user_1, create_dm_2_user):
+    requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+        "token": user_1["token"],
+        "message" : "hello world"
+    })
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1,
+        "start" : 0
+    })
+    payload = response.json()
+    assert payload["messages"][-1]["message_id"] == 1
+    assert payload["messages"][-1]["u_id"] == 1
+    assert payload["messages"][-1]["message"] == "hello world"
+    assert payload["start"] == 0
+    assert payload["end"] == -1
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_messages_none(user_1, create_dm_2_user):
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+        "token": user_1["token"],
+        "dm_id": 1,
+        "start" : 0
+    })
+    payload = response.json()
+    assert payload["messages"] == []
+    assert payload["start"] == 0
+    assert payload["end"] == -1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
