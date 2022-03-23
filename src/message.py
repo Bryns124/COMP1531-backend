@@ -134,7 +134,7 @@ def validate_message(message):
 def message_senddm_v1(token, dm_id, message):
     store = data_store.get()
     validate_token(token)
-    u_id = decode_token(token)
+    u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError("dm id does not exist")
@@ -157,7 +157,7 @@ def message_senddm_v1(token, dm_id, message):
 
     for dm in store['dms']:
         if dm['dm_id'] == dm_id:
-            dm['messages_list'].append(message_id)
+            dm['messages_list'].insert(0, message_id)
 
     message_body = {
         "message_id": message_id,
