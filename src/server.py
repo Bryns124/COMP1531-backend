@@ -155,16 +155,17 @@ def echo():
     })
 
 
-@APP.route("/dm/create/v1", methods = ['POST'])
+@APP.route("/dm/create/v1", methods=['POST'])
 def dm_create_v1():
     data = request.get_json()
     body = dm_create_v1(data['token'], data['u_ids'])
 
     return dumps({
-        'DM_id': body['dm_id']
+        'dm_id': body['dm_id']
     })
 
-@APP.route("/dm/list/v1", methods = ['GET'])
+
+@APP.route("/dm/list/v1", methods=['GET'])
 def dm_list_v1():
     data = request.args()
     body = dm_list_v1(data['token'])
@@ -174,7 +175,7 @@ def dm_list_v1():
     })
 
 
-@APP.route("/dm/remove/v1", methods = ['DELETE'])
+@APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove_v1():
     data = request.get_json()
     body = dm_list_v1(data['token'], data['dm_id'])
@@ -193,10 +194,8 @@ def dm_remove_v1():
 #     })
 
 
-
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
-
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
