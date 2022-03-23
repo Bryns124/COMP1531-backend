@@ -460,4 +460,59 @@ def test_dm_messages_none(user_1, create_dm_2_user):
     assert payload["end"] == -1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_dm_send_no_dm(user_1, channel_public, message_text, starting_value):
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 100,
+        "message": "hello world"
+    })
+
+    assert response.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_send_invalid_message(user_1, create_dm_2_user):
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
+    })
+    assert response.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_send_access_error(user_3, create_dm_2_user):
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_3['token'],
+        "dm_id": 1,
+        "message": "hello world"
+    })
+
+    assert response.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_send_access_error(user_1, create_dm_2_user):
+    response1 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "hello"
+    })
+
+    response2 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "world"
+    })
+
+    payload_1 = response1.json()
+    payload_2 = response2.json()
+    assert payload_2["message_id"] == 1
+    assert payload_2["message_id"] == 2
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+
+
+
+
+
+
 
