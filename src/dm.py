@@ -71,6 +71,8 @@ def dm_create_v1(token, u_ids):
     }
     store['dms'].append(new_dm)
 
+    data_store.set(store)
+
     return {
         'dm_id': store['dms'][-1]['dm_id']
     }
@@ -125,6 +127,8 @@ def dm_list_v1(token):
                 "name" : details_list["name"]
             }
             dm_list.append(new)
+
+    data_store.set(store)
 
     return {
         'dms': dm_list
@@ -182,6 +186,8 @@ def dm_remove_v1(token, dm_id):
             store['dms'].pop(count)
         count += 1
 
+    data_store.set(store)
+
     return {
 
     }
@@ -237,6 +243,8 @@ def dm_details_v1(token, dm_id):
             name = dm["name"]
             members = dm["members"]
 
+    data_store.set(store)
+
     return {
         "name" : name,
         "members" : members
@@ -272,6 +280,8 @@ def dm_leave_v1(token, dm_id):
     for dm in store["dms"]:
         if dm_id == dm["dm_id"]:
             dm.remove(u_id)
+
+    data_store.set(store)
 
     return {}
 
@@ -331,6 +341,8 @@ def dm_messages_v1(token, dm_id, start):
 
     if st < end:
         st = -1
+
+    data_store.set(store)
 
     return {
         "messages" : ret,
