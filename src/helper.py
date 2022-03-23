@@ -26,12 +26,12 @@ def decode_token(token):
 
 
 def validate_token(token):
-    valid_auth_user_id(decode_token(token)['auth_user_id']['auth_user_id'])
+    valid_auth_user_id(decode_token(token)['auth_user_id'])
     store = data_store.get()
     token_valid = False
     for user in store['users']:
         for session in user['session_id']:
-            if decode_token(token)['auth_user_id']['session_id'] == session:
+            if decode_token(token)['session_id'] == session:
                 token_valid = True
 
     if not token_valid:

@@ -1,4 +1,5 @@
 from base64 import decode
+from re import U
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
@@ -12,7 +13,8 @@ Functions:
     dm_messages: returns upto 50 messsages of the DM associated with the provided dm_id
 """
 
-def dm_create_v1(token, u_ids):
+
+def dm_create_v1(token, list_of_u_ids):
     """a user creates a dm given a list of u id's
         the creator of the dm is the owner
 
@@ -30,12 +32,12 @@ def dm_create_v1(token, u_ids):
     """
     store = data_store.get()
     validate_token(token)
-    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
+    auth_user_id = decode_token(token)['auth_user_id']
 
-    if check_duplicate(u_ids):
+    if check_duplicate(list_of_u_ids):
         raise InputError("there are duplicate u id's")
 
-    if check_invalid_id(store, u_ids):
+    if check_invalid_id(store, list_of_u_ids):
         raise InputError
 
     if store == {}:
@@ -44,7 +46,7 @@ def dm_create_v1(token, u_ids):
         new_dm_id = len(store['channels']) + 1
 
     handle_list = []
-    for ids in u_ids:
+    for ids in list_of_u_ids:
         for users in store['users']:
             if ids == users['u_id']:
                 handle_list.append(users['handle_str'])
@@ -52,12 +54,11 @@ def dm_create_v1(token, u_ids):
     handle_list.sort()
     new_name = ', '.join(handle_list)
 
-
     new_dm = {
         'dm_id': new_dm_id,
         'name': new_name,
         'owner_members': [auth_user_id],
-        'all_members': u_ids,
+        'all_members': list_of_u_ids,
         'messages_list': [],
         'start': 25,
         'end': 75,
@@ -70,12 +71,14 @@ def dm_create_v1(token, u_ids):
         'dm_id': store['dms'][-1]['dm_id']
     }
 
+
 def check_duplicate(u_id_list):
     ''' Check if given list of user ids contains any duplicates '''
     if len(u_id_list) == len(set(u_id_list)):
         return False
     else:
         return True
+
 
 def check_invalid_id(store, u_ids):
     '''Checks if any u_id passed in as argument for dm_create does not exist'''
@@ -86,6 +89,7 @@ def check_invalid_id(store, u_ids):
                 invalid = False
         if invalid == True:
             return True
+
 
 def dm_list_v1(token):
     """given a user, the list of dms the user is a part of
@@ -110,8 +114,8 @@ def dm_list_v1(token):
         if any(auth_user_id in dms['owner_members'], auth_user_id in dms['all_memebers']):
             details_list = (extract_dm_details(store, dms['dm_id']))
             new = {
-                "dm_id" : details_list["dm_id"],
-                "name" : details_list["name"]
+                "dm_id": details_list["dm_id"],
+                "name": details_list["name"]
             }
             dm_list.append(new)
 
@@ -127,7 +131,6 @@ def extract_dm_details(store, dm_id):
     for dms in store['dms']:
         if dms['dm_id'] == dm_id:
             return dms
-
 
 
 def dm_remove_v1(token, dm_id):
@@ -172,6 +175,7 @@ def dm_remove_v1(token, dm_id):
 
     }
 
+
 def valid_dm_id(store, dm_id):
     '''returns True if a dm with the dm_id passed in argument exists in data_store'''
     dm_exist = False
@@ -179,6 +183,7 @@ def valid_dm_id(store, dm_id):
         if dm_id == dms['dm_id']:
             dm_exist = True
     return dm_exist
+
 
 def is_dm_owner(store, auth_user_id, dm_id):
     '''the user with the given auth_user_id is an owner of the dm with the given dm_id'''
@@ -188,12 +193,14 @@ def is_dm_owner(store, auth_user_id, dm_id):
             dm_owner = True
     return dm_owner
 
+
 def is_dm_member(store, auth_user_id, dm_id):
     dm_member = False
     for dms in store['dms']:
         if dms['dm_id'] == dm_id and auth_user_id in dms['all_members']:
             dm_member = True
     return dm_member
+
 
 def dm_details_v1(token, dm_id):
     """provides basic details about a specific dm.
@@ -228,9 +235,10 @@ def dm_details_v1(token, dm_id):
     data_store.set(store)
 
     return {
-        "name" : name,
-        "members" : members
+        "name": name,
+        "members": members
     }
+
 
 def dm_leave_v1(token, dm_id):
     """user leaves a certain dm.
@@ -266,6 +274,7 @@ def dm_leave_v1(token, dm_id):
     data_store.set(store)
 
     return {}
+
 
 def dm_messages_v1(token, dm_id, start):
     """returns up to 50 messages in dm based on the start
@@ -307,16 +316,16 @@ def dm_messages_v1(token, dm_id, start):
 
     ret = []
     st = start
-    end =  start + 50
+    end = start + 50
     for m in reversed(store["messages"]):
         if st >= end:
             break
         if id_list[st] == m["message_id"]:
             ret_dict = {
-                "message_id" : m["message_id"],
-                "u_id" : m["u_id"],
-                "message" : m["message"],
-                "time_sent" : m["time_sent"]
+                "message_id": m["message_id"],
+                "u_id": m["u_id"],
+                "message": m["message"],
+                "time_sent": m["time_sent"]
             }
             ret.append(ret_dict)
             st += 1
@@ -327,7 +336,7 @@ def dm_messages_v1(token, dm_id, start):
     data_store.set(store)
 
     return {
-        "messages" : ret,
-        "start" : start,
-        "end" : st
+        "messages": ret,
+        "start": start,
+        "end": st
     }
