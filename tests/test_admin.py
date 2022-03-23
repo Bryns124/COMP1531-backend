@@ -1,12 +1,20 @@
-import pytest
+from distutils.command.config import config
 from src.data_store import data_store
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1, remove_id_from_group
 from src.auth import auth_register_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.helper import SECRET
+from src.config import port
+import json
+import requests
+import urllib
+import jwt
+import pytest
+
 
 BASE_URL = f"http://127.0.0.1:{port}/"
+
 
 @pytest.fixture
 def user_1():
@@ -18,6 +26,7 @@ def user_1():
     })
     return r.json
 
+
 @pytest.fixture
 def user_2():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -28,15 +37,17 @@ def user_2():
     })
     return r.json
 
+
 @pytest.fixture
 def user_3():
-    r = requests.post(f"{BASE_URL}/auth/register/v2", json = {
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "michael@gmail.com",
         "password": "1234567788",
         "name_first": "Michael",
         "name_last": "Chai"
     })
     return r.json
+
 
 @pytest.fixture
 def invalid_user_id():
@@ -72,10 +83,11 @@ check if u_id 3 gets removed from list of u_ids 1,2,3,4,5
 
 '''
 
+
 def test_invalid_u_id_admin_user_remove_v1(invalid_user_id, user_1):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": invalid_user_id['token'],
-        "u_id" : user_1["auth_user_id"]
+        "u_id": user_1["auth_user_id"]
     })
 
     assert request_admin_user_remove_v1.status_code == InputError.code
@@ -83,95 +95,103 @@ def test_invalid_u_id_admin_user_remove_v1(invalid_user_id, user_1):
 
 
 def test_remove_only_owner_admin_user_remove_v1(user_1):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" : user_1["auth_user_id"]
+        "u_id": user_1["auth_user_id"]
     })
 
     assert request_admin_user_remove_v1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
+def nonglobal_owner_admin_user_remove_v1(user_1, user_2):
+    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json={
+        "token": user_2["token"],
+        "u_id": user_1["auth_user_id"],
+    })
+    assert request_admin_user_remove_v1.status_code == AccessError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" : user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
-    store = datastore.get()
-    assert store["users"] = []
+    response = requests.get(f"{BASE_URL}/users/all", json={
+        "token": user_1["token"]
+    })
+
+    payload = response.json()
+
+    assert payload == [
         {
-            'u_id': 1,
-            'session_id': [],
-            'permission_id': 1,
-            'email': "alice@gmail.com",
-            'name_first': "Alice",
-            'name_last': "Wan",
-            'handle_str': "alicewan",
-            'password': "123456",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "first_name": "Alice",
+            "last_name": "Wan",
+            "handle_str": "alicewan"
         },
         {
-            'u_id': 3,
-            'session_id': [],
-            'permission_id': 2,
-            'email': "michael@gmail.com",
-            'name_first': "Michael",
-            'name_last': "Chai",
-            'handle_str': "michaelchai",
-            'password': "1234567788",
-            'channels_owned' : [],
-            'channels_joined' : []
-        }
-    ]
-
-def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
-    request_admin_userpermissions_change_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
-        "token": user_1["token"],
-        "u_id": user_2["auth_user_id"],
-        "permission_id": 1
-    })
-
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
-        "token": user_1["token"],
-        "u_id" : user_2["auth_user_id"]
-    })
-
-    store = datastore.get()
-    assert store["users"] = [
-        {
-            'u_id': 2,
-            'session_id': [],
-            'permission_id': 1,
-            'email': "adi@gmail.com",
-            'name_first': "Adiyat",
-            'name_last': "Rahman",
-            'handle_str': "adiyatrahman",
-            'password': "abcdef",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 3,
+            "email": "michael@gmail.com",
+            "first_name": "Michael",
+            "last_name": "Chai",
+            "handle_str": "michaelchai"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# check time return
+def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
+    requests.put(f"{BASE_URL}/admin/userpermission/change", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"],
+        "permission_id": 1
+    })
+
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
+        "token": user_2["token"],
+        "u_id": user_1["auth_user_id"]
+    })
+
+    response = requests.get(f"{BASE_URL}/users/all", json={
+        "token": user_2["token"]
+    })
+
+    payload = response.json()
+
+    assert payload == [
+        {
+            "u_id": 2,
+            "email": "adi@gmail.com",
+            "first_name": "Adiyat",
+            "last_name": "Rahman",
+            "handle_str": "adiyatrahman"
+        }
+    ]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+# fixed asserts for removed user messages
 def test_messages_removed_admin_user_remove_v1(user_1, user_2, public_channel_user1):
-    request_channel_invite_v2 = requests.post()(f"{BASE_URL}/channel/invite/v2", json = {
+    requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": public_channel_user1["channel_id"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
-    request_message_send_v1 = requests.post()(f"{BASE_URL}/message/send/v1", json = {
+    requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1["token"],
         "channel_id": public_channel_user1["channel_id"],
-        "message" = "Birds aren't real"
+        "message": "Birds aren't real"
     })
 
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
     store = data_store.get()
@@ -186,77 +206,74 @@ def test_messages_removed_admin_user_remove_v1(user_1, user_2, public_channel_us
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
-    request_user_profile_v1 = requests.get(f"{BASE_URL}/user/profile/v1", json = {
+    request_user_profile_v1 = requests.get(f"{BASE_URL}/user/profile/v1", json={
         "token": user_1["token"],
-        u_id = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
     payload = request_user_profile_v1.json()
 
     assert payload == {
-        "u_id" = 2,
-        "email" = "adi@gmail.com",
-        "first_name" = "Removed",
-        "last_name" = "user",
-        "handle_str" = "adiyatrahman"
+        "u_id": 2,
+        "email": "adi@gmail.com",
+        "first_name": "Removed",
+        "last_name": "user",
+        "handle_str": "adiyatrahman"
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
-    request_auth_register_v2 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+    requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "adi@gmail.com",
         "password": "abcdef",
         "name_first": "Adiyat",
         "name_last": "Rahman"
     })
 
-    store = data_store.get()
+    response = requests.get(f"{BASE_URL}/users/all", json={
+        "token": user_1["token"]
+    })
 
-    assert store["users"] == [
+    payload = response.json()
+
+    assert payload == [
         {
-            'u_id': 1,
-            'session_id': [],
-            'permission_id': 1,
-            'email': "alice@gmail.com",
-            'name_first': "Alice",
-            'name_last': "Wan",
-            'handle_str': "alicewan",
-            'password': "123456",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "first_name": "Alice",
+            "last_name": "Wan",
+            "handle_str": "alicewan"
         },
         {
-            'u_id': 3,
-            'session_id': [],
-            'permission_id': 2,
-            'email': "adi@gmail.com",
-            'name_first': "Adiyat",
-            'name_last': "Rahman",
-            'handle_str': "adiyatrahman",
-            'password': "abcdef",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 3,
+            "email": "adi@gmail.com",
+            "first_name": "Adiyat",
+            "last_name": "Rahman",
+            "handle_str": "adiyatrahman"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_users_all_admin_user_remove_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id": user_2["auth_user_id"]
     })
 
-    request_users_all_v1 = requests.delete(f"{BASE_URL}/users/all", json = {
+    request_users_all_v1 = requests.get(f"{BASE_URL}/users/all", json={
         "token": user_1["token"]
     })
 
@@ -264,16 +281,14 @@ def test_users_all_admin_user_remove_v1(user_1, user_2):
 
     assert payload == [
         {
-            "u_id" = 1,
-            "email" = "alice@gmail.com",
-            "first_name" = "Alice",
-            "last_name" = "Wan",
-            "handle_str" = "alicewan"
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "first_name": "Alice",
+            "last_name": "Wan",
+            "handle_str": "alicewan"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
 
 
 '''
@@ -282,8 +297,9 @@ admin_userpermission_change_v1
 Given a user by their user ID, set their permissions to new permissions described by permission_id.
 '''
 
+
 def test_invalid_u_id_admin_userpermission_change_v1(invalid_user_id):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": invalid_user_id["token"],
         "u_id": invalid_user_id["auth_user_id"],
         "permission_id": 1
@@ -292,8 +308,9 @@ def test_invalid_u_id_admin_userpermission_change_v1(invalid_user_id):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_demoting_only_global_owner_admin_userpermission_change_v1(user_1):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_1["auth_user_id"],
         "permission_id": 2
@@ -302,8 +319,9 @@ def test_demoting_only_global_owner_admin_userpermission_change_v1(user_1):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_invalid_permission_id_admin_userpermission_change_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_2["auth_user_id"],
         "permission_id": 3
@@ -312,14 +330,15 @@ def test_invalid_permission_id_admin_userpermission_change_v1(user_1, user_2):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_promoting_global_owner_admin_userpermission_change_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_2["auth_user_id"],
         "permission_id": 1
     })
 
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_2["token"],
         "u_id": user_1["auth_user_id"],
         "permission_id": 1
@@ -328,8 +347,9 @@ def test_promoting_global_owner_admin_userpermission_change_v1(user_1, user_2):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_demoting_nonglobal_owner_admin_userpermission_change_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_2["auth_user_id"],
         "permission_id": 2
@@ -338,8 +358,9 @@ def test_demoting_nonglobal_owner_admin_userpermission_change_v1(user_1, user_2)
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def nonglobal_owner_admin_userpermission_change_v1(user_1, user_2, user_3):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_2["token"],
         "u_id": user_3["auth_user_id"],
         "permission_id": 1
@@ -348,81 +369,61 @@ def nonglobal_owner_admin_userpermission_change_v1(user_1, user_2, user_3):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def promoting_user_2_admin_userpermission_change_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+
+def promoting_user_2_admin_userpermission_change_v1(user_1, user_2, user_3):
+    requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_2["auth_user_id"],
         "permission_id": 1
     })
-    store = datastore.get()
 
-    assert store["users"] == [
+    requests.delete(f"{BASE_URL}/admin/user/remove", json={
+        "token": user_2["token"],
+        "u_id": user_3["auth_user_id"]
+    })
+
+    response = requests.get(f"{BASE_URL}/users/all", json={
+        "token": user_1["token"]
+    })
+
+    payload = response.json()
+
+    assert payload == [
         {
-            'u_id': 1,
-            'session_id': [],
-            'permission_id': 1
-            'email': "alice@gmail.com",
-            'name_first': "Alice",
-            'name_last': "Wan",
-            'handle_str': "alicewan",
-            'password': "123456",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "first_name": "Alice",
+            "last_name": "Wan",
+            "handle_str": "alicewan"
         },
         {
-            'u_id': 2,
-            'session_id': [],
-            'permission_id': 1,
-            'email': "adi@gmail.com",
-            'name_first': "Adiyat",
-            'name_last': "Rahman",
-            'handle_str': "adiyatrahman",
-            'password': "abcdef",
-            'channels_owned' : [],
-            'channels_joined' : []
+            "u_id": 2,
+            "email": "adi@gmail.com",
+            "first_name": "Adiyat",
+            "last_name": "Rahman",
+            "handle_str": "adiyatrahman"
         }
     ]
-
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def demoting_user_1_admin_userpermission_change_v1(user_1, user_2):
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_1["token"],
         "u_id": user_2["auth_user_id"],
         "permission_id": 1
     })
 
-    request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
+    requests.put(f"{BASE_URL}/admin/userpermission/change", json={
         "token": user_2["token"],
         "u_id": user_1["auth_user_id"],
         "permission_id": 2
     })
-    store = datastore.get()
 
-    assert store["users"] == [
-        {
-            'u_id': 1,
-            'session_id': [],
-            'permission_id': 2,
-            'email': "alice@gmail.com",
-            'name_first': "Alice",
-            'name_last': "Wan",
-            'handle_str': "alicewan",
-            'password': "123456",
-            'channels_owned' : [],
-            'channels_joined' : []
-        },
-        {
-            'u_id': 2,
-            'session_id': [],
-            'permission_id': 1,
-            'email': "adi@gmail.com",
-            'name_first': "Adiyat",
-            'name_last': "Rahman",
-            'handle_str': "adiyatrahman",
-            'password': "abcdef",
-            'channels_owned' : [],
-            'channels_joined' : []
-        }
-    ]
+    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json={
+        "token": user_2["token"],
+        "u_id": user_1["auth_user_id"],
+    })
+    assert request_admin_user_remove_v1.status_code == AccessError.code
 
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
