@@ -16,6 +16,7 @@ import pytest
 
 BASE_URL = f"http://127.0.0.1:{port}/"
 
+
 @pytest.fixture
 def user_1():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -24,7 +25,8 @@ def user_1():
         "name_first": "Alice",
         "name_last": "Wan"
     })
-    return r.json
+    return r.json()
+
 
 @pytest.fixture
 def user_2():
@@ -34,21 +36,23 @@ def user_2():
         "name_first": "Adiyat",
         "name_last": "Rahman"
     })
-    return r.json
+    return r.json()
+
 
 @pytest.fixture
 def user_3():
-    r = requests.post(f"{BASE_URL}/auth/register/v2", json = {
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "michael@gmail.com",
         "password": "1234567788",
         "name_first": "Michael",
         "name_last": "Chai"
     })
-    return r.json
+    return r.json()
+
 
 @pytest.fixture
 def create_dm_2_user(user_1, user_2):
-    r = requests.post(f"{BASE_URL}/dm/create/v1", json = {
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [int(user_2["auth_user_id"])]
     })
@@ -57,18 +61,20 @@ def create_dm_2_user(user_1, user_2):
 
 @pytest.fixture
 def create_dm_3_user(user_1, user_2, user_3):
-    r = requests.post(f"{BASE_URL}/dm/create/v1", json = {
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
     })
     return r.json()
 
 
+requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_dm_create_2_users(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1('token'),
-        "u_ids": [int(user_2('auth_user_id'))]
+        "token": user_1['token'],
+        "u_ids": [user_2['auth_user_id']]
     })
     payload = r.json()
     assert payload['dm_id'] == 1
@@ -77,8 +83,8 @@ def test_dm_create_2_users(user_1, user_2):
 
 def test_dm_create_3_users(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1("token"),
-        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
+        "token": user_1["token"],
+        "u_ids": [user_2["auth_user_id"], user_3["auth_user_id"]]
     })
     payload = r.json()
     assert payload['dm_id'] == 1
@@ -88,7 +94,7 @@ def test_dm_create_3_users(user_1, user_2, user_3):
 
 def test_dm_create_2_dms(user_1, user_2, user_3, user4):
     response_1 = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1("token"),
+        "token": user_1['token'],
         "u_ids": [int(user_2('auth_user_id'))]
     })
 
@@ -106,43 +112,47 @@ def test_dm_create_2_dms(user_1, user_2, user_3, user4):
 def test_dm_create_invalid_ids(user_1):
     invalid_id = 200
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1('token'),
+        "token": user_1['token'],
         "u_ids": [invalid_id]
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_create_duplicate_ids_1(user_1):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1('token'),
+        "token": user_1['token'],
         "u_ids": [int(user_1('auth_user_id'))]
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_create_duplicate_ids_2(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1("token"),
+        "token": user_1['token'],
         "u_ids": [int(user_2('auth_user_id')), int(user_2('auth_user_id'))]
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_list_empty(user_1):
-    r = requests.get(f"{BASE_URL}/dm/list/v1", json = {
-        "token": user_1("token")
+    r = requests.get(f"{BASE_URL}/dm/list/v1", json={
+        "token": user_1['token']
     })
 
     payload = r.json()
     assert payload == []
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
-    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
-        "token": user_1("token")
+    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+        "token": user_1['token']
     })
 
-    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
+    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
         "token": user_2("token")
     })
 
@@ -150,14 +160,14 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
     payload_2 = response_2.json()
     assert payload_1["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan"
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan"
         }
     ]
     assert payload_2["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan",
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan",
         }
     ]
     # assert payload_1 == [{
@@ -181,16 +191,17 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
     # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
-    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
-        "token": user_1("token")
+    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+        "token": user_1['token']
     })
 
-    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
+    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
         "token": user_2("token")
     })
 
-    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
+    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json={
         "token": user_3("token")
     })
 
@@ -200,22 +211,22 @@ def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
 
     assert payload_1["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan, michaelchai"
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan, michaelchai"
         }
     ]
 
     assert payload_2["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan, michaelchai"
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan, michaelchai"
         }
     ]
 
     assert payload_3["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan, michaelchai"
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan, michaelchai"
         }
     ]
     # assert payload_1 == [{
@@ -251,30 +262,30 @@ def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
 
 
 def test_dm_list_two_dms(user_1, user_2, user_3):
-    requests.post(f"{BASE_URL}/dm/create/v1", json = {
+    requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [int(user_2["auth_user_id"])]
     })
 
-    requests.post(f"{BASE_URL}/dm/create/v1", json = {
+    requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [int(user_3["auth_user_id"])]
     })
 
-    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
-        "token": user_1("token")
+    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+        "token": user_1['token']
     })
 
     payload = response_3.json()
 
     assert payload["dms"] == [
         {
-            "dm_id" : 1,
-            "name" : "adiyatrahman, alicewan"
+            "dm_id": 1,
+            "name": "adiyatrahman, alicewan"
         },
         {
-            "dm_id" : 2,
-            'name' : "adiyatrahman, michaelchai",
+            "dm_id": 2,
+            'name': "adiyatrahman, michaelchai",
         }
     ]
 
@@ -298,8 +309,9 @@ def test_dm_list_two_dms(user_1, user_2, user_3):
     # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_remove(user_1, user_2, user_3, create_dm_3_user):
-    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
+    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
@@ -307,9 +319,10 @@ def test_dm_remove(user_1, user_2, user_3, create_dm_3_user):
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_remove_invalid_id(user_1, user_2, user_3, create_dm_3_user):
     invalid_id = 200
-    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
+    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json={
         "token": user_1["token"],
         "dm_id": invalid_id
     })
@@ -319,7 +332,7 @@ def test_dm_remove_invalid_id(user_1, user_2, user_3, create_dm_3_user):
 
 
 def test_dm_remove_not_creator(user_1, user_2, user_3, create_dm_3_user):
-    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
+    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json={
         "token": user_2["token"],
         "dm_id": 1
     })
@@ -327,13 +340,14 @@ def test_dm_remove_not_creator(user_1, user_2, user_3, create_dm_3_user):
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_remove_not_member(user_1, user_2, user_3, create_dm_3_user):
-    requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+    requests.post(f"{BASE_URL}/dm/leave/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
 
-    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
+    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
@@ -341,24 +355,27 @@ def test_dm_remove_not_member(user_1, user_2, user_3, create_dm_3_user):
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_details_invalid_dm_id(user_1):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_details_no_access(user_3, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
         "token": user_3["token"],
         "dm_id": 1
     })
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
         "token": user_3["token"],
         "dm_id": 1
     })
@@ -371,73 +388,80 @@ def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_leave_invalid_dm_id(user_1):
-    response = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+    response = requests.post(f"{BASE_URL}/dm/leave/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_leave_no_access(user_3, create_dm_2_user):
-    response = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+    response = requests.post(f"{BASE_URL}/dm/leave/v1", json={
         "token": user_3["token"],
         "dm_id": 1
     })
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_leave(user_1, create_dm_2_user):
-    response1 = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+    response1 = requests.post(f"{BASE_URL}/dm/leave/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
     payload1 = response1.json()
     assert payload1 == {}
 
-    response2 = requests.post(f"{BASE_URL}/dm/leave/v1", json = {
+    response2 = requests.post(f"{BASE_URL}/dm/leave/v1", json={
         "token": user_1["token"],
         "dm_id": 1
     })
 
     assert response2.status_code == AccessError.code
 
+
 def test_dm_messages_input_error(user_1):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1["token"],
         "dm_id": 1,
-        "start" : 0
+        "start": 0
     })
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_dm_messages_incorrect_start(user_1, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1["token"],
         "dm_id": 1,
-        "start" : 12
+        "start": 12
     })
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_messages_no_acces(user_3, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_3["token"],
         "dm_id": 1,
-        "start" : 0
+        "start": 0
     })
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_messages(user_1, create_dm_2_user):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1["token"],
-        "message" : "hello world"
+        "message": "hello world"
     })
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1["token"],
         "dm_id": 1,
-        "start" : 0
+        "start": 0
     })
     payload = response.json()
     assert payload["messages"][-1]["message_id"] == 1
@@ -448,17 +472,19 @@ def test_dm_messages(user_1, create_dm_2_user):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_messages_none(user_1, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json = {
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1["token"],
         "dm_id": 1,
-        "start" : 0
+        "start": 0
     })
     payload = response.json()
     assert payload["messages"] == []
     assert payload["start"] == 0
     assert payload["end"] == -1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_dm_send_no_dm(user_1, channel_public, message_text, starting_value):
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -470,6 +496,7 @@ def test_dm_send_no_dm(user_1, channel_public, message_text, starting_value):
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_dm_send_invalid_message(user_1, create_dm_2_user):
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
@@ -478,6 +505,7 @@ def test_dm_send_invalid_message(user_1, create_dm_2_user):
     })
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_dm_send_access_error_1(user_3, create_dm_2_user):
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -488,6 +516,7 @@ def test_dm_send_access_error_1(user_3, create_dm_2_user):
 
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_dm_send_access_error_2(user_1, create_dm_2_user):
     response1 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -507,12 +536,3 @@ def test_dm_send_access_error_2(user_1, create_dm_2_user):
     assert payload_1["message_id"] == 1
     assert payload_2["message_id"] == 2
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-
-
-
-
-
-
-
