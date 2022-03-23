@@ -7,7 +7,8 @@ from src.error import AccessError, InputError
 from src.helper import SECRET
 from src.config import port
 import json
-from flask import request, Flask
+from flask import Flask
+import requests
 import urllib
 import jwt
 import pytest
@@ -68,7 +69,7 @@ def test_users_all_2_users(user1, user2):
         'name_last': "Rahman",
         'handle_str': "adiyatrahman"
         }]
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_users_all_1_user(user1):
@@ -84,7 +85,7 @@ def test_users_all_1_user(user1):
         'name_last': "Wan",
         'handle_str': "alicewan"
         }]
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_users_all_3_users(user1, user2, user3):
     response = requests.get(f"{BASE_URL}/users/all/v1", json = {
@@ -113,7 +114,7 @@ def test_users_all_3_users(user1, user2, user3):
         'name_last': "Chai",
         'handle_str': "michaelchai"
         }]
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_user_profile_valid_user_1(user1):
     response = requests.get(f"{BASE_URL}/user/profile/v1", json = {
@@ -128,7 +129,7 @@ def test_user_profile_valid_user_1(user1):
         'name_last': "Wan",
         'handle_str': "alicewan"
         }
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_user_profile_valid_user_2(user1, user2):
     response = requests.get(f"{BASE_URL}/user/profile/v1", json = {
@@ -143,117 +144,117 @@ def test_user_profile_valid_user_2(user1, user2):
         'name_last': "Rahman",
         'handle_str': "adiyatrahman"
         }
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_user_profile_invalid(user1):
-    requests.get(f"{BASE_URL}/user/profile/v1", json = {
+    r = requests.get(f"{BASE_URL}/user/profile/v1", json = {
         "token": user1["token"],
         "u_id": 200
     })
-    assert requests.status_code == InputError.code
-    clear_v1()
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_setemail_valid(user1):
     new_email = "alicenew@gmail.com"
-    requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
         "token": user1['token'],
         "email": new_email
     })
-    assert requests.status_code == 200
-    clear_v1()
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_setemail_invalid_1(user1):
     new_email = "alicenew@gmail"
-    requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
         "token": user1['token'],
         "email": new_email
     })
-    assert requests.status_code == InputError.code
-    clear_v1()
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_setemail_invalid_2(user1, user2):
     new_email = "adi@gmail.com"
-    requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {
         "token": user1['token'],
         "email": new_email
     })
-    assert requests.status_code == InputError.code
-    clear_v1()
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_sethandle_valid(user1):
     new_handle = "unfertileegg"
-    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
     })
-    assert requests.status_code == 200
-    clear_v1()
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_sethandle_invalid_not_alphanumeric(user1):
     new_handle = "unfertile&&egg"
-    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
     })
-    assert requests.status_code == InputError
-    clear_v1()
+    assert r.status_code == InputError
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_sethandle_invalid_length_short(user1):
     new_handle = "un"
-    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
     })
-    assert requests.status_code == InputError
-    clear_v1()
+    assert r.status_code == InputError
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_sethandle_invalid_length_long(user1):
     new_handle = "abcdefjhijklmnopqrtuvwxyz"
-    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
     })
-    assert requests.status_code == InputError
+    assert r.status_code == InputError
 
 
 def test_sethandle_invalid_3(user1, user2):
     new_handle = "alicewan"
-    requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json = {
         "token": user1['token'],
         "handle_str": new_handle
     })
-    assert requests.status_code == InputError
+    assert r.status_code == InputError
 
 def test_setname_valid(user1):
     new_first_name = "Unfertile"
     new_last_name = "Egg"
-    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
         "token": user1['token'],
         "name_first": new_first_name,
         "name_last": new_last_name
     })
-    assert requests.status_code == InputError
+    assert r.status_code == InputError
 
 def test_setname_firstname_long(user1):
     new_first_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
     new_last_name = "Egg"
-    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
         "token": user1['token'],
         "name_first": new_first_name,
         "name_last": new_last_name
     })
-    assert requests.status_code == InputError
+    assert r.status_code == InputError
 
 
 def test_setname_lastname_long(user1):
     new_first_name = "Unfertile"
     new_last_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
-    requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json = {
         "token": user1['token'],
         "name_first": new_first_name,
         "name_last": new_last_name
     })
-    assert requests.status_code == InputError
+    assert r.status_code == InputError
