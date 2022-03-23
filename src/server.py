@@ -163,7 +163,7 @@ def dm_create():
     body = dm_create_v1(data['token'], data['u_ids'])
 
     return dumps({
-        'DM_id': body['dm_id']
+        'dm_id': body['dm_id']
     })
 
 @APP.route("/dm/list/v1", methods = ['GET'])
@@ -232,10 +232,8 @@ def message_senddm():
 #     })
 
 
-
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
-
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage

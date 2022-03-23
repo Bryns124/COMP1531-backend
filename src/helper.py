@@ -1,5 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from datetime import timezone
+import datetime
 import jwt
 
 
@@ -24,12 +26,12 @@ def decode_token(token):
 
 
 def validate_token(token):
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+    valid_auth_user_id(decode_token(token)['auth_user_id']['auth_user_id'])
     store = data_store.get()
     token_valid = False
     for user in store['users']:
         for session in user['session_id']:
-            if decode_token(token)['session_id'] == session:
+            if decode_token(token)['auth_user_id']['session_id'] == session:
                 token_valid = True
 
     if not token_valid:
@@ -106,3 +108,10 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details
+
+
+def generate_timestamp():
+    time = datetime.datetime.now(timezone.utc)
+    utc = time.replace(tzinfo=timezone.utc)
+    timestamp = utc.timestamp()
+    return int(timestamp)

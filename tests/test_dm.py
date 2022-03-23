@@ -56,10 +56,10 @@ def create_dm_2_user(user_1, user_2):
 
 
 @pytest.fixture
-def create_dm_3_user(user_1, user_2, user3):
+def create_dm_3_user(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json = {
         "token": user_1['token'],
-        "u_ids": [int(user_2["auth_user_id"]), int(user3["auth_user_id"])]
+        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
     })
     return r.json()
 
@@ -78,7 +78,7 @@ def test_dm_create_2_users(user_1, user_2):
 def test_dm_create_3_users(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1("token"),
-        "u_ids": [int(user_2["auth_user_id"]), int(user3["auth_user_id"])]
+        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
     })
     payload = r.json()
     assert payload['dm_id'] == 1
@@ -86,14 +86,14 @@ def test_dm_create_3_users(user_1, user_2, user_3):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_create_2_dms(user_1, user_2, user3, user4):
+def test_dm_create_2_dms(user_1, user_2, user_3, user4):
     response_1 = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1("token"),
         "u_ids": [int(user_2('auth_user_id'))]
     })
 
     response_2 = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user3("token"),
+        "token": user_3("token"),
         "u_ids": [int(user4('auth_user_id'))]
     })
     payload_1 = response_1.json()
@@ -181,7 +181,7 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
     # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
+def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
     response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
         "token": user_1("token")
     })
@@ -191,7 +191,7 @@ def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
     })
 
     response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
-        "token": user3("token")
+        "token": user_3("token")
     })
 
     payload_1 = response_1.json()
@@ -222,7 +222,7 @@ def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
     #         'dm_id' : 1,
     #         'name' : "adiyatrahman, alicewan, michaelchai",
     #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user3["auth_user_id"]],
+    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
     #         'messages_list': [], #list of message IDs
     #         'start': 25,
     #         'end': 75,
@@ -232,7 +232,7 @@ def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
     #         'dm_id' : 1,
     #         'name' : "adiyatrahman, alicewan, michaelchai",
     #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user3["auth_user_id"]],
+    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
     #         'messages_list': [], #list of message IDs
     #         'start': 25,
     #         'end': 75,
@@ -242,7 +242,7 @@ def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
     #         'dm_id' : 1,
     #         'name' : "adiyatrahman, alicewan, michaelchai",
     #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user3["auth_user_id"]],
+    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
     #         'messages_list': [], #list of message IDs
     #         'start': 25,
     #         'end': 75,
@@ -250,7 +250,7 @@ def test_dm_list_three_users(user_1, user_2, user3, create_dm_3_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_list_two_dms(user_1, user_2, user3):
+def test_dm_list_two_dms(user_1, user_2, user_3):
     requests.post(f"{BASE_URL}/dm/create/v1", json = {
         "token": user_1['token'],
         "u_ids": [int(user_2["auth_user_id"])]
@@ -258,7 +258,7 @@ def test_dm_list_two_dms(user_1, user_2, user3):
 
     requests.post(f"{BASE_URL}/dm/create/v1", json = {
         "token": user_1['token'],
-        "u_ids": [int(user3["auth_user_id"])]
+        "u_ids": [int(user_3["auth_user_id"])]
     })
 
     response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json = {
@@ -291,14 +291,14 @@ def test_dm_list_two_dms(user_1, user_2, user3):
     #         'dm_id' : 2,
     #         'name' : "adiyatrahman, michaelchai",
     #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user3["auth_user_id"]],
+    #         'all_members' : [user_1["auth_user_id"], user_3["auth_user_id"]],
     #         'messages_list': [], #list of message IDs
     #         'start': 25,
     #         'end': 75,
     # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_remove(user_1, user_2, user3, create_dm_3_user):
+def test_dm_remove(user_1, user_2, user_3, create_dm_3_user):
     response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
         "token": user_1["token"],
         "dm_id": 1
@@ -307,7 +307,7 @@ def test_dm_remove(user_1, user_2, user3, create_dm_3_user):
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_remove_invalid_id(user_1, user_2, user3, create_dm_3_user):
+def test_dm_remove_invalid_id(user_1, user_2, user_3, create_dm_3_user):
     invalid_id = 200
     response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
         "token": user_1["token"],
@@ -318,7 +318,7 @@ def test_dm_remove_invalid_id(user_1, user_2, user3, create_dm_3_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_remove_not_creator(user_1, user_2, user3, create_dm_3_user):
+def test_dm_remove_not_creator(user_1, user_2, user_3, create_dm_3_user):
     response = requests.delete(f"{BASE_URL}/dm/remove/v1", json = {
         "token": user_2["token"],
         "dm_id": 1
@@ -327,7 +327,7 @@ def test_dm_remove_not_creator(user_1, user_2, user3, create_dm_3_user):
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_remove_not_member(user_1, user_2, user3, create_dm_3_user):
+def test_dm_remove_not_member(user_1, user_2, user_3, create_dm_3_user):
     requests.post(f"{BASE_URL}/dm/leave/v1", json = {
         "token": user_1["token"],
         "dm_id": 1

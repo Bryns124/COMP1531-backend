@@ -202,26 +202,24 @@ def channel_messages_v1(token, channel_id, start):
         _type_: _description_
     """
     store = data_store.get()
-
-    # print(store)
     validate_token(token)
 
     channel_exist = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel_exist = True
+            active_channel = channel
 
     if not channel_exist:
         raise InputError(
             "The input channel_id does not exist in the datastore.")
 
-    if len(store['channels'][channel_id - 1]['messages_list']) < start:
+    if len(active_channel['messages_list']) < start:
         raise InputError(
             "Your start value is greater than the messages in the channel.")
 
     in_channel = False
-
-    for members in store['channels'][channel_id - 1]['all_members']:
+    for members in active_channel['all_members']:
         # do i need to contunue using tokens or do i need to extract auth_user_id
         if members == decode_token(token)['auth_user_id']:
             in_channel = True
@@ -231,11 +229,11 @@ def channel_messages_v1(token, channel_id, start):
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
     number_of_messages = 0
-    for message_id in store['channels'][channel_id - 1]['messages_list'][start: start + 50]:
+    for message_id in list(reversed(active_channel['messages_list']))[start: start + 50]:
         for message in store['messages']:
             if message['message_id'] == message_id:
                 returned_messages['messages'].append(message)
-                number_of_messages = + 1
+                number_of_messages += 1
 
         if number_of_messages == 50:
             returned_full = True
