@@ -21,7 +21,7 @@ def dm_create_v1(token, u_ids):
         u_ids (int): users in the dm
 
     Raises:
-        AccessError: if the user dose not exist
+        AccessError: if the user doese not exist
         InputError: if there are duplicate u id's for the input
         InputError: invalid id
 
@@ -38,6 +38,7 @@ def dm_create_v1(token, u_ids):
 
     if not auth_user_exist:
         raise AccessError("user does not exist")
+
 
     if check_duplicate(u_ids):
         raise InputError("there are duplicate u id's")
@@ -78,13 +79,14 @@ def dm_create_v1(token, u_ids):
     }
 
 def check_duplicate(u_id_list):
-    ''' Check if given list contains any duplicates '''
+    ''' Check if given list of user ids contains any duplicates '''
     if len(u_id_list) == len(set(u_id_list)):
         return False
     else:
         return True
 
 def check_invalid_id(store, u_ids):
+    '''Checks if any u_id passed in as argument for dm_create does not exist'''
     invalid = True
     for ids in u_ids:
         for user in store['users']:
@@ -101,10 +103,10 @@ def dm_list_v1(token):
         token (string): user
 
     Raises:
-        AccessError: _description_
+        None
 
     Returns:
-        dictionary: contains a list of dms user is a part of
+        dms (dictionary): contains a list of dms user is a part of under the key 'dms'
     """
     store = data_store.get()
     auth_user_exist = False
@@ -136,6 +138,7 @@ def dm_list_v1(token):
 
 
 def extract_dm_details(store, dm_id):
+    '''given a dm_id, it returns the dictionary containing the details of the dm'''
     for dms in store['dms']:
         if dms['dm_id'] == dm_id:
             return dms
@@ -152,10 +155,9 @@ def dm_remove_v1(token, dm_id):
         dm_id (int): dm to be removed
 
     Raises:
-        AccessError: _description_
-        InputError: _description_
-        AccessError: _description_
-        AccessError: _description_
+        AccessError: the authorised user is not the original creator of the DM
+        InputError: the dm_id provided is invalid
+        AccessError: The authorised user is no longer a part of the DM
 
     Returns:
         dictionary: empty
@@ -193,6 +195,7 @@ def dm_remove_v1(token, dm_id):
     }
 
 def valid_dm_id(store, dm_id):
+    '''returns True if a dm with the dm_id passed in argument exists in data_store'''
     dm_exist = False
     for dms in store['dms']:
         if dm_id == dms['dm_id']:
@@ -200,6 +203,7 @@ def valid_dm_id(store, dm_id):
     return dm_exist
 
 def is_dm_owner(store, auth_user_id, dm_id):
+    '''the user with the given auth_user_id is an owner of the dm with the given dm_id'''
     dm_owner = False
     for dms in store['dms']:
         if dms['dm_id'] == dm_id and auth_user_id in dms['owner_members']:
