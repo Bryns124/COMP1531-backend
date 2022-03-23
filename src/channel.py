@@ -327,23 +327,6 @@ def channel_leave_v1(token, channel_id):
     if not in_channel:
         raise AccessError("User is not a part of channel.")
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def channel_addowner_v1(token, channel_id, u_id):
     pass
 

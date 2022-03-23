@@ -522,3 +522,97 @@ def test_channel_join(channel_public, user_2):
     }
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_invalid_channel_id_channel_leave_v1(user_1, invalid_channel_id):
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json={
+        "token": user_1["token"],
+        "channel_id": invalid_channel_id
+    })
+
+    assert response.status_code == InputError.code
+
+
+def test_auth_user_not_in_channel_channel_leave_v1(user_1, channel_2):
+    response = requests.post(f"{BASE_URL}/channel/leave/v1", json={
+        "token": user_1["token"],
+        "channel_id": channel_2["channel_id"]
+    })
+
+    assert response.status_code == AccessError.code
+
+
+def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
+    response1 = requests.post(f"{BASE_URL}/channel/leave/v1", json={
+        "token": user_1["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+    assert response1.status_code == 200
+
+    response2 = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    assert response2.status_code == AccessError.code
+
+    response3 = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    assert response3.status_code == 200
+
+
+def test_only_owner_leaves(user_1, user_2, channel_1):
+    requests.post(f"{BASE_URL}/channel/invite/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_1["channel_id"],
+        "u_id": user_2["auth_user_id"]
+    })
+
+    requests.post(f"{BASE_URL}/channel/leave/v1", json={
+        "token": user_2["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    response = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    payload = response.json()
+
+    assert response.status_code == 200
+    assert payload == {
+        "name": "A New Hope",
+        "is_public": True,
+        "owner_members": [],
+        "all_members": [user_2["auth_user_id"]]
+    }
+
+def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
+    response1 = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+    assert response.status_code == 200
+
+    requests.post(f"{BASE_URL}/channel/leave/v1", json={
+        "token": user_2["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    response2 = requests.get(f"{BASE_URL}/channel/details/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_1["channel_id"]
+    })
+
+    payload = response2.json()
+
+    assert payload == {
+        "name": "A New Hope",
+        "is_public": True,
+        "owner_members": [user_1["auth_user_id"]],
+        "all_members": [user_1["auth_user_id"]]
+    }
