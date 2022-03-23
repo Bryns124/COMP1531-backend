@@ -75,7 +75,7 @@ def test_dm_create_2_users(user_1, user_2):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_create_3_users(user_1, user_2, user3):
+def test_dm_create_3_users(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1("token"),
         "u_ids": [int(user_2["auth_user_id"]), int(user3["auth_user_id"])]
