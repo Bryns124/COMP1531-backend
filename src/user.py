@@ -20,8 +20,9 @@ def users_all_v1(token):
     for users in store['users']:
         user_list.append(extract_user_details(users))
 
-    return user_list
-
+    return {
+        'users': user_list
+    }
 
 def extract_user_details(user):
     users = {
@@ -43,7 +44,9 @@ def user_profile_v1(token, u_id):
         if users['u_id'] == u_id:
             user = extract_user_details(users)
 
-    return user
+    return {
+        'user': user
+    }
 
 def user_profile_setname_v1(token, name_first, name_last):
     validate_token(token)
@@ -60,6 +63,8 @@ def user_profile_setname_v1(token, name_first, name_last):
             user['name_first'] = name_first
             user['name_last'] = name_last
 
+    return {}
+
 
 def user_profile_setemail_v1(token, email):
     validate_token(token)
@@ -73,6 +78,8 @@ def user_profile_setemail_v1(token, email):
         if user['u_id'] == auth_user_id:
             user['email'] = email
 
+    return {}
+
 
 def user_profile_sethandle_v1(token, handle_str):
     validate_token(token)
@@ -85,6 +92,7 @@ def user_profile_sethandle_v1(token, handle_str):
     for user in store['users']:
         if user['u_id'] == auth_user_id:
             user['handle_str'] = handle_str
+    return {}
 
 
 
