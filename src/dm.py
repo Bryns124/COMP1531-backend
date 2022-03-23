@@ -29,16 +29,8 @@ def dm_create_v1(token, u_ids):
         dictionary: contains dm_id
     """
     store = data_store.get()
-    auth_user_exist = False
-    auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError("user does not exist")
-
+    validate_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
 
     if check_duplicate(u_ids):
         raise InputError("there are duplicate u id's")
@@ -109,15 +101,8 @@ def dm_list_v1(token):
         dms (dictionary): contains a list of dms user is a part of under the key 'dms'
     """
     store = data_store.get()
-    auth_user_exist = False
-    auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError
+    validate_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
 
     dm_list = []
 
@@ -163,15 +148,8 @@ def dm_remove_v1(token, dm_id):
         dictionary: empty
     """
     store = data_store.get()
-    auth_user_exist = False
-    auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError
+    validate_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError
@@ -234,7 +212,7 @@ def dm_details_v1(token, dm_id):
     """
     store = data_store.get()
     validate_token(token)
-    u_id = decode_token(token)
+    u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError("dm does not exist")
@@ -273,7 +251,7 @@ def dm_leave_v1(token, dm_id):
     """
     store = data_store.get()
     validate_token(token)
-    u_id = decode_token(token)
+    u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError("dm id does nto exist")
@@ -311,7 +289,7 @@ def dm_messages_v1(token, dm_id, start):
     """
     store = data_store.get()
     validate_token(token)
-    u_id = decode_token(token)
+    u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError("dm id does not exist")
