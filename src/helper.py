@@ -1,5 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
+from datetime import timezone
+import datetime
 import jwt
 
 
@@ -106,3 +108,10 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details
+
+
+def generate_timestamp():
+    time = datetime.datetime.now(timezone.utc)
+    utc = time.replace(tzinfo=timezone.utc)
+    timestamp = utc.timestamp()
+    return int(timestamp)
