@@ -326,7 +326,7 @@ def dm_messages_v1(token, dm_id, start):
     ret = []
     st = start
     end =  start + 50
-    for m in store["messages"]:
+    for m in reversed(store["messages"]):
         if st >= end:
             break
         if id_list[st] == m["message_id"]:
