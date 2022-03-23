@@ -479,7 +479,7 @@ def test_dm_send_invalid_message(user_1, create_dm_2_user):
     assert response.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_send_access_error(user_3, create_dm_2_user):
+def test_dm_send_access_error_1(user_3, create_dm_2_user):
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_3['token'],
         "dm_id": 1,
@@ -489,7 +489,7 @@ def test_dm_send_access_error(user_3, create_dm_2_user):
     assert response.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_send_access_error(user_1, create_dm_2_user):
+def test_dm_send_access_error_2(user_1, create_dm_2_user):
     response1 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": 1,
@@ -504,7 +504,7 @@ def test_dm_send_access_error(user_1, create_dm_2_user):
 
     payload_1 = response1.json()
     payload_2 = response2.json()
-    assert payload_2["message_id"] == 1
+    assert payload_1["message_id"] == 1
     assert payload_2["message_id"] == 2
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
