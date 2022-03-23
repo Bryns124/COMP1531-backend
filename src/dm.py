@@ -314,11 +314,12 @@ def dm_messages_v1(token, dm_id, start):
             id_list = dm["messages_list"]
 
     ret = []
-    end = 0
+    st = start
+    end =  start + 50
     for m in store["messages"]:
-        if end >= start + 50:
+        if st >= end:
             break
-        if id_list[end] == m["message_id"]:
+        if id_list[st] == m["message_id"]:
             ret_dict = {
                 "message_id" : m["message_id"],
                 "u_id" : m["u_id"],
@@ -326,13 +327,13 @@ def dm_messages_v1(token, dm_id, start):
                 "time_sent" : m["time_sent"]
             }
             ret.append(ret_dict)
-            end += 1
+            st += 1
 
-    if end < start + 50:
-        end = -1
+    if st < end:
+        st = -1
 
     return {
         "messages" : ret,
         "start" : start,
-        "end" : end
+        "end" : st
     }
