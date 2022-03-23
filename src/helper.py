@@ -3,8 +3,7 @@ from src.error import AccessError, InputError
 import jwt
 
 
-def SECRET():
-    return "ANT"
+SECRET = "ANT"
 
 
 def generate_token(u_id):
@@ -15,12 +14,12 @@ def generate_token(u_id):
             user['session_id'].append(
                 len(user['session_id']) + 1)  # potential bug
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET(), algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET, algorithm="HS256")
     return token
 
 
 def decode_token(token):
-    token_data = jwt.decode(token, SECRET(), algorithms="HS256")
+    token_data = jwt.decode(token, SECRET, algorithms="HS256")
     return token_data
 
 

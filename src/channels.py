@@ -182,7 +182,7 @@ def channels_create_v1(token, name, is_public):
         'is_public': is_public,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
-        'messages': [],
+        'messages_list': [],
         'start': 0,  # ditto
         'end': 50,
     }
@@ -197,7 +197,3 @@ def channels_create_v1(token, name, is_public):
     return {
         'channel_id': store['channels'][-1]['channel_id']
     }
-
-    # {
-    #     'channel_id': (channel id)
-    # }
