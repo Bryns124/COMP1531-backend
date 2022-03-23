@@ -54,8 +54,8 @@ initial_object = {
     ],
     'dms' : [
         # {
-        #     'DM_id' : ,
-        #     'DM_name' : "",
+        #     'dm_id' : ,
+        #     'name' : "",
         #     'owner_members' : ['u_id'], #check again if this is leagal
         #     'all_members' : ['u_id'],
         #     'messages_list': [1,2,3,6,7,8] #list of message IDs
