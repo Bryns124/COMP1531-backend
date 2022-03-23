@@ -1,9 +1,7 @@
 from ast import In
 from src.data_store import data_store
-from src.helper import decode_token, validate_token, channel_validity, already_member
+from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp
 from src.error import AccessError, InputError
-from datetime import timezone
-import datetime
 
 
 def messages_send_v1(token, channel_id, message):
@@ -38,11 +36,6 @@ def messages_send_v1(token, channel_id, message):
     else:
         message_id = len(store['messages']) + 1
 
-    time = datetime.datetime.now(timezone.utc)
-
-    utc = time.replace(tzinfo=timezone.utc)
-    timestamp = utc.timestamp()
-
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel['messages_list'].append(message_id)
@@ -51,7 +44,7 @@ def messages_send_v1(token, channel_id, message):
         "message_id": message_id,
         "u_id": u_id,
         "message": message,
-        "time_sent": timestamp,
+        "time_sent": generate_timestamp(),
         "is_ch_message": True,
     }
     store['messages'].append(message_body)
