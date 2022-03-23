@@ -56,11 +56,11 @@ def public_channel_user1(user_1):
 '''
 admin_user_remove
 
-Given a user by their u_id, remove them from the Seams. This means they should be removed from all 
-channels/DMs, and will not be included in the list of users returned by users/all. Seams owners can 
-remove other Seams owners (including the original first owner). Once users are removed, the contents 
-of the messages they sent will be replaced by 'Removed user'. Their profile must still be retrievable 
-with user/profile, however name_first should be 'Removed' and name_last should be 'user'. The user's 
+Given a user by their u_id, remove them from the Seams. This means they should be removed from all
+channels/DMs, and will not be included in the list of users returned by users/all. Seams owners can
+remove other Seams owners (including the original first owner). Once users are removed, the contents
+of the messages they sent will be replaced by 'Removed user'. Their profile must still be retrievable
+with user/profile, however name_first should be 'Removed' and name_last should be 'user'. The user's
 email and handle should be reusable.
 
 input error when u_id is invalid, u_id is the only global owner
@@ -75,26 +75,26 @@ check if u_id 3 gets removed from list of u_ids 1,2,3,4,5
 def test_invalid_u_id_admin_user_remove_v1(invalid_user_id, user_1):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
         "token": invalid_user_id['token'],
-        "u_id" = user_1["auth_user_id"]
+        "u_id" : user_1["auth_user_id"]
     })
 
     assert request_admin_user_remove_v1.status_code == InputError.code
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_remove_only_owner_admin_user_remove_v1(user_1):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
         "token": user_1["token"],
-        "u_id" = user_1["auth_user_id"]
+        "u_id" : user_1["auth_user_id"]
     })
 
     assert request_admin_user_remove_v1.status_code == InputError.code
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id" : user_2["auth_user_id"]
     })
 
     store = datastore.get()
@@ -131,10 +131,10 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
         "u_id": user_2["auth_user_id"],
         "permission_id": 1
     })
-    
+
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
         "token": user_1["token"],
-        "u_id" = user_2["auth_user_id"]
+        "u_id" : user_2["auth_user_id"]
     })
 
     store = datastore.get()
@@ -152,7 +152,7 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
             'channels_joined' : []
         }
     ]
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 # check time return
@@ -162,7 +162,7 @@ def test_messages_removed_admin_user_remove_v1(user_1, user_2, public_channel_us
         "channel_id": public_channel_user1["channel_id"],
         "u_id" = user_2["auth_user_id"]
     })
-    
+
     request_message_send_v1 = requests.post()(f"{BASE_URL}/message/send/v1", json = {
         "token": user_1["token"],
         "channel_id": public_channel_user1["channel_id"],
@@ -184,7 +184,7 @@ def test_messages_removed_admin_user_remove_v1(user_1, user_2, public_channel_us
             'is_ch_message': True
         }
     ]
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
@@ -205,7 +205,7 @@ def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
         "last_name" = "user",
         "handle_str" = "adiyatrahman"
     }
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
@@ -219,7 +219,7 @@ def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
         "name_first": "Adiyat",
         "name_last": "Rahman"
     })
-    
+
     store = data_store.get()
 
     assert store["users"] == [
@@ -248,7 +248,7 @@ def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
             'channels_joined' : []
         }
     ]
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_users_all_admin_user_remove_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove", json = {
@@ -259,7 +259,7 @@ def test_users_all_admin_user_remove_v1(user_1, user_2):
     request_users_all_v1 = requests.delete(f"{BASE_URL}/users/all", json = {
         "token": user_1["token"]
     })
-    
+
     payload = request_users_all_v1.json
 
     assert payload == [
@@ -271,12 +271,12 @@ def test_users_all_admin_user_remove_v1(user_1, user_2):
             "handle_str" = "alicewan"
         }
     ]
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 
 
-''' 
+'''
 admin_userpermission_change_v1
 
 Given a user by their user ID, set their permissions to new permissions described by permission_id.
@@ -290,7 +290,7 @@ def test_invalid_u_id_admin_userpermission_change_v1(invalid_user_id):
     })
     assert request_admin_user_remove_v1.status_code == InputError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_demoting_only_global_owner_admin_userpermission_change_v1(user_1):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -300,7 +300,7 @@ def test_demoting_only_global_owner_admin_userpermission_change_v1(user_1):
     })
     assert request_admin_user_remove_v1.status_code == InputError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_invalid_permission_id_admin_userpermission_change_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -310,7 +310,7 @@ def test_invalid_permission_id_admin_userpermission_change_v1(user_1, user_2):
     })
     assert request_admin_user_remove_v1.status_code == InputError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_promoting_global_owner_admin_userpermission_change_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -326,7 +326,7 @@ def test_promoting_global_owner_admin_userpermission_change_v1(user_1, user_2):
     })
     assert request_admin_user_remove_v1.status_code == InputError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_demoting_nonglobal_owner_admin_userpermission_change_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -336,7 +336,7 @@ def test_demoting_nonglobal_owner_admin_userpermission_change_v1(user_1, user_2)
     })
     assert request_admin_user_remove_v1.status_code == InputError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def nonglobal_owner_admin_userpermission_change_v1(user_1, user_2, user_3):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -346,7 +346,7 @@ def nonglobal_owner_admin_userpermission_change_v1(user_1, user_2, user_3):
     })
     assert request_admin_user_remove_v1.status_code == AccessError.code
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def promoting_user_2_admin_userpermission_change_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {
@@ -383,7 +383,7 @@ def promoting_user_2_admin_userpermission_change_v1(user_1, user_2):
         }
     ]
 
-    request_clear.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def demoting_user_1_admin_userpermission_change_v1(user_1, user_2):
     request_admin_user_remove_v1 = requests.put(f"{BASE_URL}/admin/userpermission/change", json = {

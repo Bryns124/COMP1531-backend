@@ -149,7 +149,7 @@ def test_handle_generated_correctly():
     store = data_store.get()
     auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
     auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle4@gmail.com", "password123",
+    auth_register_v1("bryanle3@gmail.com", "password123",
                      "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
     auth_register_v1("bryanle4@gmail.com", "password123",
                      "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
