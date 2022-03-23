@@ -38,7 +38,7 @@ def extract_user_details(user):
 def user_profile_v1(token, u_id):
     validate_token(token)
     store = data_store.get()
-    auth_user_id = decode_token(token)['auth_user_id']
+    u_id = decode_token(token)['auth_user_id']
 
     for users in store['users']:
         if users['u_id'] == u_id:
