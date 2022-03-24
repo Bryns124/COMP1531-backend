@@ -294,7 +294,7 @@ def test_channel_addowner_invalid_channel(invalid_channel_id, user_1):
     """
     This test checks to see that a InputError is raised when channel is invalid.
     """
-    requests.post(f"{BASE_URL}/channel/join/v1", json={
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
     })
@@ -309,7 +309,7 @@ def test_channel_addowner_invalid_channel(invalid_channel_id, user_1):
 
 def test_channel_addowner_owner_not_in_channel(user_1, user_2, channel_public):
     """
-    This test checks to see that a InputError is raised when owner is not a member 
+    This test checks to see that a InputError is raised when owner is not a member
     of that channel.
     """
     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
@@ -608,12 +608,13 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "all_members": [user_2["auth_user_id"]]
     }
 
+
 def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
     response1 = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
         "channel_id": channel_1["channel_id"]
     })
-    assert response.status_code == 200
+    assert response1.status_code == 200
 
     requests.post(f"{BASE_URL}/channel/leave/v1", json={
         "token": user_2["token"],
