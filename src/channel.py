@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, valid_auth_user_id, extract_channel_details
+from src.helper import decode_token, generate_token, validate_token, already_member, already_owner, channel_validity, valid_auth_user_id, extract_channel_details
 
 """
 Channel contains the functionality which allows for the inviting of users, calling the
@@ -295,12 +295,55 @@ def channel_join_v1(token, channel_id):
 
 
 def channel_leave_v1(token, channel_id):
-    pass
+
+    # data_store.set(store)
+    return {}
 
 
 def channel_addowner_v1(token, channel_id, u_id):
-    pass
+    store = data_store.get()
+
+    validate_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
+    users = store["users"]
+    channels = store["channels"]
+
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_owner(auth_user_id, channel_id, store):
+        raise InputError("User is already an owner of channel.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
+
+    for channel in channels:
+        if channel["channel_id"] == channel_id:
+            if (auth_user_id not in channels["owner_members"]) and (auth_user_id in channels["all_members"]):
+                raise AccessError(
+                    "Authorised user does not have owner permissions in channel.")
+
+    for user in users:
+        if user["u_id"] == u_id:
+            user["channels_owned"].append(channel_id)
+            user["channels_joined"].append(channel_id)
+
+    for channel in channels:
+        if channel["channel_id"] == channel_id:
+            channel["owner_members"].append(u_id)
+            channel["all_members"].append(u_id)
+
+    data_store.set(store)
+    return {}
 
 
 def channel_removeowner_v1(token, channel_id, u_id):
-    pass
+    # store = data_store.get()
+
+    # validate_token(token)
+    # auth_user_id = decode_token(token)['auth_user_id']
+    # valid_auth_user_id(auth_user_id)
+
+    # data_store.set(store)
+    return {}
