@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, already_owner, channel_validity, valid_auth_user_id, extract_channel_details
+from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, valid_auth_user_id, extract_channel_details
 
 """
 Channel contains the functionality which allows for the inviting of users, calling the
@@ -312,10 +312,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     if not channel_validity(channel_id, store):
         raise InputError("Channel id is invalid.")
 
-    if already_owner(auth_user_id, channel_id, store):
-        raise InputError("User is already an owner of channel.")
-
-    if already_member(auth_user_id, channel_id, store):
+    if not already_member(auth_user_id, channel_id, store):
         raise InputError("Owner is not in channel.")
 
     for channel in channels:
