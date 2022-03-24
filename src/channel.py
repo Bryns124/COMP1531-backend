@@ -297,7 +297,8 @@ def channel_join_v1(token, channel_id):
 def channel_leave_v1(token, channel_id):
 
     # data_store.set(store)
-    return {}
+    # return {}
+    pass
 
 
 def channel_addowner_v1(token, channel_id, u_id):
@@ -341,6 +342,9 @@ def channel_removeowner_v1(token, channel_id, u_id):
     # validate_token(token)
     # auth_user_id = decode_token(token)['auth_user_id']
     # valid_auth_user_id(auth_user_id)
+    # users = store["users"]
+    # channels = store["channels"]
 
     # data_store.set(store)
-    return {}
+    # return {}
+    pass
