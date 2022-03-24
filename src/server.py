@@ -7,7 +7,7 @@ from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_addowner_v1
 from src.other import clear_v1
 
 
@@ -138,16 +138,16 @@ def channel_messages_v2():
 #     })
 
 
-# # Need to write functions for channel addowner and removeowner
-# # and successful tests like addowner and removeowner successfully
-# @APP.route("/channel/addowner/v1", methods=['POST'])
-# def channel_addowner_v1():
-#     data = request.get_json()
-#     body = channel_addowner_v1(
-#         data['token'], data['channel_id'], data['u_id'])
-#     return dumps({
+# Need to write functions for channel addowner and removeowner
+# and successful tests like addowner and removeowner successfully
+@APP.route("/channel/addowner/v1", methods=['POST'])
+def channel_addowner():
+    data = request.get_json()
+    channel_addowner_v1(
+        data['token'], data['channel_id'], data['u_id'])
+    return dumps({
 
-#     })
+    })
 
 
 # @APP.route("/channel/removeowner/v1", methods=['POST'])
