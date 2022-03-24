@@ -309,17 +309,17 @@ def channel_addowner_v1(token, channel_id, u_id):
     users = store["users"]
     channels = store["channels"]
 
-    if not channel_validity(channel_id, store):
-        raise InputError("Channel id is invalid.")
-
-    if already_member(auth_user_id, channel_id, store):
-        raise InputError("Owner is not in channel.")
-
     for channel in channels:
         if channel["channel_id"] == channel_id:
             if (auth_user_id not in channels["owner_members"]) and (auth_user_id in channels["all_members"]):
                 raise AccessError(
                     "Authorised user does not have owner permissions in channel.")
+
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
 
     for user in users:
         if user["u_id"] == u_id:
