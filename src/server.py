@@ -133,9 +133,9 @@ def clear_v2():
 
 @ APP.route("/echo", methods=['GET'])
 def echo():
-    data = request.args.get('data')
+    data=request.args.get('data')
     if data == 'echo':
-        raise InputError(description='Cannot echo "echo"')
+        raise InputError(description = 'Cannot echo "echo"')
     return dumps({
         'data': data
     })
@@ -145,4 +145,4 @@ def echo():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port, debug=True)  # Do not edit this port
+    APP.run(port = config.port, debug = True)  # Do not edit this port
