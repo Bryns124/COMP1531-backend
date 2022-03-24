@@ -342,10 +342,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     if not channel_validity(channel_id, store):
         raise InputError("Channel id is invalid.")
 
-    if already_owner(auth_user_id, channel_id, store):
-        raise InputError("User is already an owner of channel.")
-
-    if already_member(auth_user_id, channel_id, store):
+    if not already_member(auth_user_id, channel_id, store):
         raise InputError("Owner is not in channel.")
 
     for channel in channels:
