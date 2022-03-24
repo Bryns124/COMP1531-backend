@@ -303,7 +303,7 @@ def channel_leave_v1(token, channel_id):
     validate_token(token)
     auth_user_id = decode_token(token)["auth_user_id"]
     valid_auth_user_id(auth_user_id)
-    
+
     store = data_store.get()
 
     is_channel = False
@@ -316,20 +316,64 @@ def channel_leave_v1(token, channel_id):
             if auth_user_id in channel["all_members"]:
                 in_channel = True
                 store["channels"][i]["all_members"].remove(auth_user_id)
-            
+
             if auth_user_id in channel["owner_members"]:
                 store["channels"][i]["owner_members"].remove(auth_user_id)
 
         i += 1
     if not is_channel:
         raise InputError("Channel id is invalid.")
-    
+
     if not in_channel:
         raise AccessError("User is not a part of channel.")
 
+    return {}
+
+
 def channel_addowner_v1(token, channel_id, u_id):
-    pass
+    store = data_store.get()
+
+    validate_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
+    users = store["users"]
+    channels = store["channels"]
+
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_owner(auth_user_id, channel_id, store):
+        raise InputError("User is already an owner of channel.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
+
+    for channel in channels:
+        if channel["channel_id"] == channel_id:
+            if (auth_user_id not in channels["owner_members"]) and (auth_user_id in channels["all_members"]):
+                raise AccessError(
+                    "Authorised user does not have owner permissions in channel.")
+
+    for user in users:
+        if user["u_id"] == u_id:
+            user["channels_owned"].append(channel_id)
+            user["channels_joined"].append(channel_id)
+
+    for channel in channels:
+        if channel["channel_id"] == channel_id:
+            channel["owner_members"].append(u_id)
+            channel["all_members"].append(u_id)
+
+    data_store.set(store)
+    return {}
 
 
 def channel_removeowner_v1(token, channel_id, u_id):
-    pass
+    # store = data_store.get()
+
+    # validate_token(token)
+    # auth_user_id = decode_token(token)['auth_user_id']
+    # valid_auth_user_id(auth_user_id)
+
+    # data_store.set(store)
+    return {}

@@ -290,7 +290,24 @@ def test_channel_messages_v1(user_1, channel_public):
 
 
 # Tests for channel/addowner
-def test_channel_addowner_user_not_in_channel(user_1, user_2, channel_public):
+def test_channel_addowner_invalid_channel(invalid_channel_id, user_1):
+    """
+    This test checks to see that a InputError is raised when channel is invalid.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v1", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id,
+    })
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id,
+        "u_id": user_1['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_addowner_owner_not_in_channel(user_1, user_2, channel_public):
     """
     This test checks to see that a InputError is raised when owner is not a member 
     of that channel.
@@ -323,25 +340,25 @@ def test_channel_addowner_user_already_owner(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_channel_addowner_user_not_owner(user_1, user_2, channel_public):
+def test_channel_addowner_user_not_owner(user_2, user_no_access, channel_public):
     """
     This test checks to see that an AccessError is raised when channel is
     valid and the authorised user does not have owner permissions in the channel
     """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
-    })
-
-    requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
 
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_no_access['token'],
+        "channel_id": channel_public['channel_id']
+    })
+
     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-        "token": user_1['token'],
+        "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
-        "u_id": user_2['auth_user_id']
+        "u_id": user_no_access['auth_user_id']
     })
     assert request_channel_add_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
