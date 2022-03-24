@@ -1,3 +1,5 @@
+import code
+from os import access
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
@@ -361,3 +363,14 @@ def test_handles_appends_correctly(user_1, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def auth_logout(user_1, channel_public):
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_1['token']
+    })
+    r = requests.get(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    assert r.status_code == AccessError.code

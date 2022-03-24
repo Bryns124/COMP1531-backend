@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 import jwt
-
+import pickle
 
 SECRET = "ANT"
 
@@ -106,3 +106,13 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details
+
+
+def save_data_store():
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(data_store.get(), FILE)
+
+
+def load_data_store():
+    with open('datastore.p', 'rb') as FILE:
+        data_store.set(pickle.load(FILE))
