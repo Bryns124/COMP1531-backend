@@ -3,7 +3,7 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import generate_token
+from src.helper import decode_token, generate_token
 import hashlib
 """
 Auth has two main functions: register and login
@@ -156,6 +156,16 @@ def create_handle(name_first, name_last):
             i += 1
 
     return handle
+
+
+def auth_logout_v1(token):
+    store = data_store.get()
+
+    for user in store['users']:
+        if user['u_id'] == decode_token(token)['auth_user_id']:
+            user['session_id'].remove(decode_token(token)['session_id'])
+
+    data_store.set(store)
 
 ###############################################################
 ##                 Checking functions                        ##

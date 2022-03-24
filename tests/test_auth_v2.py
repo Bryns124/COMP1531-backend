@@ -141,7 +141,7 @@ def test_login_correct(user_1):
         "email": "mikey@unsw.com",
         "password": "test123456"
     })
-    body = decode_token(r.json()['token'])
+    body = jwt.decode(r.json()['token'], SECRET, algorithms="HS256")
     assert body == {
         "auth_user_id": 1,
         "session_id": 2
@@ -349,7 +349,7 @@ def test_handles_appends_correctly(user_1, channel_public):
             "name_last": "def"
         })
         body = request.json()
-        requests.get(f"{BASE_URL}/channel/join/v2", json={
+        requests.post(f"{BASE_URL}/channel/join/v2", json={
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
         })
@@ -365,12 +365,15 @@ def test_handles_appends_correctly(user_1, channel_public):
     })
 
 
-def auth_logout(user_1, channel_public):
+def test_auth_logout(user_1, channel_public):
     requests.post(f"{BASE_URL}/auth/logout/v1", json={
         "token": user_1['token']
     })
-    r = requests.get(f"{BASE_URL}/channel/join/v2", json={
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
