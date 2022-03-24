@@ -163,7 +163,7 @@ def test_handle_generated_correctly():
     # Tests that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
-
+    clear_v1()
 # Testing that the handle appends the number correctly for more than once instance of the handle
 
 
@@ -270,3 +270,4 @@ def test_handles_appends_correctly():
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle12
+    clear_v1()

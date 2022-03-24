@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import AccessError, InputError
 import jwt
-
+import pickle
 
 SECRET = "ANT"
 
@@ -15,21 +15,23 @@ def generate_token(u_id):
                 len(user['session_id']) + 1)  # potential bug
     token = jwt.encode(
         {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET, algorithm="HS256")
+    data_store.set(store)
     return token
 
 
 def decode_token(token):
     token_data = jwt.decode(token, SECRET, algorithms="HS256")
+    validate_token(token_data)
     return token_data
 
 
-def validate_token(token):
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+def validate_token(token_data):
+    valid_auth_user_id(token_data['auth_user_id'])
     store = data_store.get()
     token_valid = False
     for user in store['users']:
         for session in user['session_id']:
-            if decode_token(token)['session_id'] == session:
+            if token_data['session_id'] == session:
                 token_valid = True
 
     if not token_valid:
@@ -106,3 +108,13 @@ def extract_channel_details(channel_id, store):
         if channels['channel_id'] == channel_id:
             channel_details = channels
     return channel_details
+
+
+def save_data_store():
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(data_store.get(), FILE)
+
+
+def load_data_store():
+    with open('datastore.p', 'rb') as FILE:
+        data_store.set(pickle.load(FILE))
