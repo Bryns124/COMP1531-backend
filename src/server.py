@@ -14,7 +14,6 @@ from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 
 
-
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -149,15 +148,15 @@ def message_send():
 
 @APP.route("/echo", methods=['GET'])
 def echo():
-    data=request.args.get('data')
+    data = request.args.get('data')
     if data == 'echo':
-        raise InputError(description = 'Cannot echo "echo"')
+        raise InputError(description='Cannot echo "echo"')
     return dumps({
         'data': data
     })
 
 
-@APP.route("/users/all/v1", methods = ['GET'])
+@APP.route("/users/all/v1", methods=['GET'])
 def users_all():
     data = request.args.get()
     body = users_all_v1(data['token'])
@@ -166,8 +165,7 @@ def users_all():
     })
 
 
-
-@APP.route("/user/profile/v1", methods = ['GET'])
+@APP.route("/user/profile/v1", methods=['GET'])
 def user_profile():
     data = request.args.get()
     body = user_profile_v1(data['token'], data['u_id'])
@@ -176,22 +174,25 @@ def user_profile():
     })
 
 
-@APP.route("/user/profile/setname/v1", methods = ['PUT'])
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
 def user_profile_setname():
     data = request.get_json()
-    body = user_profile_setname_v1(data['token'], data['name_first'], data['name_last'])
+    user_profile_setname_v1(
+        data['token'], data['name_first'], data['name_last'])
     return dumps({})
 
-@APP.route("/user/profile/setemail/v1", methods = ['PUT'])
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
 def user_profile_setemail():
     data = request.get_json()
-    body = user_profile_setemail_v1(data['token'], data['email'])
+    user_profile_setemail_v1(data['token'], data['email'])
     return dumps({})
 
-@APP.route("/user/profile/sethandle/v1", methods = ['PUT'])
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
 def user_profile_sethandle():
     data = request.get_json()
-    body = user_profile_sethandle_v1(data['token'], data['handle_str'])
+    user_profile_sethandle_v1(data['token'], data['handle_str'])
     return dumps({})
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
@@ -199,4 +200,4 @@ def user_profile_sethandle():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port = config.port, debug = True)  # Do not edit this port
+    APP.run(port=config.port, debug=True)  # Do not edit this port
