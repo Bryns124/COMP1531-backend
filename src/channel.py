@@ -331,16 +331,14 @@ def channel_leave_v1(token, channel_id):
 
 def channel_addowner_v1(token, channel_id, u_id):
     store = data_store.get()
-
-    decode_token(token)
     auth_user_id = decode_token(token)['auth_user_id']
     valid_auth_user_id(auth_user_id)
-    users = store["users"]
-    channels = store["channels"]
 
-    for channel in channels:
+    for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            if not auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
+            if auth_user_id in channel['owner_members']:
+                pass
+            else:
                 raise AccessError(
                     "Authorised user does not have owner permissions in channel.")
 
@@ -350,12 +348,12 @@ def channel_addowner_v1(token, channel_id, u_id):
     if already_member(auth_user_id, channel_id, store):
         raise InputError("Owner is not in channel.")
 
-    for user in users:
+    for user in store['users']:
         if user["u_id"] == u_id:
             user["channels_owned"].append(channel_id)
             user["channels_joined"].append(channel_id)
 
-    for channel in channels:
+    for channel in store['channels']:
         if channel["channel_id"] == channel_id:
             channel["owner_members"].append(u_id)
             channel["all_members"].append(u_id)
