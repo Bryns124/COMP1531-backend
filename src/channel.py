@@ -49,7 +49,7 @@ def channel_invite_v1(token, channel_id, u_id):
 
     if not already_member(auth_user_id, channel_id, store):
         raise AccessError(
-            "You are not apart of the channel you are trying to invite to.")
+            description="You are not apart of the channel you are trying to invite to.")
 
     for channel in store['channels']:
         for user in store['users']:
@@ -109,7 +109,7 @@ def channel_details_v1(token, channel_id):
             is_member = True
 
     if not is_member:
-        raise AccessError("You are not a member of the channel.")
+        raise AccessError(description="You are not a member of the channel.")
 
     owner_members_details = []
     all_members_details = []
@@ -227,7 +227,7 @@ def channel_messages_v1(token, channel_id, start):
             in_channel = True
 
     if not in_channel:
-        raise AccessError("You are not part of that channel.")
+        raise AccessError(description="You are not part of that channel.")
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
     for messages in store['channels'][channel_id - 1]['messages']:
@@ -276,7 +276,7 @@ def channel_join_v1(token, channel_id):
     current_channel = extract_channel_details(channel_id, store)
     if not current_channel['is_public']:
         raise AccessError(
-            "This is a private channel, user does not have access.")
+            description="This is a private channel, user does not have access.")
 
     for user_accounts in store['users']:
         if user_accounts['u_id'] == decode_token(token)['auth_user_id']:
@@ -324,7 +324,7 @@ def channel_leave_v1(token, channel_id):
         raise InputError("Channel id is invalid.")
 
     if not in_channel:
-        raise AccessError("User is not a part of channel.")
+        raise AccessError(description="User is not a part of channel.")
 
     return {}
 
@@ -340,7 +340,7 @@ def channel_addowner_v1(token, channel_id, u_id):
                 pass
             else:
                 raise AccessError(
-                    "Authorised user does not have owner permissions in channel.")
+                    description="Authorised user does not have owner permissions in channel.")
 
     if not channel_validity(channel_id, store):
         raise InputError("Channel id is invalid.")
