@@ -34,7 +34,7 @@ def dm_create_v1(token, list_of_u_ids):
     validate_token(token)
     auth_user_id = decode_token(token)['auth_user_id']
 
-    if check_duplicate(list_of_u_ids):
+    if check_duplicate(auth_user_id, list_of_u_ids):
         raise InputError("there are duplicate u id's")
 
     if check_invalid_id(store, list_of_u_ids):
@@ -72,9 +72,9 @@ def dm_create_v1(token, list_of_u_ids):
     }
 
 
-def check_duplicate(u_id_list):
+def check_duplicate(auth_user_id, u_id_list):
     ''' Check if given list of user ids contains any duplicates '''
-    if len(u_id_list) == len(set(u_id_list)):
+    if len(u_id_list) == len(set(u_id_list)) or auth_user_id not in u_id_list:
         return False
     else:
         return True
@@ -82,8 +82,8 @@ def check_duplicate(u_id_list):
 
 def check_invalid_id(store, u_ids):
     '''Checks if any u_id passed in as argument for dm_create does not exist'''
-    invalid = True
     for ids in u_ids:
+        invalid = True
         for user in store['users']:
             if ids == user['u_id']:
                 invalid = False

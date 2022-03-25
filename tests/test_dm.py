@@ -1,9 +1,5 @@
 import pytest
 import src.server
-# from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1
-# from src.dm import dm_details_v1, dm_leave_v1, dm_messages_v1
-# from src.auth import auth_register_v1
-# from src.other import clear_v1
 from src.error import AccessError, InputError
 from src.helper import SECRET, generate_timestamp
 from src.config import port
@@ -74,7 +70,7 @@ requests.delete(f"{BASE_URL}/clear/v1", json={})
 def test_dm_create_2_users(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [user_2['auth_user_id']]
+        "u_ids": [int(user_2['auth_user_id'])]
     })
     payload = r.json()
     assert payload['dm_id'] == 1
@@ -84,7 +80,7 @@ def test_dm_create_2_users(user_1, user_2):
 def test_dm_create_3_users(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1["token"],
-        "u_ids": [user_2["auth_user_id"], user_3["auth_user_id"]]
+        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
     })
     payload = r.json()
     assert payload['dm_id'] == 1
