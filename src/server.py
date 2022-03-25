@@ -6,7 +6,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
-from src.auth import auth_login_v1, auth_register_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.message import messages_send_v1, message_senddm_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
@@ -223,6 +223,7 @@ def echo():
         'data': data
     })
 
+
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all():
     data = request.args.get()
@@ -262,7 +263,8 @@ def user_profile_sethandle():
     user_profile_sethandle_v1(data['token'], data['handle_str'])
     return dumps({})
 
-@APP.route("/dm/create/v1", methods = ['POST'])
+
+@APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     data = request.get_json()
     body = dm_create_v1(data['token'], data['u_ids'])
@@ -271,7 +273,8 @@ def dm_create():
         "dm_id": body["dm_id"]
     })
 
-@APP.route("/dm/list/v1", methods = ['GET'])
+
+@APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     data = request.get_json()
     body = dm_list_v1(data["token"])
@@ -280,13 +283,15 @@ def dm_list():
         'dms': body['dms']
     })
 
-@APP.route("/dm/remove/v1", methods = ['DELETE'])
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove():
     data = request.get_json()
     dm_remove_v1(data['token'], data["dm_id"])
     return dumps({})
 
-@APP.route("/dm/details/v1", methods = ['GET'])
+
+@APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
     data = request.get_json()
     # token = request.args.get("token")
@@ -294,34 +299,37 @@ def dm_details():
     # body = dm_details_v1(token, dm_id)
     body = dm_details_v1(data["token"], data["dm_id"])
     return dumps({
-        "name" : body["name"],
-        "members" : body["members"]
+        "name": body["name"],
+        "members": body["members"]
     })
 
-@APP.route("/dm/leave/v1", methods = ['POST'])
+
+@APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave():
     data = request.get_json()
     dm_leave_v1(data['token'], data["dm_id"])
     return dumps({})
 
-@APP.route("/dm/messages/v1", methods = ['GET'])
+
+@APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():
     data = request.get_json()
     body = dm_messages_v1(data["token"], data["dm_id"], data["start"])
 
     return dumps({
-        "messages" : body["messages"],
-        "start" : body["start"],
-        "end" : body["end"]
+        "messages": body["messages"],
+        "start": body["start"],
+        "end": body["end"]
     })
 
-@APP.route("/message/senddm/v1", methods = ['POST'])
+
+@APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
     data = request.get_json()
     body = message_senddm_v1(data["token"], data["dm_id"], data["message"])
 
     return dumps({
-        "message_id" : body["message_id"]
+        "message_id": body["message_id"]
     })
 
 
