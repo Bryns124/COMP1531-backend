@@ -125,7 +125,7 @@ def messages_send_v1(token, channel_id, message):
 def validate_message(message):
     if len(message) >= 1 and len(message) <= 1000:
         return
-    raise InputError("incorrect message length")
+    raise InputError(description="incorrect message length")
 
 
 def message_senddm_v1(token, dm_id, message):
@@ -133,12 +133,12 @@ def message_senddm_v1(token, dm_id, message):
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
-        raise InputError("dm id does not exist")
+        raise InputError(description="dm id does not exist")
 
     validate_message(message)
 
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError("user is not part of dm")
+        raise AccessError(description="user is not part of dm")
 
     if store['messages'] == []:
         message_id = 1

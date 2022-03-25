@@ -12,6 +12,7 @@ Functions:
     user_profile_sethandle: Update the authorised user's hand (handle name)
 """
 
+
 def users_all_v1(token):
     """returns a list of all users and their associated details
 
@@ -35,14 +36,15 @@ def users_all_v1(token):
         'users': user_list
     }
 
+
 def extract_user_details(user):
     users = {
-        'u_id' : user['u_id'],
+        'u_id': user['u_id'],
         'email': user['e_mail'],
         'name_first': user['name_first'],
         'name_last': user['name_last'],
         'handle_str': user['handle_str']
-        }
+    }
     return users
 
 
@@ -71,6 +73,7 @@ def user_profile_v1(token, u_id):
         'user': user
     }
 
+
 def user_profile_setname_v1(token, name_first, name_last):
     """Updates the authorised user's first and last name
     Args:
@@ -86,9 +89,11 @@ def user_profile_setname_v1(token, name_first, name_last):
     validate_token(token)
     store = data_store.get()
     if not name_length_check(name_first):
-        raise InputError("The length of the new first name has to be within 1 and 50 characters inclusive")
+        raise InputError(
+            description="The length of the new first name has to be within 1 and 50 characters inclusive")
     if not name_length_check(name_last):
-        raise InputError("The length of the new last name has to be within 1 and 50 characters inclusive")
+        raise InputError(
+            description="The length of the new last name has to be within 1 and 50 characters inclusive")
 
     auth_user_id = decode_token(token)['auth_user_id']
 
@@ -115,7 +120,8 @@ def user_profile_setemail_v1(token, email):
     validate_token(token)
     store = data_store.get()
     if not valid_email(email):
-        raise InputError("Email entered is not of valid format or is already in use by another user")
+        raise InputError(
+            description="Email entered is not of valid format or is already in use by another user")
 
     auth_user_id = decode_token(token)['auth_user_id']
 
@@ -142,7 +148,7 @@ def user_profile_sethandle_v1(token, handle_str):
     validate_token(token)
     store = data_store.get()
     if not valid_handle_string(store, handle_str):
-        raise InputError("""
+        raise InputError(description="""
                          The length of the handle is between 3 and 20 characters,
                          or it contains non-alphanumeric characters,
                          or it is already in-use""")
@@ -155,9 +161,6 @@ def user_profile_sethandle_v1(token, handle_str):
     return {}
 
 
-
-
-
 def name_length_check(name):
     '''returns True if the length of the name is between 1 and 50 characters inclusive'''
     if any(len(name) > 50, len(name) < 1):
@@ -165,12 +168,14 @@ def name_length_check(name):
     else:
         return True
 
+
 def valid_email(email):
     '''returns True if the email follows proper email formatting and is not already in use by another user'''
     if any(not email_check(email), duplicate_email_check(email)):
         return False
     else:
         return True
+
 
 def valid_handle_string(store, handle_str):
     '''returns True if all three of the following things are satisfied:
@@ -183,10 +188,10 @@ def valid_handle_string(store, handle_str):
     else:
         return True
 
+
 def duplicate_handle(store, handle_str):
     '''returns True if the given handle string is already use'''
     for users in store['users']:
         if handle_str == users['handle_str']:
             return True
     return False
-
