@@ -6,6 +6,13 @@ from src.helper import decode_token, generate_token, validate_token, already_mem
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
+
+    channel_invite_v1: allows a user to invite another user to a channel.
+    channel_details_v1: provides the details of a channel.
+    channel_messages_v1: returns all the messages within a channel.
+    channel_join_v1: allows a user to join a channel.
+    channel_leave_v1: allows a user to leave a channel.
+    
 """
 
 
@@ -14,9 +21,9 @@ def channel_invite_v1(token, channel_id, u_id):
     Allows a authorized user to invite another user to a channel they are apart of.
 
     Args:
-        auth_user_id (u_id): A valid user who is apart of the channel/
+        token (string): The token of the user who is apart of the channel.
         channel_id (channel_id): The channel id auth_user is inviting to.
-        u_id (u_id): A valid second user who is being invited
+        u_id (u_id): A valid second user who is being invited.
 
     Raises:
         InputError: u_id dos not exist in datastore.
@@ -183,11 +190,11 @@ def member_details(user_id):
 
 
 def channel_messages_v1(token, channel_id, start):
-    """_summary_
+    """
     Taking a valid user it pulls a list of up to 50 messages from a starting
     point and returns them.
     Args:
-        auth_user_id (_u_id): The valid id of the user calling the messages.
+        token (string): The token of the user calling the messages.
         channel_id (channel_id): The channel_id of the channel which to call the
         messages from.
         start (int): A starting index value.
