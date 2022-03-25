@@ -6,10 +6,11 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
-from src.auth import auth_login_v1, auth_register_v1
 from src.message import messages_send_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.helper import save_data_store, load_data_store
 from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 
@@ -40,6 +41,10 @@ APP.register_error_handler(Exception, defaultHandler)
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
+try:
+    load_data_store()
+except Exception:
+    pass
 
 
 @APP.route("/auth/login/v2", methods=['POST'])
@@ -57,9 +62,20 @@ def auth_register_v2():
     data = request.get_json()
     body = auth_register_v1(
         data['email'], data['password'], data['name_first'], data['name_last'])
+    save_data_store()
     return dumps({
         'token': body['token'],
         'auth_user_id': body['auth_user_id']
+    })
+
+
+@APP.route("/auth/logout/v1", methods=['POST'])
+def auth_logout():
+    data = request.get_json()
+    auth_logout_v1(data['token'])
+    save_data_store()
+    return dumps({
+
     })
 
 
@@ -68,6 +84,7 @@ def channels_create_v2():
     data = request.get_json()
     body = channels_create_v1(
         data['token'], data['name'], data['is_public'])
+    save_data_store()
     return dumps({
         'channel_id': body['channel_id']
     })
