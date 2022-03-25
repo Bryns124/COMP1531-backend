@@ -3,7 +3,7 @@ from src.helper import decode_token, validate_token, channel_validity, already_m
 from src.error import AccessError, InputError
 from datetime import timezone
 import datetime
-from src.dm import valid_dm_id, is_dm_member
+from src.dm import valid_dm_id, is_dm_member, is_dm_owner
 
 
 def messages_send_v1(token, channel_id, message):
@@ -130,7 +130,6 @@ def validate_message(message):
 
 def message_senddm_v1(token, dm_id, message):
     store = data_store.get()
-    validate_token(token)
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
@@ -138,19 +137,13 @@ def message_senddm_v1(token, dm_id, message):
 
     validate_message(message)
 
-    if not is_dm_member(store, u_id, dm_id):
+    if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError("user is not part of dm")
-    message_id = store['messages']
 
     if store['messages'] == []:
         message_id = 1
     else:
         message_id = len(store['messages']) + 1
-
-    time = datetime.datetime.now(timezone.utc)
-
-    utc = time.replace(tzinfo=timezone.utc)
-    timestamp = utc.timestamp()
 
     for dm in store['dms']:
         if dm['dm_id'] == dm_id:
@@ -160,7 +153,7 @@ def message_senddm_v1(token, dm_id, message):
         "message_id": message_id,
         "u_id": u_id,
         "message": message,
-        "time_sent": timestamp,
+        "time_sent": generate_timestamp(),
         "is_ch_message": False,
     }
     store['messages'].append(message_body)
