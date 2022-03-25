@@ -202,8 +202,9 @@ def channel_messages_v1(token, channel_id, start):
         _type_: _description_
     """
     store = data_store.get()
-    validate_token(token)
 
+    # print(store)
+    decode_token(token)
     channel_exist = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
