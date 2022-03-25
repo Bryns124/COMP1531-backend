@@ -589,7 +589,6 @@ def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
         "channel_id": channel_1["channel_id"]
     })
     assert response1.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
     response2 = requests.get(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1["token"],
@@ -597,7 +596,6 @@ def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
     })
 
     assert response2.status_code == AccessError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
     response3 = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],

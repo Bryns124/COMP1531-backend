@@ -325,6 +325,7 @@ def channel_leave_v1(token, channel_id):
     if not in_channel:
         raise AccessError(description="User is not a part of channel.")
 
+    data_store.set(store)
     return {}
 
 
