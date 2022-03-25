@@ -331,6 +331,7 @@ def dm_messages_v1(token, dm_id, start):
                     "message" : m["message"],
                     "time_sent" : m["time_sent"]
                 }
+                ret.append(ret_dict)
         counter += 1
     # data_store.set(store)
     return {
