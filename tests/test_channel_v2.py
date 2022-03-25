@@ -630,7 +630,9 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [],
-        "all_members": [user_2["auth_user_id"]]
+        "all_members": [
+            {'email': 'miguel@unsw.com', 'handle_str': 'migueltest', 'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2}
+            ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
