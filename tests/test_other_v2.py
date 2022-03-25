@@ -72,7 +72,8 @@ def test_clear_empty():
     r = requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    assert r.json() == {}
+    body = r.json()
+    assert body == {}
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
@@ -83,18 +84,20 @@ def test_clear_user(user_1, user_2):
     r = requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    assert r.json() == {}
+    body = r.json()
+    assert body == {}
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
 
 
-def test_clear_channel(user_1, user_2, channel_public, channel_private):
+def test_clear_channel(user_1, user_2, channel_public):
     r = requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    assert r.json() == {}
+    body = r.json()
+    assert body == {}
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
@@ -105,7 +108,8 @@ def test_clear_messages(channel_public, message_send):
     r = requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    assert r.json() == {}
+    body = r.json()
+    assert body == {}
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
@@ -116,7 +120,8 @@ def test_clear_DM(DM):
     r = requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-    assert r.json() == {}
+    body = r.json()
+    assert body == {}
     assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 

@@ -1,15 +1,18 @@
+from operator import truediv
 import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import generate_token
+from src.helper import decode_token, generate_token
 import hashlib
 """
-Auth has two main functions: register and login
+Auth has three main functions: register, login and logout
 
 Functions:
     auth_login_v1: logs in a registered user
     auth_register_v1: registers a new user
+    auth_logout_v1: logs a user out
+
         create_user: initialises a new user
             create_handle: creates handle for new user
         email_check: checks if email is valid
@@ -156,11 +159,37 @@ def create_handle(name_first, name_last):
 
     return handle
 
+
+def auth_logout_v1(token):
+    """_summary_
+    Logs the user off, removing their current session_id from the datastore.
+    Args:
+        token (string): token of user, obtained when logging on or when registering.
+    """
+    store = data_store.get()
+
+    for user in store['users']:
+        if user['u_id'] == decode_token(token)['auth_user_id']:
+            user['session_id'].remove(decode_token(token)['session_id'])
+
+    data_store.set(store)
+
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
+
+
 def hash_password(password):
+    """_summary_
+    Encodes the password given when registering.
+    Args:
+        password (string): Users input plantext password.
+
+    Returns:
+        string: Hashed password
+    """
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def email_check(email):
     """
@@ -170,7 +199,8 @@ def email_check(email):
     :return: whether the email is valid or not
     :rtype: boolean
     """
-    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    regex = re.compile(
+        r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     return bool(re.fullmatch(regex, email))
 
 
@@ -183,5 +213,8 @@ def duplicate_email_check(email):
     :rtype: boolean
     """
     store = data_store.get()
+    does_email_exist = False
     for user in store['users']:
-        return bool(user['email'] == email)
+        if user['email'] == email:
+            does_email_exist = True
+    return does_email_exist
