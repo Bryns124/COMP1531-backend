@@ -494,7 +494,9 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         ]
     }
     assert r.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
 
 
 def test_channel_join_channel_id_error(user_1, invalid_channel_id):
@@ -631,7 +633,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "all_members": [user_2["auth_user_id"]]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    
+
 
 def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
     response1 = requests.post(f"{BASE_URL}/channel/join/v2", json={
