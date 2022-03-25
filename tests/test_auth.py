@@ -12,17 +12,10 @@ def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
 
 
-def test_login_invalid_email():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_login_invalid_email(email_1):
     with pytest.raises(InputError):
-        auth_login_v1("bryanle", "password123")
-        auth_login_v1("bryanle@gmailcom", "password123")
-        auth_login_v1("bryanle@gmial.com", "password123")
-        auth_login_v1("bryan..le@gmail.com", "password123")
-        auth_login_v1("bryanle@gmail", "password123")
-        auth_login_v1("bryan/le@gmail.com", "password123")
-        auth_login_v1("bryanle-@gmail.com", "password123")
-        auth_login_v1("@gmail", "password123")
-        auth_login_v1("", "password123")
+        auth_login_v1(email_1, "password123")
     clear_v1()
 
 # test when login email is incorrect
@@ -61,19 +54,13 @@ def test_user_created_successfully():
     clear_v1()
 
 
-def test_register_invalid_email():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_register_invalid_email(email_1):
     '''
     Tests when the registering email is invalid
     '''
     with pytest.raises(InputError):
-        auth_register_v1("bryanle@gmailcom", "password123", "Bryan", "Le")
-        auth_register_v1("bryanle@gmial.com", "password123", "Bryan", "Le")
-        auth_register_v1("bryan..le@gmail.com", "password123", "Bryan", "Le")
-        auth_register_v1("bryanle@gmail", "password123", "Bryan", "Le")
-        auth_register_v1("bryan/le@gmail.com", "password123", "Bryan", "Le")
-        auth_register_v1("bryanle-@gmail.com", "password123", "Bryan", "Le")
-        auth_register_v1("@gmail", "password123", "Bryan", "Le")
-        auth_register_v1("", "password123", "Bryan", "Le")
+        auth_register_v1(email_1, "password123", "Bryan", "Le")
     clear_v1()
 
 

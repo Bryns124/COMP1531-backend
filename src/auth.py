@@ -186,7 +186,8 @@ def email_check(email):
     :return: whether the email is valid or not
     :rtype: boolean
     """
-    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    regex = re.compile(
+        r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     return bool(re.fullmatch(regex, email))
 
 
