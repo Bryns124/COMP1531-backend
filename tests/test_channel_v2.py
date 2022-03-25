@@ -614,7 +614,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
     })
 
     requests.post(f"{BASE_URL}/channel/leave/v1", json={
-        "token": user_1"token"],
+        "token": user_1["token"],
         "channel_id": channel_1["channel_id"]
     })
 
