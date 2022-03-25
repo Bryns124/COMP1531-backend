@@ -626,7 +626,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload == {
+    assert payload["channels"] == {
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [],
@@ -656,7 +656,7 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
 
     payload = response2.json()
 
-    assert payload == {
+    assert payload["channels"] == {
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [user_1["auth_user_id"]],
