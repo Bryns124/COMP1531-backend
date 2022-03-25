@@ -118,9 +118,7 @@ def channel_join_v2():
 def channel_details_v2():
     data = request.get_json()
     body = channel_details_v1(data['token'], data['channel_id'])
-    return dumps({
-        "channels": body
-    })
+    return dumps(body)
 
 
 @APP.route("/channel/invite/v2", methods=['POST'])
