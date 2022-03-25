@@ -68,37 +68,13 @@ def channel_public(user_1):
         "is_public": True
     })
     return r.json()
-# def test_message_edit(user_1):
-#     # craete channel, send message
-#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-#         "token": user_1["token"],
-#         "message_id": 1,
-#         "message": "user 1 new message"
-#     })
-#     payload = r.json()
-#     assert payload == {}
-#     clear_v1()
 
 
-def test_login_invalid_email():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_login_invalid_email(email_1):
 
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle@gmailcom",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle@gmial.com",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryan..le@gmail.com",
+        "email": email_1,
         "password": "password123",
     })
     assert r.status_code == InputError.code
@@ -169,10 +145,11 @@ def test_auth_register_user_created_sucessfully_v2():
     })
 
 
-def test_register_invalid_email_v2():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_register_invalid_email_v2(email_1):
     # not sure how to fit all the invalid email cases
     request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmailcom",
+        "email": email_1,
         "password": "password123",
         "name_first": "Bryan",
         "name_last": "Le"
