@@ -5,7 +5,7 @@ import src.server
 # from src.auth import auth_register_v1
 # from src.other import clear_v1
 from src.error import AccessError, InputError
-from src.helper import SECRET
+from src.helper import SECRET, generate_timestamp
 from src.config import port
 import json
 from flask import Flask
@@ -170,25 +170,6 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
             "name": "adiyatrahman, alicewan",
         }
     ]
-    # assert payload_1 == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
-
-    # assert payload_2 == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -229,35 +210,6 @@ def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
             "name": "adiyatrahman, alicewan, michaelchai"
         }
     ]
-    # assert payload_1 == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan, michaelchai",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
-
-    # assert payload_2 == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan, michaelchai",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
-
-    # assert payload_3 == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan, michaelchai",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"], user_3["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -288,25 +240,6 @@ def test_dm_list_two_dms(user_1, user_2, user_3):
             'name': "adiyatrahman, michaelchai",
         }
     ]
-
-    # assert payload == [{
-    #         'dm_id' : 1,
-    #         'name' : "adiyatrahman, alicewan",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_2["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # },
-    # {
-    #         'dm_id' : 2,
-    #         'name' : "adiyatrahman, michaelchai",
-    #         'owner_members' : [user_1["auth_user_id"]], #check again if this is leagal
-    #         'all_members' : [user_1["auth_user_id"], user_3["auth_user_id"]],
-    #         'messages_list': [], #list of message IDs
-    #         'start': 25,
-    #         'end': 75,
-    # }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -485,6 +418,57 @@ def test_dm_messages_none(user_1, create_dm_2_user):
     assert payload["end"] == -1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_dm_messages_multiple(user_1, create_dm_2_user):
+    time_send = generate_timestamp()
+    for _ in range(50):
+        requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+            "token" : user_1["token"],
+            "dm_id" : 1,
+            "message" : "hello world"
+        })
+
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+        "token": user_1['token'],
+        "dm_id": channel_public['channel_id'],
+        "start": 0
+    }
+
+    payload = response.json()
+    for i in range(49):
+        assert r.status_code == 200
+        assert payload['messages'][i]['message_id'] == 50 - i
+        assert payload['messages'][i]['u_id'] == 1
+        assert payload['messages'][i]['message'] == "hello world"
+        assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['start'] == 0
+        assert payload['end'] == 50
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_messages_multiple_51(user_1, create_dm_2_user):
+    time_send = generate_timestamp()
+    for _ in range(51):
+        requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+            "token" : user_1["token"],
+            "dm_id" : 1,
+            "message" : "hello world"
+        })
+
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+        "token": user_1['token'],
+        "dm_id": channel_public['channel_id'],
+        "start": 0
+    }
+
+    payload = response.json()
+    for i in range(49):
+        assert r.status_code == 200
+        assert payload['messages'][i]['message_id'] == 50 - i
+        assert payload['messages'][i]['u_id'] == 1
+        assert payload['messages'][i]['message'] == "hello world"
+        assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['start'] == 0
+        assert payload['end'] == 50
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_send_no_dm(user_1, channel_public, message_text, starting_value):
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
