@@ -122,7 +122,6 @@ def test_login_incorrect_email(user_1):
 
 # test when login password is incorrect
 
-
 def test_login_incorrect_password(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
         "email": "bryan.le@gmailcom",
@@ -134,7 +133,6 @@ def test_login_incorrect_password(user_1):
     })
 
 # test registered account is logged in correctly
-
 
 def test_login_correct(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={

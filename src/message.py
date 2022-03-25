@@ -5,28 +5,30 @@ from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member
 
+
 def messages_send_v1(token, channel_id, message):
-    """user sends a message into channel
-
-    Exceptions: #add later
-
-
+    """_summary_
+    Sends a message in specified channel.
     Args:
-        token (string): user's token
-        channel_id (int): channel id of where the message will be sent
-        message (string): contains the message
+        token (string): The token of the user who is sending the message.
+        channel_id (int): The channel which the message is being sent in.
+        message (string): Message of user.
+
+    Raises:
+        InputError: Raised when the input channel is not valid
+        AccessError: Raised when the user is not apart of the channel they are trying to msg in.
 
     Returns:
-        dictionary: dictionary that contains the message id
+        int: Id of the message which was sent.
     """
     store = data_store.get()
     validate_token(token)
     if not channel_validity(channel_id, store):
-        raise InputError("The channel you have entered is invalid")
+        raise InputError(description="The channel you have entered is invalid")
     u_id = decode_token(token)['auth_user_id']
 
     if not already_member(u_id, channel_id, store):
-        raise AccessError("authorised user is not a member of the channel")
+        raise AccessError(description="User is not a member of the channel")
 
     validate_message(message)
 
@@ -125,6 +127,7 @@ def validate_message(message):
         return
     raise InputError("incorrect message length")
 
+
 def message_senddm_v1(token, dm_id, message):
     store = data_store.get()
     validate_token(token)
@@ -164,4 +167,3 @@ def message_senddm_v1(token, dm_id, message):
 
     data_store.set(store)
     return {"message_id": message_id}
-
