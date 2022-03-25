@@ -52,7 +52,7 @@ initial_object = {
         #     'end': 75,
         # }
     ],
-    'dms' : [
+    'dms': [
         # {
         #     'dm_id' : ,
         #     'name' : "",

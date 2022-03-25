@@ -182,7 +182,7 @@ def channels_create_v1(token, name, is_public):
         'is_public': is_public,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
-        'messages': [],
+        'messages_list': [],
         'start': 0,  # ditto
         'end': 50,
     }
