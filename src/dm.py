@@ -31,7 +31,6 @@ def dm_create_v1(token, list_of_u_ids):
         dictionary: contains dm_id
     """
     store = data_store.get()
-    validate_token(token)
     auth_user_id = decode_token(token)['auth_user_id']
 
     if check_duplicate(auth_user_id, list_of_u_ids):
@@ -55,7 +54,7 @@ def dm_create_v1(token, list_of_u_ids):
     new_name = ', '.join(handle_list)
 
     new_dm = {
-        'dm_id': new_dm_id,
+        "dm_id": new_dm_id,
         'name': new_name,
         'owner_members': [auth_user_id],
         'all_members': list_of_u_ids,
@@ -68,13 +67,13 @@ def dm_create_v1(token, list_of_u_ids):
     data_store.set(store)
 
     return {
-        'dm_id': store['dms'][-1]['dm_id']
+        "dm_id": new_dm["dm_id"]
     }
 
 
 def check_duplicate(auth_user_id, u_id_list):
     ''' Check if given list of user ids contains any duplicates '''
-    if len(u_id_list) == len(set(u_id_list)) or auth_user_id not in u_id_list:
+    if len(u_id_list) == len(set(u_id_list)) and auth_user_id not in u_id_list:
         return False
     else:
         return True
@@ -105,16 +104,15 @@ def dm_list_v1(token):
         dms (dictionary): contains a list of dms user is a part of under the key 'dms'
     """
     store = data_store.get()
-    validate_token(token)
     auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
 
     for dms in store['dms']:
         if any(auth_user_id in dms['owner_members'], auth_user_id in dms['all_memebers']):
-            details_list = (extract_dm_details(store, dms['dm_id']))
+            #details_list = (extract_dm_details(store, dms["dm_id"]))
             new = {
-                "dm_id": details_list["dm_id"],
-                "name": details_list["name"]
+                "dm_id": dms["dm_id"],
+                "name": dms["name"]
             }
             dm_list.append(new)
 
@@ -128,7 +126,7 @@ def dm_list_v1(token):
 def extract_dm_details(store, dm_id):
     '''given a dm_id, it returns the dictionary containing the details of the dm'''
     for dms in store['dms']:
-        if dms['dm_id'] == dm_id:
+        if dms["dm_id"] == dm_id:
             return dms
 
 
@@ -150,7 +148,6 @@ def dm_remove_v1(token, dm_id):
         dictionary: empty
     """
     store = data_store.get()
-    validate_token(token)
     auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
@@ -164,7 +161,7 @@ def dm_remove_v1(token, dm_id):
 
     count = 0
     for dms in store['dms']:
-        if dms['dm_id'] == dm_id:
+        if dms["dm_id"] == dm_id:
             store['dms'].pop(count)
         count += 1
 
@@ -179,7 +176,7 @@ def valid_dm_id(store, dm_id):
     '''returns True if a dm with the dm_id passed in argument exists in data_store'''
     dm_exist = False
     for dms in store['dms']:
-        if dm_id == dms['dm_id']:
+        if dm_id == dms["dm_id"]:
             dm_exist = True
     return dm_exist
 
@@ -188,7 +185,7 @@ def is_dm_owner(store, auth_user_id, dm_id):
     '''the user with the given auth_user_id is an owner of the dm with the given dm_id'''
     dm_owner = False
     for dms in store['dms']:
-        if dms['dm_id'] == dm_id and auth_user_id in dms['owner_members']:
+        if dms["dm_id"] == dm_id and auth_user_id in dms['owner_members']:
             dm_owner = True
     return dm_owner
 
@@ -196,7 +193,7 @@ def is_dm_owner(store, auth_user_id, dm_id):
 def is_dm_member(store, auth_user_id, dm_id):
     dm_member = False
     for dms in store['dms']:
-        if dms['dm_id'] == dm_id and auth_user_id in dms['all_members']:
+        if dms["dm_id"] == dm_id and auth_user_id in dms['all_members']:
             dm_member = True
     return dm_member
 
@@ -217,7 +214,6 @@ def dm_details_v1(token, dm_id):
         dictionary: contains the name and members of the dm
     """
     store = data_store.get()
-    validate_token(token)
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
@@ -257,7 +253,6 @@ def dm_leave_v1(token, dm_id):
         dictionary: empty
     """
     store = data_store.get()
-    validate_token(token)
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
@@ -296,8 +291,8 @@ def dm_messages_v1(token, dm_id, start):
         it returns less than 50 messages.
     """
     store = data_store.get()
-    validate_token(token)
     u_id = decode_token(token)['auth_user_id']
+
 
     if not valid_dm_id(store, dm_id):
         raise InputError("dm id does not exist")

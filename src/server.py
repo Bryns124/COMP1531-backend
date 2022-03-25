@@ -213,23 +213,22 @@ def dm_create():
     body = dm_create_v1(data['token'], data['u_ids'])
 
     return dumps({
-        'dm_id': body['dm_id']
+        "dm_id": body["dm_id"]
     })
 
 @APP.route("/dm/list/v1", methods = ['GET'])
 def dm_list():
-    token = request.args.get("token")
-    body = dm_list_v1(token)
+    data = request.get_json()
+    body = dm_list_v1(data["token"])
 
     return dumps({
         'dms': body['dms']
     })
 
-
 @APP.route("/dm/remove/v1", methods = ['DELETE'])
 def dm_remove():
     data = request.get_json()
-    dm_remove_v1(data['token'], data['dm_id'])
+    dm_remove_v1(data['token'], data["dm_id"])
     return dumps({})
 
 @APP.route("/dm/details/v1", methods = ['GET'])
@@ -246,7 +245,7 @@ def dm_details():
 @APP.route("/dm/leave/v1", methods = ['POST'])
 def dm_leave():
     data = request.get_json()
-    dm_leave_v1(data['token'], data['dm_id'])
+    dm_leave_v1(data['token'], data["dm_id"])
 
     return dumps({})
 
