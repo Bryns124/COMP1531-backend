@@ -233,10 +233,11 @@ def dm_remove():
 
 @APP.route("/dm/details/v1", methods = ['GET'])
 def dm_details():
-    token = request.args.get("token")
-    dm_id = request.args.get("dm_id")
-    body = dm_details_v1(token, dm_id)
-
+    data = request.get_json()
+    # token = request.args.get("token")
+    # dm_id = request.args.get("dm_id")
+    # body = dm_details_v1(token, dm_id)
+    body = dm_details_v1(data["token"], data["dm_id"])
     return dumps({
         "name" : body["name"],
         "members" : body["members"]
@@ -246,15 +247,12 @@ def dm_details():
 def dm_leave():
     data = request.get_json()
     dm_leave_v1(data['token'], data["dm_id"])
-
     return dumps({})
 
 @APP.route("/dm/messages/v1", methods = ['GET'])
 def dm_messages():
-    token = request.args.get("token")
-    dm_id = request.args.get("dm_id")
-    start = request.args.get("start")
-    body = dm_messages_v1(token, dm_id, start)
+    data = request.get_json()
+    body = dm_messages_v1(data["token"], data["dm_id"], data["start"])
 
     return dumps({
         "messages" : body["messages"],
