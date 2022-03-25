@@ -5,17 +5,6 @@ from src.error import InputError
 import jwt
 from src.helper import decode_token, generate_token
 import hashlib
-"""
-Auth has two main functions: register and login
-
-Functions:
-    auth_login_v1: logs in a registered user
-    auth_register_v1: registers a new user
-        create_user: initialises a new user
-            create_handle: creates handle for new user
-        email_check: checks if email is valid
-        duplicate_email_check: checks if email has already been registered.
-"""
 
 
 def auth_login_v1(email, password):
@@ -159,6 +148,11 @@ def create_handle(name_first, name_last):
 
 
 def auth_logout_v1(token):
+    """_summary_
+    Logs the user off, removing their current session_id from the datastore.
+    Args:
+        token (string): token of user, obtained when logging on or when registering.
+    """
     store = data_store.get()
 
     for user in store['users']:
@@ -173,6 +167,14 @@ def auth_logout_v1(token):
 
 
 def hash_password(password):
+    """_summary_
+    Encodes the password given when registering.
+    Args:
+        password (string): Users input plantext password.
+
+    Returns:
+        string: Hashed password
+    """
     return hashlib.sha256(password.encode()).hexdigest()
 
 
