@@ -22,7 +22,7 @@ def messages_send_v1(token, channel_id, message):
         int: Id of the message which was sent.
     """
     store = data_store.get()
-    validate_token(token)
+    decode_token(token)
     if not channel_validity(channel_id, store):
         raise InputError(description="The channel you have entered is invalid")
     u_id = decode_token(token)['auth_user_id']
