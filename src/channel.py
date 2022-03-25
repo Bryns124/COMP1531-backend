@@ -2,9 +2,17 @@ from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
 from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, valid_auth_user_id, extract_channel_details
+
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
+
+    channel_invite_v1: allows a user to invite another user to a channel.
+    channel_details_v1: provides the details of a channel.
+    channel_messages_v1: returns all the messages within a channel.
+    channel_join_v1: allows a user to join a channel.
+    channel_leave_v1: allows a user to leave a channel.
+    
 """
 
 
@@ -13,9 +21,9 @@ def channel_invite_v1(token, channel_id, u_id):
     Allows a authorized user to invite another user to a channel they are apart of.
 
     Args:
-        auth_user_id (u_id): A valid user who is apart of the channel/
+        token (string): The token of the user who is apart of the channel.
         channel_id (channel_id): The channel id auth_user is inviting to.
-        u_id (u_id): A valid second user who is being invited
+        u_id (u_id): A valid second user who is being invited.
 
     Raises:
         InputError: u_id dos not exist in datastore.
@@ -48,7 +56,7 @@ def channel_invite_v1(token, channel_id, u_id):
 
     if not already_member(auth_user_id, channel_id, store):
         raise AccessError(
-            "You are not apart of the channel you are trying to invite to.")
+            description="You are not apart of the channel you are trying to invite to.")
 
     for channel in store['channels']:
         for user in store['users']:
@@ -108,7 +116,7 @@ def channel_details_v1(token, channel_id):
             is_member = True
 
     if not is_member:
-        raise AccessError("You are not a member of the channel.")
+        raise AccessError(description="You are not a member of the channel.")
 
     owner_members_details = []
     all_members_details = []
@@ -182,11 +190,11 @@ def member_details(user_id):
 
 
 def channel_messages_v1(token, channel_id, start):
-    """_summary_
+    """
     Taking a valid user it pulls a list of up to 50 messages from a starting
     point and returns them.
     Args:
-        auth_user_id (_u_id): The valid id of the user calling the messages.
+        token (string): The token of the user calling the messages.
         channel_id (channel_id): The channel_id of the channel which to call the
         messages from.
         start (int): A starting index value.
@@ -226,7 +234,7 @@ def channel_messages_v1(token, channel_id, start):
             in_channel = True
 
     if not in_channel:
-        raise AccessError("You are not part of that channel.")
+        raise AccessError(description="You are not part of that channel.")
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
     for messages in store['channels'][channel_id - 1]['messages']:
@@ -275,7 +283,7 @@ def channel_join_v1(token, channel_id):
     current_channel = extract_channel_details(channel_id, store)
     if not current_channel['is_public']:
         raise AccessError(
-            "This is a private channel, user does not have access.")
+            description="This is a private channel, user does not have access.")
 
     for user_accounts in store['users']:
         if user_accounts['u_id'] == decode_token(token)['auth_user_id']:
@@ -290,3 +298,107 @@ def channel_join_v1(token, channel_id):
     return {
         # empty
     }
+
+
+def channel_leave_v1(token, channel_id):
+    """
+    Takes user and removes them from the channel's list of users and owners, if they are an owner
+    Fails if channel_id is invalid (InputError)
+    Fails if user does not exist or is not a part of the channel (AccessError)
+    """
+    auth_user_id = decode_token(token)["auth_user_id"]
+    valid_auth_user_id(auth_user_id)
+
+    store = data_store.get()
+
+    is_channel = False
+    in_channel = False
+    i = 0
+    for channel in store["channels"]:
+        if channel_id == channel["channel_id"]:
+            is_channel = True
+
+            if auth_user_id in channel["all_members"]:
+                in_channel = True
+                store["channels"][i]["all_members"].remove(auth_user_id)
+
+            if auth_user_id in channel["owner_members"]:
+                store["channels"][i]["owner_members"].remove(auth_user_id)
+
+        i += 1
+    if not is_channel:
+        raise InputError("Channel id is invalid.")
+
+    if not in_channel:
+        raise AccessError(description="User is not a part of channel.")
+
+    return {}
+
+
+def channel_addowner_v1(token, channel_id, u_id):
+    store = data_store.get()
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
+
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            if auth_user_id in channel['owner_members']:
+                pass
+            else:
+                raise AccessError(
+                    description="Authorised user does not have owner permissions in channel.")
+
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
+
+    for user in store['users']:
+        if user["u_id"] == u_id:
+            user["channels_owned"].append(channel_id)
+            user["channels_joined"].append(channel_id)
+
+    for channel in store['channels']:
+        if channel["channel_id"] == channel_id:
+            channel["owner_members"].append(u_id)
+            channel["all_members"].append(u_id)
+
+    data_store.set(store)
+    return {}
+
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    store = data_store.get()
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
+
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            if auth_user_id in channel['owner_members']:
+                if len(channel['owner_members']) == 1:
+                    raise InputError(
+                        "Auththorised user is the only owner of the channel.")
+                pass
+            else:
+                raise AccessError(
+                    description="Authorised user does not have owner permissions in channel.")
+
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
+
+    for user in store['users']:
+        if user["u_id"] == u_id:
+            user["channels_owned"].remove(channel_id)
+            user["channels_joined"].remove(channel_id)
+
+    for channel in store['channels']:
+        if channel["channel_id"] == channel_id:
+            channel["owner_members"].remove(u_id)
+            channel["all_members"].remove(u_id)
+
+    data_store.set(store)
+    return {}
