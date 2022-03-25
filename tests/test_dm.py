@@ -431,76 +431,76 @@ def test_dm_messages_none(user_1, create_dm_2_user):
     # assert payload["end"] == -1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_messages(user_1, create_dm_2_user):
-    time_sent = generate_timestamp()
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_1["token"],
-        "message": "hello world"
-    })
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
-        "token": user_1["token"],
-        "dm_id": 1,
-        "start": 0
-    })
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload["start"] == 0
-    assert payload["end"] == -1
-    assert payload["messages"][-1]["message_id"] == 1
-    assert payload["messages"][-1]["u_id"] == 1
-    assert payload["messages"][-1]["message"] == "hello world"
-    assert payload['messages'][-1]['time_sent'] >= time_sent
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+# def test_dm_messages(user_1, create_dm_2_user):
+#     time_sent = generate_timestamp()
+#     requests.post(f"{BASE_URL}/message/senddm/v1", json={
+#         "token": user_1["token"],
+#         "message": "hello world"
+#     })
+#     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+#         "token": user_1["token"],
+#         "dm_id": 1,
+#         "start": 0
+#     })
+#     assert response.status_code == 200
+#     payload = response.json()
+#     assert payload["start"] == 0
+#     assert payload["end"] == -1
+#     assert payload["messages"][-1]["message_id"] == 1
+#     assert payload["messages"][-1]["u_id"] == 1
+#     assert payload["messages"][-1]["message"] == "hello world"
+#     assert payload['messages'][-1]['time_sent'] >= time_sent
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_messages_multiple(user_1, create_dm_2_user):
-    time_sent = generate_timestamp()
-    for _ in range(50):
-        requests.post(f"{BASE_URL}/message/senddm/v1", json = {
-            "token" : user_1["token"],
-            "dm_id" : 1,
-            "message" : "hello world"
-        })
+# def test_dm_messages_multiple(user_1, create_dm_2_user):
+#     time_sent = generate_timestamp()
+#     for _ in range(50):
+#         requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+#             "token" : user_1["token"],
+#             "dm_id" : 1,
+#             "message" : "hello world"
+#         })
 
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
-        "token": user_1['token'],
-        "dm_id": 1,
-        "start": 0
-    })
+#     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+#         "token": user_1['token'],
+#         "dm_id": 1,
+#         "start": 0
+#     })
 
-    payload = response.json()
-    for i in range(49):
-        assert response.status_code == 200
-        assert payload['messages'][i]['message_id'] == 50 - i
-        assert payload['messages'][i]['u_id'] == 1
-        assert payload['messages'][i]['message'] == "hello world"
-        assert payload['messages'][i]['time_sent'] >= time_sent
-        assert payload['start'] == 0
-        assert payload['end'] == 50
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     payload = response.json()
+#     for i in range(49):
+#         assert response.status_code == 200
+#         assert payload['messages'][i]['message_id'] == 50 - i
+#         assert payload['messages'][i]['u_id'] == 1
+#         assert payload['messages'][i]['message'] == "hello world"
+#         assert payload['messages'][i]['time_sent'] >= time_sent
+#         assert payload['start'] == 0
+#         assert payload['end'] == 50
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_dm_messages_multiple_51(user_1, create_dm_2_user):
-    time_sent = generate_timestamp()
-    for _ in range(51):
-        requests.post(f"{BASE_URL}/message/senddm/v1", json = {
-            "token" : user_1["token"],
-            "dm_id" : 1,
-            "message" : "hello world"
-        })
+# def test_dm_messages_multiple_51(user_1, create_dm_2_user):
+#     time_sent = generate_timestamp()
+#     for _ in range(51):
+#         requests.post(f"{BASE_URL}/message/senddm/v1", json = {
+#             "token" : user_1["token"],
+#             "dm_id" : 1,
+#             "message" : "hello world"
+#         })
 
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
-        "token": user_1['token'],
-        "dm_id": 1,
-        "start": 0
-    })
+#     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+#         "token": user_1['token'],
+#         "dm_id": 1,
+#         "start": 0
+#     })
 
-    payload = response.json()
-    for i in range(49):
-        assert response.status_code == 200
-        assert payload['messages'][i]['message_id'] == 50 - i
-        assert payload['messages'][i]['u_id'] == 1
-        assert payload['messages'][i]['message'] == "hello world"
-        assert payload['messages'][i]['time_sent'] >= time_sent
-        assert payload['start'] == 0
-        assert payload['end'] == 50
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     payload = response.json()
+#     for i in range(49):
+#         assert response.status_code == 200
+#         assert payload['messages'][i]['message_id'] == 50 - i
+#         assert payload['messages'][i]['u_id'] == 1
+#         assert payload['messages'][i]['message'] == "hello world"
+#         assert payload['messages'][i]['time_sent'] >= time_sent
+#         assert payload['start'] == 0
+#         assert payload['end'] == 50
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
