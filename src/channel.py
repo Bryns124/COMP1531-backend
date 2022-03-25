@@ -306,7 +306,6 @@ def channel_leave_v1(token, channel_id):
     Fails if channel_id is invalid (InputError)
     Fails if user does not exist or is not a part of the channel (AccessError)
     """
-    validate_token(token)
     auth_user_id = decode_token(token)["auth_user_id"]
     valid_auth_user_id(auth_user_id)
 
@@ -370,11 +369,36 @@ def channel_addowner_v1(token, channel_id, u_id):
 
 
 def channel_removeowner_v1(token, channel_id, u_id):
-    # store = data_store.get()
+    store = data_store.get()
+    auth_user_id = decode_token(token)['auth_user_id']
+    valid_auth_user_id(auth_user_id)
 
-    # validate_token(token)
-    # auth_user_id = decode_token(token)['auth_user_id']
-    # valid_auth_user_id(auth_user_id)
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            if auth_user_id in channel['owner_members']:
+                if len(channel['owner_members']) == 1:
+                    raise InputError(
+                        "Auththorised user is the only owner of the channel.")
+                pass
+            else:
+                raise AccessError(
+                    description="Authorised user does not have owner permissions in channel.")
 
-    # data_store.set(store)
+    if not channel_validity(channel_id, store):
+        raise InputError("Channel id is invalid.")
+
+    if already_member(auth_user_id, channel_id, store):
+        raise InputError("Owner is not in channel.")
+
+    for user in store['users']:
+        if user["u_id"] == u_id:
+            user["channels_owned"].remove(channel_id)
+            user["channels_joined"].remove(channel_id)
+
+    for channel in store['channels']:
+        if channel["channel_id"] == channel_id:
+            channel["owner_members"].remove(u_id)
+            channel["all_members"].remove(u_id)
+
+    data_store.set(store)
     return {}

@@ -7,7 +7,7 @@ from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_addowner_v1
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.helper import save_data_store, load_data_store
 from src.other import clear_v1
 
@@ -147,14 +147,14 @@ def channel_messages_v2():
 # Havent written the test functions and function
 
 
-# @APP.route("/channel/leave/v1", methods=['POST'])
-# def channel_leave_v1():
-#     data = request.get_json()
-#     body = channel_leave_v1(
-#         data['token'], data['channel_id'])
-#     return dumps({
+@APP.route("/channel/leave/v1", methods=['POST'])
+def channel_leave():
+    data = request.get_json()
+    channel_leave_v1(
+        data['token'], data['channel_id'])
+    return dumps({
 
-#     })
+    })
 
 
 # Need to write functions for channel addowner and removeowner
@@ -169,14 +169,14 @@ def channel_addowner():
     })
 
 
-# @APP.route("/channel/removeowner/v1", methods=['POST'])
-# def channel_removeowner_v1():
-#     data = request.get_json()
-#     channel_removeowner_v1(
-#         data['token'], data['channel_id'], data['u_id'])
-#     return dumps({
+@APP.route("/channel/removeowner/v1", methods=['POST'])
+def channel_removeowner():
+    data = request.get_json()
+    channel_removeowner_v1(
+        data['token'], data['channel_id'], data['u_id'])
+    return dumps({
 
-#     })
+    })
 
 
 @APP.route("/clear/v1", methods=['DELETE'])
@@ -189,9 +189,9 @@ def clear_v2():
 
 @ APP.route("/echo", methods=['GET'])
 def echo():
-    data=request.args.get('data')
+    data = request.args.get('data')
     if data == 'echo':
-        raise InputError(description = 'Cannot echo "echo"')
+        raise InputError(description='Cannot echo "echo"')
     return dumps({
         'data': data
     })
@@ -201,4 +201,4 @@ def echo():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port = config.port, debug = True)  # Do not edit this port
+    APP.run(port=config.port, debug=True)  # Do not edit this port
