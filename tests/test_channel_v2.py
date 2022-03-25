@@ -455,9 +455,7 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         ]
     }
     assert r.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_channel_join_channel_id_error(user_1, invalid_channel_id):
@@ -531,6 +529,7 @@ def test_invalid_channel_id_channel_leave_v1(user_1, invalid_channel_id):
     })
 
     assert response.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_auth_user_not_in_channel_channel_leave_v1(user_1, channel_2):
@@ -540,6 +539,7 @@ def test_auth_user_not_in_channel_channel_leave_v1(user_1, channel_2):
     })
 
     assert response.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
@@ -562,6 +562,7 @@ def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
     })
 
     assert response3.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_only_owner_leaves(user_1, user_2, channel_1):
@@ -590,6 +591,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "owner_members": [],
         "all_members": [user_2["auth_user_id"]]
     }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
     response1 = requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -616,3 +618,4 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
         "owner_members": [user_1["auth_user_id"]],
         "all_members": [user_1["auth_user_id"]]
     }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
