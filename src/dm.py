@@ -106,8 +106,7 @@ def dm_list_v1(token):
     """
     store = data_store.get()
     validate_token(token)
-    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
-
+    auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
 
     for dms in store['dms']:
@@ -152,7 +151,7 @@ def dm_remove_v1(token, dm_id):
     """
     store = data_store.get()
     validate_token(token)
-    auth_user_id = decode_token(token)['auth_user_id']['auth_user_id']
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
         raise InputError
