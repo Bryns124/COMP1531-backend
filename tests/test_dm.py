@@ -1,7 +1,7 @@
 import pytest
 import src.server
 from src.error import AccessError, InputError
-from src.helper import SECRET, generate_timestamp
+from src.helper import SECRET, generate_timestamp, decode_token
 from src.config import port
 import json
 from flask import Flask
@@ -50,7 +50,7 @@ def user_3():
 def create_dm_2_user(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_2["auth_user_id"])]
+        "u_ids": [user_2['auth_user_id']]
     })
     return r.json()
 
@@ -59,51 +59,12 @@ def create_dm_2_user(user_1, user_2):
 def create_dm_3_user(user_1, user_2, user_3):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
+        "u_ids": [user_2['auth_user_id'], user_3['auth_user_id']]
     })
     return r.json()
 
 
 requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-def test_dm_create_2_users(user_1, user_2):
-    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1['token'],
-        "u_ids": [int(user_2['auth_user_id'])]
-    })
-    payload = r.json()
-    assert payload['dm_id'] == 1
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-def test_dm_create_3_users(user_1, user_2, user_3):
-    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1["token"],
-        "u_ids": [int(user_2["auth_user_id"]), int(user_3["auth_user_id"])]
-    })
-    payload = r.json()
-    assert payload['dm_id'] == 1
-    assert r.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-def test_dm_create_2_dms(user_1, user_2, user_3, user4):
-    response_1 = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_1['token'],
-        "u_ids": [int(user_2('auth_user_id'))]
-    })
-
-    response_2 = requests.post(f"{BASE_URL}/dm/create/v1", json={
-        "token": user_3("token"),
-        "u_ids": [int(user4('auth_user_id'))]
-    })
-    payload_1 = response_1.json()
-    payload_2 = response_2.json()
-    assert payload_1['dm_id'] == 1
-    assert payload_2['dm_id'] == 2
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
 
 def test_dm_create_invalid_ids(user_1):
     invalid_id = 200
@@ -118,7 +79,7 @@ def test_dm_create_invalid_ids(user_1):
 def test_dm_create_duplicate_ids_1(user_1):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_1('auth_user_id'))]
+        "u_ids": [user_1['auth_user_id']]
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -127,19 +88,39 @@ def test_dm_create_duplicate_ids_1(user_1):
 def test_dm_create_duplicate_ids_2(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_2('auth_user_id')), int(user_2('auth_user_id'))]
+        "u_ids": [user_2['auth_user_id'], user_2['auth_user_id']]
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_dm_create_2_users(user_1, user_2):
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
+        "token": user_1['token'],
+        "u_ids": [user_2["auth_user_id"]]
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload['dm_id'] == 1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_create_3_users(user_1, user_2, user_3):
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
+        "token": user_1["token"],
+        "u_ids": [user_2["auth_user_id"], user_3['auth_user_id']]
+    })
+    payload = r.json()
+    assert payload['dm_id'] == 1
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_list_empty(user_1):
     r = requests.get(f"{BASE_URL}/dm/list/v1", json={
         "token": user_1['token']
     })
 
+    assert r.status_code == 200
     payload = r.json()
-    assert payload == []
+    assert payload["dms"] == []
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -149,9 +130,11 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
     })
 
     response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
-        "token": user_2("token")
+        "token": user_2["token"]
     })
 
+    assert response_1.status_code == 200
+    assert response_2.status_code == 200
     payload_1 = response_1.json()
     payload_2 = response_2.json()
     assert payload_1["dms"] == [
@@ -212,12 +195,12 @@ def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
 def test_dm_list_two_dms(user_1, user_2, user_3):
     requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_2["auth_user_id"])]
+        "u_ids": [user_2['auth_user_id']]
     })
 
     requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
-        "u_ids": [int(user_3["auth_user_id"])]
+        "u_ids": [user_3['auth_user_id']]
     })
 
     response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json={
@@ -311,9 +294,9 @@ def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
     payload = response.json()
     assert payload["name"] == "adiyatrahman, alicewan, michaelchai"
     assert payload["members"] == [
-        int(user_2["auth_user_id"]),
-        int(user_2["auth_user_id"]),
-        int(user_3["auth_user_id"])
+        user_1['auth_user_id'],
+        user_2['auth_user_id'],
+        user_3['auth_user_id']
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
