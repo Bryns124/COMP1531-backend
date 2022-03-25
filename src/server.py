@@ -71,13 +71,6 @@ def channels_create_v2():
     return dumps({
         'channel_id': body['channel_id']
     })
-# @APP.route("/channels/create/v2", methods=['POST'])
-# def channels_create_v2():
-#     data = request.get_json()
-#     body = channels_create_v1(data['token'], data['name'], data['is_public'])
-#     return dumps({
-#         'channel_id': body(['channel_id'])
-#     })
 
 
 @APP.route("/channels/list/v2", methods=['GET'])

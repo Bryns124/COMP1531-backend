@@ -298,7 +298,7 @@ def test_messages_send_token_error(user_invalid, channel_public, message_text):
     })
 
 
-def test_messages_send_49(user_1, channel_public, message_text, starting_value):
+def test_messages_send_50(user_1, channel_public, message_text, starting_value):
     time_sent = generate_timestamp()
     for _ in range(50):
         requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -327,7 +327,7 @@ def test_messages_send_49(user_1, channel_public, message_text, starting_value):
     })
 
 
-def test_messages_send_50(user_1, channel_public, message_text, starting_value):
+def test_messages_send_51(user_1, channel_public, message_text, starting_value):
     time_sent = generate_timestamp()
     for _ in range(50):
         requests.post(f"{BASE_URL}/message/send/v1", json={
