@@ -453,7 +453,7 @@ def test_channel_details(user_1, channel_public):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data == {
+    assert data['channels'] == {
         'name': "Test Channel",
         'is_public': True,
         'owner_members': [
@@ -479,7 +479,7 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data == {
+    assert data['channels'] == {
         'name': "Test Channel",
         'is_public': True,
         'owner_members': [
@@ -545,7 +545,7 @@ def test_channel_join(channel_public, user_2):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data == {
+    assert data['channels'] == {
         'name': "Test Channel",
         'is_public':  True,
         'owner_members': [
@@ -614,7 +614,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
     })
 
     requests.post(f"{BASE_URL}/channel/leave/v1", json={
-        "token": user_1["token"],
+        "token": user_2["token"],
         "channel_id": channel_1["channel_id"]
     })
 
@@ -630,10 +630,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [],
-        "all_members": [
-            {'email': 'miguel@unsw.com', 'handle_str': 'migueltest',
-                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2}
-        ]
+        "all_members": [user_2["auth_user_id"]]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
