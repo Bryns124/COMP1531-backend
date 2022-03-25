@@ -419,7 +419,7 @@ def test_dm_messages_none(user_1, create_dm_2_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_messages_multiple(user_1, create_dm_2_user):
-    time_send = generate_timestamp()
+    time_sent = generate_timestamp()
     for _ in range(50):
         requests.post(f"{BASE_URL}/message/senddm/v1", json = {
             "token" : user_1["token"],
@@ -429,13 +429,13 @@ def test_dm_messages_multiple(user_1, create_dm_2_user):
 
     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1['token'],
-        "dm_id": channel_public['channel_id'],
+        "dm_id": 1,
         "start": 0
-    }
+    })
 
     payload = response.json()
     for i in range(49):
-        assert r.status_code == 200
+        assert response.status_code == 200
         assert payload['messages'][i]['message_id'] == 50 - i
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
@@ -445,7 +445,7 @@ def test_dm_messages_multiple(user_1, create_dm_2_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_messages_multiple_51(user_1, create_dm_2_user):
-    time_send = generate_timestamp()
+    time_sent = generate_timestamp()
     for _ in range(51):
         requests.post(f"{BASE_URL}/message/senddm/v1", json = {
             "token" : user_1["token"],
@@ -455,13 +455,13 @@ def test_dm_messages_multiple_51(user_1, create_dm_2_user):
 
     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
         "token": user_1['token'],
-        "dm_id": channel_public['channel_id'],
+        "dm_id": 1,
         "start": 0
-    }
+    })
 
     payload = response.json()
     for i in range(49):
-        assert r.status_code == 200
+        assert response.status_code == 200
         assert payload['messages'][i]['message_id'] == 50 - i
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
