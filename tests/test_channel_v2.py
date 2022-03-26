@@ -453,7 +453,7 @@ def test_channel_details(user_1, channel_public):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data['channels'] == {
+    assert data == {
         'name': "Test Channel",
         'is_public': True,
         'owner_members': [
@@ -479,7 +479,7 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data['channels'] == {
+    assert data == {
         'name': "Test Channel",
         'is_public': True,
         'owner_members': [
@@ -545,7 +545,7 @@ def test_channel_join(channel_public, user_2):
         "channel_id": channel_public['channel_id']
     })
     data = r.json()
-    assert data['channels'] == {
+    assert data == {
         'name': "Test Channel",
         'is_public':  True,
         'owner_members': [
@@ -614,7 +614,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
     })
 
     requests.post(f"{BASE_URL}/channel/leave/v1", json={
-        "token": user_2["token"],
+        "token": user_1["token"],
         "channel_id": channel_1["channel_id"]
     })
 
