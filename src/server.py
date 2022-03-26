@@ -60,9 +60,12 @@ def auth_register_v2():
     data = request.get_json()
     body = auth_register_v1(
         data['email'], data['password'], data['name_first'], data['name_last'])
+    save_data_store()
     return dumps({
-        'channel_id': body['channel_id']
+        'token': body['token'],
+        'auth_user_id': body['auth_user_id']
     })
+
 
 
 @ APP.route("/channels/create/v2", methods=['POST'])

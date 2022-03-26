@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.helper import valid_auth_user_id, decode_token
-from data_store import data_store
+from src.data_store import data_store
 
 
 def admin_userpermission_change_v1(token, u_id, permission_id):
