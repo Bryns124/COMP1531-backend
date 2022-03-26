@@ -290,23 +290,23 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
     body2 = request_2.json()
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": body['token'],
-        "channel_id": channel_public['channel_id'],
+        "channel_id": channel_public,
     })
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": body2['token'],
-        "channel_id": channel_public['channel_id'],
+        "channel_id": channel_public,
     })
-    details = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    details = requests.post(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": channel_public
     })
     body3 = details.json()
-    for users in body3['channels']['all_members']:
-        if users['u_id'] == body['auth_user_id']:
+    for users in body3['all_members']:
+        if users['u_id'] == request_1.json()['auth_user_id']:
             assert users['name_first'] == name_first
             assert users['name_last'] == name_last
             assert users['handle_str'] == handle_1
-        if users['u_id'] == body2['auth_user_id']:
+        if users['u_id'] == request_2.json()['auth_user_id']:
             assert users['name_first'] == name_first_2
             assert users['name_last'] == name_last_2
             assert users['handle_str'] == handle_2
@@ -316,27 +316,31 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
 
 
 def test_handles_appends_correctly(user_1, channel_public):
-    handles = ["mikeytest", "abcdef", 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
+    handles = ['abcdef', 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
                'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10']
     for _ in range(12):
         request = requests.post(f"{BASE_URL}/auth/register/v2", json={
-            "email": f"bryanle{_}@gmail.com",
+            "email": "bryanle{_}@gmail.com",
             "password": "password123",
             "name_first": "abc",
             "name_last": "def"
         })
         body = request.json()
         requests.post(f"{BASE_URL}/channel/join/v2", json={
+<<<<<<< HEAD
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
+=======
+            "token": body.json()['token'],
+            "channel_id": channel_public,
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
         })
-    data = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    data = requests.post(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": channel_public
     })
-    body = data.json()
-    for users in body['channels']['all_members']:
-        assert users['handle_str'] in handles
+    for users in data.json()['all_members']:
+        assert users['handle_str'] == handles
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
