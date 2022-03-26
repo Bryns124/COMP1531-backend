@@ -12,7 +12,7 @@ details of channels, calling messages and joining channels. ß
     channel_messages_v1: returns all the messages within a channel.
     channel_join_v1: allows a user to join a channel.
     channel_leave_v1: allows a user to leave a channel.
-    
+
 """
 
 

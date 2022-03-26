@@ -115,17 +115,17 @@ def dm_list_v1(token):
     for dm in store["dms"]:
         if auth_user_id in dm["owner_members"] or auth_user_id in dm['all_members']:
             new = {
-                "dm_id" : dm["dm_id"],
-                "name" : dm["name"]
+                "dm_id": dm["dm_id"],
+                "name": dm["name"]
             }
             dm_list.append(new)
-
 
     data_store.set(store)
 
     return {
         'dms': dm_list
     }
+
 
 def dm_remove_v1(token, dm_id):
     """removes an existing dm so all members are
@@ -166,12 +166,14 @@ def dm_remove_v1(token, dm_id):
 
     }
 
+
 def valid_dm_id(store, dm_id):
     '''returns True if a dm with the dm_id passed in argument exists in data_store'''
     for dms in store['dms']:
         if dm_id == dms["dm_id"]:
             return True
     return False
+
 
 def is_dm_owner(store, auth_user_id, dm_id):
     '''the user with the given auth_user_id is an owner of the dm with the given dm_id'''
@@ -224,6 +226,7 @@ def dm_details_v1(token, dm_id):
         "members": members
     }
 
+
 def dm_leave_v1(token, dm_id):
     """user leaves a certain dm.
         given dm ID the user is removed from DM
@@ -261,6 +264,7 @@ def dm_leave_v1(token, dm_id):
 
     return {}
 
+
 def dm_messages_v1(token, dm_id, start):
     """returns up to 50 messages in dm based on the start
 
@@ -284,7 +288,6 @@ def dm_messages_v1(token, dm_id, start):
     store = data_store.get()
     u_id = decode_token(token)['auth_user_id']
 
-
     if not valid_dm_id(store, dm_id):
         raise InputError("dm id does not exist")
 
@@ -295,7 +298,7 @@ def dm_messages_v1(token, dm_id, start):
         if dm_id == dm["dm_id"]:
             curr_dm = dm
 
-    if curr_dm["messages_list"] == [] or len(curr_dm["messages_list"]) < start:
+    if len(curr_dm["messages_list"]) < start:
         raise InputError("start value gerater than messaegs in dm")
     # for m in reversed(store["messages"]):
     #     if end == -1 and curr >= len(messages_list):
@@ -327,9 +330,9 @@ def dm_messages_v1(token, dm_id, start):
                 print("entered here")
                 ret_dict = {
                     "message_id": m["message_id"],
-                    "u_id" : m["u_id"],
-                    "message" : m["message"],
-                    "time_sent" : m["time_sent"]
+                    "u_id": m["u_id"],
+                    "message": m["message"],
+                    "time_sent": m["time_sent"]
                 }
                 ret.append(ret_dict)
         counter += 1
