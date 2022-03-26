@@ -561,7 +561,7 @@ def test_channel_join(channel_public, user_2):
         "channel_id": channel_public
     })
     r = requests.get(f"{BASE_URL}/channel/details/v2", json={
-        "token": user_2['token'],
+        "token": user_1['token'],
         "channel_id": channel_public
     })
     data = r.json()
