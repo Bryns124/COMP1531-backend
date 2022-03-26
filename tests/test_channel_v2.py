@@ -223,7 +223,7 @@ def test_channel_invite(user_1, channel_public, user_2):
         "u_id": user_2['auth_user_id']
     })
     r = requests.get(f"{BASE_URL}/channels/list/v2", params={
-        "token": user_2["token"]
+        "token": user_2['token']
     })
     assert r.json()[
         'channels'][-1]['channel_id'] == channel_public['channel_id']
@@ -263,7 +263,7 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public):
     """
     request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_no_access['token'],
-        "channel_id": channel_public['channel_id'],
+        "channel_id": int(channel_public['channel_id']),
         "start": 0
     })
     assert request_channel_messages.status_code == AccessError.code

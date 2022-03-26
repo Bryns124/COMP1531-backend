@@ -83,7 +83,7 @@ def auth_logout():
 
 @APP.route("/channels/create/v2", methods=['POST'])
 def channels_create_v2():
-    data = request.args.to_dict()
+    data = request.get_json()
     body = channels_create_v1(
         data['token'], data['name'], data['is_public'])
     save_data_store()
@@ -109,6 +109,7 @@ def channels_listall_v2():
         'channels': body['channels']
     })
 
+
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_v2():
     data = request.get_json()
@@ -121,7 +122,7 @@ def channel_join_v2():
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_v2():
     data = request.args.to_dict()
-    body = channel_details_v1(data['token'], data['channel_id'])
+    body = channel_details_v1(data['token'], int(data['channel_id']))
     return dumps({
         "name": body['name'],
         "is_public": body['is_public'],
@@ -144,7 +145,7 @@ def channel_invite_v2():
 def channel_messages_v2():
     data = request.args.to_dict()
     body = channel_messages_v1(
-        data['token'], data['channel_id'], data['start'])
+        data['token'], int(data['channel_id']), data['start'])
     return dumps({
         'messages': body['messages'],
         'start': body['start'],
@@ -214,7 +215,6 @@ def message_send():
     return dumps({
         "message_id": data['message_id']
     })
-
 
 
 @APP.route("/echo", methods=['GET'])
@@ -314,7 +314,8 @@ def dm_leave():
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():
     data = request.args.to_dict()
-    body = dm_messages_v1(data["token"], int(data["dm_id"]), int(data["start"]))
+    body = dm_messages_v1(data["token"], int(
+        data["dm_id"]), int(data["start"]))
 
     return dumps({
         "messages": body["messages"],

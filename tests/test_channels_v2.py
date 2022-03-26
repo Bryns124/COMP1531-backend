@@ -75,8 +75,8 @@ def test_listall_no_channel(user_1):
     response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
-    payload = response.json()
-    assert response["channels"] == []
+    body = response.json()
+    assert body["channels"] == []
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
