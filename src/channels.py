@@ -34,7 +34,7 @@ def channels_list_v1(token):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise AccessError
+        raise AccessError(description="Access Denied")
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
@@ -112,7 +112,7 @@ def channels_listall_v1(token):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise AccessError
+        raise AccessError(description="Access Denied")
 
     all_channels = []
     for channel in store_channels:
@@ -165,11 +165,11 @@ def channels_create_v1(token, name, is_public):
 
     if len(name) > 20:
         raise InputError(
-            "The name of the channel cannot be more than 20 characters.")
+            description="The name of the channel cannot be more than 20 characters.")
 
     if len(name) < 1:
         raise InputError(
-            "The name of the channel cannot be less than 1 character.")
+            description="The name of the channel cannot be less than 1 character.")
 
     if store == {}:
         new_channel_id = 1
@@ -182,7 +182,7 @@ def channels_create_v1(token, name, is_public):
         'is_public': is_public,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
-        'messages': [],
+        'messages_list': [],
         'start': 0,  # ditto
         'end': 50,
     }
