@@ -423,7 +423,10 @@ def test_channel_details_input_error(user_1, invalid_channel_id):
         "channel_id": invalid_channel_id
     })
     assert r.status_code == InputError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_details_access_error(user_2, channel_public):
@@ -432,7 +435,10 @@ def test_channel_details_access_error(user_2, channel_public):
         "channel_id": channel_public
     })
     assert r.status_code == AccessError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_details_wrong_u_id(user_invalid, channel_public):
@@ -441,7 +447,10 @@ def test_channel_details_wrong_u_id(user_invalid, channel_public):
         "channel_id": channel_public
     })
     assert r.status_code == AccessError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_details(user_1, channel_public):
@@ -465,7 +474,10 @@ def test_channel_details(user_1, channel_public):
         ]
     }
     assert r.status_code == 200
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_details_multiple_users(user_1, channel_public, user_2):
@@ -501,7 +513,10 @@ def test_channel_join_channel_id_error(user_1, invalid_channel_id):
         "channel_id": invalid_channel_id
     })
     assert r.status_code == InputError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_join_already_member_error(user_1, channel_public):
@@ -510,7 +525,10 @@ def test_channel_join_already_member_error(user_1, channel_public):
         "channel_id": channel_public
     })
     assert r.status_code == InputError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_join_access_error(user_2, channel_private):
@@ -519,7 +537,10 @@ def test_channel_join_access_error(user_2, channel_private):
         "channel_id": channel_private
     })
     assert r.status_code == AccessError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_join_invalid_token(user_invalid, channel_public):
@@ -528,7 +549,10 @@ def test_channel_join_invalid_token(user_invalid, channel_public):
         "channel_id": channel_public
     })
     assert r.status_code == AccessError.code
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
 
 
 def test_channel_join(channel_public, user_2):
@@ -556,6 +580,7 @@ def test_channel_join(channel_public, user_2):
         ]
     }
     assert r.status_code == 200
+<<<<<<< HEAD
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -660,3 +685,5 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
         "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Miikey', 'name_last': 'Test', 'u_id': 1}]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+=======
+>>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
