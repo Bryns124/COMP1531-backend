@@ -660,6 +660,6 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1}],
-        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Miikey', 'name_last': 'Test', 'u_id': 1}]
+        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1}]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
