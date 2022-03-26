@@ -294,7 +294,7 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
         "token": body2['token'],
         "channel_id": channel_public['channel_id'],
     })
-    details = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    details = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -328,7 +328,7 @@ def test_handles_appends_correctly(user_1, channel_public):
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
         })
-    data = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    data = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id']
     })
