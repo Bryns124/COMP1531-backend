@@ -1,8 +1,9 @@
+from operator import truediv
 import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import generate_token
+from src.helper import decode_token, generate_token
 import hashlib
 """
 Auth has two main functions: register and login
@@ -156,11 +157,24 @@ def create_handle(name_first, name_last):
 
     return handle
 
+
+def auth_logout_v1(token):
+    store = data_store.get()
+
+    for user in store['users']:
+        if user['u_id'] == decode_token(token)['auth_user_id']:
+            user['session_id'].remove(decode_token(token)['session_id'])
+
+    data_store.set(store)
+
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
+
+
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def email_check(email):
     """
@@ -183,5 +197,8 @@ def duplicate_email_check(email):
     :rtype: boolean
     """
     store = data_store.get()
+    does_email_exist = False
     for user in store['users']:
-        return bool(user['email'] == email)
+        if user['email'] == email:
+            does_email_exist = True
+    return does_email_exist

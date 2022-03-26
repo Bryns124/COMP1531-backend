@@ -3,10 +3,9 @@ from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
-from src.helper import SECRET
+from src.helper import SECRET, decode_token, validate_token
 import jwt
 import pytest
-
 
 """Users"""
 
@@ -28,12 +27,12 @@ def user_no_access():
 
 @pytest.fixture
 def user_invalid():
-    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET(), algorithm="HS256")
+    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
 
 
 @pytest.fixture
 def invalid_user_id():
-    return jwt.encode({'auth_user_id': -1, 'session_id': 1}, SECRET(), algorithm="HS256")
+    return jwt.encode({'auth_user_id': -1, 'session_id': 1}, SECRET, algorithm="HS256")
 
 
 """Channels"""
@@ -192,7 +191,7 @@ def test_wrong_user_id_channel_details_v1(invalid_user_id, channel_1):
         channel_1: a channel that is trying to be accessed
     '''
     with pytest.raises(AccessError):
-        channel_details_v1(invalid_user_id, channel_1)
+        channel_details_v1(invalid_user_id, channel_1['channel_id'])
     clear_v1()
 
 

@@ -12,6 +12,44 @@ def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
 
 
+def test_login_invalid_email():
+    with pytest.raises(InputError):
+        auth_login_v1("bryanle", "password123")
+        auth_login_v1("bryanle@gmailcom", "password123")
+        auth_login_v1("bryanle@gmial.com", "password123")
+        auth_login_v1("bryan..le@gmail.com", "password123")
+        auth_login_v1("bryanle@gmail", "password123")
+        auth_login_v1("bryan/le@gmail.com", "password123")
+        auth_login_v1("bryanle-@gmail.com", "password123")
+        auth_login_v1("@gmail", "password123")
+        auth_login_v1("", "password123")
+    clear_v1()
+
+# test when login email is incorrect
+
+
+def test_login_incorrect_email(user_1):
+    with pytest.raises(InputError):
+        auth_login_v1("notbryan.le@gmail.com", "password123")
+    clear_v1()
+
+# test when login password is incorrect
+
+
+def test_login_incorrect_password(user_1):
+    with pytest.raises(InputError):
+        auth_login_v1("bryan.le@gmailcom", "password456")
+    clear_v1()
+
+# test registered account is logged in correctly
+
+
+def test_login_correct(user_1):
+    assert auth_login_v1("bryanle@gmail.com",
+                         "password123")['auth_user_id'] == 1
+    clear_v1()
+
+
 def test_user_created_successfully():
     '''
     Tests to see if user was created correctly
@@ -111,7 +149,7 @@ def test_handle_generated_correctly():
     store = data_store.get()
     auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
     auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle4@gmail.com", "password123",
+    auth_register_v1("bryanle3@gmail.com", "password123",
                      "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
     auth_register_v1("bryanle4@gmail.com", "password123",
                      "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
@@ -125,7 +163,7 @@ def test_handle_generated_correctly():
     # Tests that a unique handle is created for a new user with the same first name and last name
     assert handle_str1 != handle_str2
     assert handle_str3 != handle_str4
-
+    clear_v1()
 # Testing that the handle appends the number correctly for more than once instance of the handle
 
 
@@ -232,3 +270,4 @@ def test_handles_appends_correctly():
             assert k['name_first'] == first
             assert k['name_last'] == last
             assert k['handle_str'] == handle12
+    clear_v1()

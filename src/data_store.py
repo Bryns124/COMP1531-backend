@@ -48,13 +48,22 @@ initial_object = {
         #     'owner_members' : ['u_id'], #check again if this is leagal
         #     'all_members' : ['u_id'],
         #     'messages_list': [1,2,3,6,7,8] #list of message IDs
-        #       'start': 25,
-        #       'end': 75,
-
-
+        #     'start': 25,
+        #     'end': 75,
         # }
     ],
-     'messages': [
+    'DM' : [
+        # {
+        #     'DM_id' : ,
+        #     'DM_name' : "",
+        #     'owner_members' : ['u_id'], #check again if this is leagal
+        #     'all_members' : ['u_id'],
+        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
+        #     'start': 25,
+        #     'end': 75,
+        # }
+    ],
+    'messages': [
         #        {
         #            'message_id': 1,
         #            'u_id': 1,
