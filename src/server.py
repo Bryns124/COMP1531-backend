@@ -119,7 +119,10 @@ def channel_details_v2():
     data = request.get_json()
     body = channel_details_v1(data['token'], data['channel_id'])
     return dumps({
-        "channels": body
+        "name": body['name'],
+        "is_public": body['is_public'],
+        "owner_members": body['owner_members'],
+        "all_members": body['all_members']
     })
 
 
