@@ -327,13 +327,8 @@ def test_handles_appends_correctly(user_1, channel_public):
         })
         body = request.json()
         requests.post(f"{BASE_URL}/channel/join/v2", json={
-<<<<<<< HEAD
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
-=======
-            "token": body.json()['token'],
-            "channel_id": channel_public,
->>>>>>> parent of 769bd69... fixed tests, corrected syntax for paths join and details, corrected test assertions, in terms of spelling
         })
     data = requests.post(f"{BASE_URL}/channel/details/v2", json={
         "token": user_1['token'],
