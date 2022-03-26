@@ -11,9 +11,12 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     permission_id.
 
     InputError when: u_id is invalid, u_id is the only global user and is being demoted,
-    permission_id in invalid, the user already has the permission_id requested.
+    permission_id in invalid or the user already has the permission_id requested.
 
     AccessError when the authorised user is not a global owner.
+
+    Input: {token, u_id, permission_id}
+    Output: {}
     """
     store = data_store.get()
 
@@ -58,15 +61,16 @@ def admin_user_remove_v1(token, u_id):
     '''
     admin_user_remove
 
-    Given a user by their u_id, remove them from the Seams. This means they should be removed from
-    all channels/DMs, and will not be included in the list of users returned by users/all. Seams
-    owners can remove other Seams owners (including the original first owner). Once users are
-    removed, the contents of the messages they sent will be replaced by 'Removed user'. Their
-    profile must still be retrievable with user/profile, however name_first should be 'Removed' and
-    name_last should be 'user'. The user's email and handle should be reusable.
+    Given a user by their u_id, remove them from the Seams. They are removed from all channels/DMs, 
+    and will not be included in the list of users returned by users/all. Removed users have the contents 
+    of their messages changed to 'Removed user'. Their profile is still retrievable with user/profile, 
+    with: name_first: 'Removed', name_last: 'user'. The user's email and handle should be reusable.
 
-    input error when u_id is invalid, u_id is the only global owner
-    access error when the authorised user is not a global owner
+    InputError when u_id is invalid or u_id is the only global owner
+    AccessError when the authorised user is not a global owner
+
+    Input: {token, u_id}
+    Output: {}
     '''
     auth_user_id = decode_token(token)["auth_user_id"]
     valid_auth_user_id(auth_user_id)
@@ -119,12 +123,17 @@ def admin_user_remove_v1(token, u_id):
 
     data_store.set(store)
 
+    return{}
+
 
 def remove_id_from_group(u_id, group_type):
     '''
     Receives a u_id and either "channels" or "dms" for group_type.
 
     Then removes u_id from each of the specified channels/dms owner/all members.
+
+    Input: {u_id, group_type, (group_type is a string of either "channels" or "dms")}
+    Output: {}
     '''
 
     store = data_store.get()
@@ -138,3 +147,5 @@ def remove_id_from_group(u_id, group_type):
         i += 1
 
     data_store.set(store)
+
+    return{}

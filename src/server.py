@@ -11,6 +11,7 @@ from src.message import messages_send_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
+from src.admin import admin_userpermission_change_v1, admin_user_remove_v1
 
 
 def quit_gracefully(*args):
@@ -145,6 +146,18 @@ def echo():
     return dumps({
         'data': data
     })
+
+@ APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove():
+    body = request.get_json()
+    admin_user_remove_v1(body['token'], body['u_id'])
+    return dumps({})
+
+@ APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change():
+    body = request.get_json()
+    admin_userpermission_change_v1(body['token'], body['u_id'], body['permission_id'])
+    return dumps({})
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
 
