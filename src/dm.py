@@ -328,7 +328,6 @@ def dm_messages_v1(token, dm_id, start):
             break
         for m in store["messages"]:
             if id == m["message_id"]:
-                print("entered here")
                 ret_dict = {
                     "message_id": m["message_id"],
                     "u_id": m["u_id"],
