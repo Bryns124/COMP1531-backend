@@ -123,7 +123,7 @@ def test_dm_create_3_users(user_1, user_2, user_3):
 
 
 def test_dm_list_empty(user_1):
-    r = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    r = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
 
@@ -134,11 +134,11 @@ def test_dm_list_empty(user_1):
 
 
 def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
-    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
 
-    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_2["token"]
     })
 
@@ -162,15 +162,15 @@ def test_dm_list_two_users(user_1, user_2, create_dm_2_user):
 
 
 def test_dm_list_three_users(user_1, user_2, user_3, create_dm_3_user):
-    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_1 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
 
-    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_2 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_2["token"]
     })
 
-    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_3["token"]
     })
 
@@ -212,7 +212,7 @@ def test_dm_list_two_dms(user_1, user_2, user_3):
         "u_ids": [user_3['auth_user_id']]
     })
 
-    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response_3 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
 
@@ -276,7 +276,7 @@ def test_dm_remove(user_1, user_2, user_3, create_dm_3_user):
     payload1 = response1.json()
     assert payload1 == {}
 
-    response2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response2 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
     payload2 = response2.json()
@@ -285,7 +285,7 @@ def test_dm_remove(user_1, user_2, user_3, create_dm_3_user):
 
 
 def test_dm_details_invalid_dm_id(user_1):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/details/v1", params={
         "token": user_1["token"],
         "dm_id": 1
     })
@@ -294,7 +294,7 @@ def test_dm_details_invalid_dm_id(user_1):
 
 
 def test_dm_details_no_access(user_3, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/details/v1", params={
         "token": user_3["token"],
         "dm_id": 1
     })
@@ -303,7 +303,7 @@ def test_dm_details_no_access(user_3, create_dm_2_user):
 
 
 def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
-    response = requests.get(f"{BASE_URL}/dm/details/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/details/v1", params={
         "token": user_3["token"],
         "dm_id": 1
     })
@@ -342,7 +342,7 @@ def test_dm_leave(user_1, create_dm_2_user):
     })
     payload1 = response1.json()
 
-    response2 = requests.get(f"{BASE_URL}/dm/list/v1", json={
+    response2 = requests.get(f"{BASE_URL}/dm/list/v1", params={
         "token": user_1['token']
     })
     payload2 = response2.json()
@@ -404,7 +404,7 @@ def test_dm_send_access_error_2(user_1, create_dm_2_user):
 
 
 def test_dm_messages_input_error(user_1):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1["token"],
         "dm_id": 1,
         "start": 0
@@ -414,7 +414,7 @@ def test_dm_messages_input_error(user_1):
 
 
 def test_dm_messages_incorrect_start(user_1, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1["token"],
         "dm_id": 1,
         "start": 100
@@ -424,7 +424,7 @@ def test_dm_messages_incorrect_start(user_1, create_dm_2_user):
 
 
 def test_dm_messages_no_acces(user_3, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_3["token"],
         "dm_id": 1,
         "start": 0
@@ -454,7 +454,7 @@ def test_dm_messages(user_1, create_dm_2_user):
         "dm_id": 1,
         "message": "hello world"
     })
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1["token"],
         "dm_id": 1,
         "start": 0
@@ -471,7 +471,7 @@ def test_dm_messages(user_1, create_dm_2_user):
 
 
 def test_dm_messages_none(user_1, create_dm_2_user):
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1["token"],
         "dm_id": 1,
         "start": 0
@@ -492,7 +492,7 @@ def test_dm_messages_multiple(user_1, create_dm_2_user, starting_value):
             "message": "hello world"
         })
 
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1['token'],
         "dm_id": 1,
         "start": 0
@@ -520,7 +520,7 @@ def test_dm_messages_multiple_51(user_1, create_dm_2_user, starting_value):
             "message": "hello world"
         })
 
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1['token'],
         "dm_id": 1,
         "start": 0

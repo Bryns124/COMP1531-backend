@@ -1,8 +1,9 @@
 import pytest
-from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
-from src.auth import auth_register_v1
-from src.other import clear_v1
+# from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
+# from src.auth import auth_register_v1
+# from src.other import clear_v1
 from src.error import AccessError, InputError
+import src.server
 from src.helper import SECRET
 from src.config import port
 import json
@@ -71,11 +72,11 @@ def test_listall_no_channel(user_1):
     """
     test for if no channels have been created
     """
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload["channels"] == []
+    assert response["channels"] == []
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
@@ -85,7 +86,7 @@ def test_listall_public(user_1, public_channel_user1):
     """
     test for listing public channels
     """
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -102,7 +103,7 @@ def test_listall_private(user_1, private_channel_user2):
     """
     test for listing private channel
     """
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -119,7 +120,7 @@ def test_listall_both(user_1, user_2, public_channel_user1, private_channel_user
     """
     test if two channels are created by separate users
     """
-    response = requests.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -237,7 +238,7 @@ def test_channel_list_private(user_2, private_channel_user2):
     Assumption: The token is correct
     Assumption: The user is only a member of one channel
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_2["token"]
     })
     payload = response.json()
@@ -258,7 +259,7 @@ def test_channel_list_public(user_1, public_channel_user1):
     Assumption: The token is correct
     Assumption: The user is only a member of one channel
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -278,7 +279,7 @@ def test_channel_list_empty(user_2):
     Test to check if an empty list of dictionaries is returned if the user is not a member of any channels
     Assumption: The token is correct
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_2["token"]
     })
     payload = response.json()
@@ -294,7 +295,7 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
     when the user creates and is the owner of multiple channels
     Assumption: The token is correct
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()

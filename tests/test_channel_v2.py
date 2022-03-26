@@ -1,8 +1,9 @@
 from distutils.command.config import config
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
-from src.channels import channels_create_v1, channels_list_v1
-from src.auth import auth_register_v1
-from src.other import clear_v1
+# from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
+# from src.channels import channels_create_v1, channels_list_v1
+# from src.auth import auth_register_v1
+# from src.other import clear_v1
+import src.server
 from src.error import InputError, AccessError
 from src.helper import SECRET
 from src.config import port
@@ -221,7 +222,7 @@ def test_channel_invite(user_1, channel_public, user_2):
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
     })
-    r = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    r = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_2["token"]
     })
     assert r.json()[
@@ -242,7 +243,7 @@ def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
         invalid_channel_id (channel_id): The invalid channel id
         start (start): Where the user wants to start indexing the messages from
     """
-    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
         "start": 0
@@ -260,7 +261,7 @@ def test_channel_messages_v1_access_error(user_no_access, channel_public):
         channel_public (channel_id): Id of the channel the user is trying to access
         start start): Starting index
     """
-    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_no_access['token'],
         "channel_id": channel_public['channel_id'],
         "start": 0
@@ -277,7 +278,7 @@ def test_channel_messages_v1(user_1, channel_public):
         channel_public (channel_id): The channel_id the user is trying to access
         first_message (start_): Starting index of the messages
     """
-    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "start": 0
@@ -460,7 +461,7 @@ def test_channel_removeowner_only_one_owner(user_1, user_2, channel_public):
 
 
 def test_channel_details_input_error(user_1, invalid_channel_id):
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
         "channel_id": invalid_channel_id
     })
@@ -469,7 +470,7 @@ def test_channel_details_input_error(user_1, invalid_channel_id):
 
 
 def test_channel_details_access_error(user_2, channel_public):
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -478,7 +479,7 @@ def test_channel_details_access_error(user_2, channel_public):
 
 
 def test_channel_details_wrong_u_id(user_invalid, channel_public):
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_invalid,
         "channel_id": channel_public['channel_id']
     })
@@ -487,7 +488,7 @@ def test_channel_details_wrong_u_id(user_invalid, channel_public):
 
 
 def test_channel_details(user_1, channel_public):
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -513,7 +514,7 @@ def test_channel_details_multiple_users(user_1, channel_public, user_2):
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -579,7 +580,7 @@ def test_channel_join(channel_public, user_2):
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
-    r = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -629,7 +630,7 @@ def test_only_user_leaves_channel_leave_v1(user_1, user_2, channel_1):
     })
     assert response1.status_code == 200
 
-    response2 = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    response2 = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1["token"],
         "channel_id": channel_1["channel_id"]
     })
@@ -657,7 +658,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "channel_id": channel_1["channel_id"]
     })
 
-    response = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    response = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_2["token"],
         "channel_id": channel_1["channel_id"]
     })
@@ -689,7 +690,7 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
         "channel_id": channel_1["channel_id"]
     })
 
-    response2 = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    response2 = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1["token"],
         "channel_id": channel_1["channel_id"]
     })
