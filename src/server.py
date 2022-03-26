@@ -9,11 +9,12 @@ from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
 from src.message import messages_send_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
-from src.admin import admin_userpermission_change_v1, admin_user_remove_v1
+from src.admin import admin_user_remove_v1, admin_userpermission_change_v1, remove_id_from_group
 from src.user import users_all_v1, user_profile_v1
-from src.channel import channel_invite_v1
+from operator import methodcaller
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
+from src.helper import save_data_store, load_data_store
 
 
 def quit_gracefully(*args):
