@@ -37,15 +37,16 @@ def channel_invite_v1(token, channel_id, u_id):
             user_exist = True
 
     if not user_exist:
-        raise InputError("The input u_id does not exist in the datastore.")
+        raise InputError(
+            description="The input u_id does not exist in the datastore.")
 
     if not channel_validity(channel_id, store):
         raise InputError(
-            "The input channel_id does not exist in the datastore.")
+            description="The input channel_id does not exist in the datastore.")
 
     if already_member(u_id, channel_id, store):
         raise InputError(
-            "The member you are trying to invite is already apart of the channel.")
+            description="The member you are trying to invite is already apart of the channel.")
 
     if not already_member(auth_user_id, channel_id, store):
         raise AccessError(
@@ -102,7 +103,7 @@ def channel_details_v1(token, channel_id):
             # to use it later in the function
 
     if not is_channel:
-        raise InputError("Invalid Channel ID")
+        raise InputError(description="Invalid Channel ID")
 
     for member in active_channel['all_members']:
         if member == auth_user_id:
@@ -213,11 +214,11 @@ def channel_messages_v1(token, channel_id, start):
 
     if not channel_exist:
         raise InputError(
-            "The input channel_id does not exist in the datastore.")
+            description="The input channel_id does not exist in the datastore.")
 
     if len(store['channels'][channel_id - 1]['messages']) < start:
         raise InputError(
-            "Your start value is greater than the messages in the channel.")
+            description="Your start value is greater than the messages in the channel.")
 
     in_channel = False
 
@@ -268,10 +269,11 @@ def channel_join_v1(token, channel_id):
     valid_auth_user_id(decode_token(token)['auth_user_id'])
 
     if not channel_validity(channel_id, store):
-        raise InputError("Channel id is invalid.")
+        raise InputError(description="Channel id is invalid.")
 
     if already_member(decode_token(token)['auth_user_id'], channel_id, store):
-        raise InputError("The user is already a member of this channel.")
+        raise InputError(
+            description="The user is already a member of this channel.")
 
     current_channel = extract_channel_details(channel_id, store)
     if not current_channel['is_public']:
@@ -320,7 +322,7 @@ def channel_leave_v1(token, channel_id):
 
         i += 1
     if not is_channel:
-        raise InputError("Channel id is invalid.")
+        raise InputError(description="Channel id is invalid.")
 
     if not in_channel:
         raise AccessError(description="User is not a part of channel.")
@@ -343,10 +345,10 @@ def channel_addowner_v1(token, channel_id, u_id):
                     description="Authorised user does not have owner permissions in channel.")
 
     if not channel_validity(channel_id, store):
-        raise InputError("Channel id is invalid.")
+        raise InputError(description="Channel id is invalid.")
 
     if already_member(auth_user_id, channel_id, store):
-        raise InputError("Owner is not in channel.")
+        raise InputError(description="Owner is not in channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
@@ -372,17 +374,17 @@ def channel_removeowner_v1(token, channel_id, u_id):
             if auth_user_id in channel['owner_members']:
                 if len(channel['owner_members']) == 1:
                     raise InputError(
-                        "Auththorised user is the only owner of the channel.")
+                        description="Auththorised user is the only owner of the channel.")
                 pass
             else:
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
 
     if not channel_validity(channel_id, store):
-        raise InputError("Channel id is invalid.")
+        raise InputError(description="Channel id is invalid.")
 
     if already_member(auth_user_id, channel_id, store):
-        raise InputError("Owner is not in channel.")
+        raise InputError(description="Owner is not in channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
