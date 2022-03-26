@@ -12,6 +12,8 @@ from src.channels import channels_list_v1, channels_listall_v1, channels_create_
 from src.channel import channel_details_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
 from src.admin import admin_userpermission_change_v1, admin_user_remove_v1
+from src.user import users_all_v1, user_profile_v1
+from src.channel import channel_invite_v1
 
 
 def quit_gracefully(*args):
@@ -147,16 +149,51 @@ def echo():
         'data': data
     })
 
+## channel_invite, users_all, user_profile
+
+
+@APP.route("/user/profile/v1", methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
+    body = user_profile_v1(token, u_id)
+    return dumps({
+        'user': body['user']
+    })
+
+
+@APP.route("/users/all/v1", methods=['GET'])
+def users_all():
+    # data = request.get_json()
+    token = request.args.get('token')
+    body = users_all_v1(token)
+    return dumps({
+        'users': body['users']
+    })
+
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite_v2():
+    data = request.get_json()
+    channel_invite_v1(
+        data['token'], data['channel_id'], data['u_id'])
+    return dumps({
+
+    })
+
+
 @ APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove():
     body = request.get_json()
     admin_user_remove_v1(body['token'], body['u_id'])
     return dumps({})
 
+
 @ APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change():
     body = request.get_json()
-    admin_userpermission_change_v1(body['token'], body['u_id'], body['permission_id'])
+    admin_userpermission_change_v1(
+        body['token'], body['u_id'], body['permission_id'])
     return dumps({})
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT

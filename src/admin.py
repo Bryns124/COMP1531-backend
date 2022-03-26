@@ -52,18 +52,23 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     if (number_of_global_owners < 2) & (permission_id == 2):
         raise InputError("Cannot demote only global user")
 
+    i = 0
     for user in store["users"]:
         if user["u_id"] == u_id:
-            user["permission_id"] = permission_id
+            store["users"][i]["permission_id"] = permission_id
+            break
+        i += 1
+
+    data_store.set(store)
 
 
 def admin_user_remove_v1(token, u_id):
     '''
     admin_user_remove
 
-    Given a user by their u_id, remove them from the Seams. They are removed from all channels/DMs, 
-    and will not be included in the list of users returned by users/all. Removed users have the contents 
-    of their messages changed to 'Removed user'. Their profile is still retrievable with user/profile, 
+    Given a user by their u_id, remove them from the Seams. They are removed from all channels/DMs,
+    and will not be included in the list of users returned by users/all. Removed users have the contents
+    of their messages changed to 'Removed user'. Their profile is still retrievable with user/profile,
     with: name_first: 'Removed', name_last: 'user'. The user's email and handle should be reusable.
 
     InputError when u_id is invalid or u_id is the only global owner
