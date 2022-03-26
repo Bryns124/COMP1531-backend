@@ -1,4 +1,3 @@
-from os import times_result
 import pytest
 import src.server
 from src.error import AccessError, InputError
