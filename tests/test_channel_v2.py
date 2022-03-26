@@ -626,12 +626,13 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["channels"] == {
+    assert payload == {
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [],
         "all_members": [
-            {'email': 'miguel@unsw.com', 'handle_str': 'migueltest', 'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2}
+            {'email': 'miguel@unsw.com', 'handle_str': 'migueltest',
+                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -656,7 +657,7 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
 
     payload = response2.json()
 
-    assert payload["channels"] == {
+    assert payload == {
         "name": "A New Hope",
         "is_public": True,
         "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1}],
