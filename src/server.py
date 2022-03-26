@@ -94,8 +94,8 @@ def channels_create_v2():
 
 @APP.route("/channels/list/v2", methods=['GET'])
 def channels_list_v2():
-    data = request.args.to_dict()
-    body = channels_list_v1(data['token'])
+    token = request.args.get('token')
+    body = channels_list_v1(token)
     return dumps({
         'channels': body['channels']
     })
@@ -103,8 +103,8 @@ def channels_list_v2():
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channels_listall_v2():
-    data = request.get_json()
-    body = channels_listall_v1(data['token'])
+    token = request.args.get('token')
+    body = channels_listall_v1(token)
     return dumps({
         'channels': body['channels']
     })
@@ -121,8 +121,13 @@ def channel_join_v2():
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_v2():
-    data = request.args.to_dict()
-    body = channel_details_v1(data['token'], int(data['channel_id']))
+    # data = request.args.to_dict()
+    # body = channel_details_v1(data['token'], int(data['channel_id']))
+
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    body = channel_details_v1(token, channel_id)
     return dumps({
         "name": body['name'],
         "is_public": body['is_public'],
@@ -143,9 +148,11 @@ def channel_invite_v2():
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def channel_messages_v2():
-    data = request.args.to_dict()
-    body = channel_messages_v1(
-        data['token'], int(data['channel_id']), data['start'])
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+
+    body = channel_messages_v1(token, channel_id, start)
     return dumps({
         'messages': body['messages'],
         'start': body['start'],
@@ -195,17 +202,17 @@ def clear_v2():
     })
 
 
-@APP.route("/channel/messages/v2", methods=['GET'])
-def channel_message_v2():
-    data = request.args.to_dict()
-    body = channel_messages_v1(
-        data['token'], data['channel_id'], data['start'])
-    return dumps({
-        "messages": body['messages'],
-        "start": body['start'],
-        "end": body['end']
+# @APP.route("/channel/messages/v2", methods=['GET'])
+# def channel_message_v2():
+#     data = request.args.to_dict()
+#     body = channel_messages_v1(
+#         data['token'], data['channel_id'], data['start'])
+#     return dumps({
+#         "messages": body['messages'],
+#         "start": body['start'],
+#         "end": body['end']
 
-    })
+#     })
 
 
 @APP.route("/message/send/v1", methods=['POST'])
@@ -229,8 +236,10 @@ def echo():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all():
-    data = request.args.get()
-    body = users_all_v1(data['token'])
+    # data = request.get_json()
+    token = request.args.get('token')
+
+    body = users_all_v1(token)
     return dumps({
         'users': body['users']
     })
@@ -238,8 +247,11 @@ def users_all():
 
 @APP.route("/user/profile/v1", methods=['GET'])
 def user_profile():
-    data = request.args.get()
-    body = user_profile_v1(data['token'], data['u_id'])
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+
+    # data = request.get_json()
+    body = user_profile_v1(token, u_id)
     return dumps({
         'user': body['user']
     })
@@ -279,8 +291,9 @@ def dm_create():
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
-    data = request.args.to_dict()
-    body = dm_list_v1(data["token"])
+    token = request.args.get('token')
+
+    body = dm_list_v1(token)
 
     return dumps({
         'dms': body['dms']
@@ -296,8 +309,10 @@ def dm_remove():
 
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
-    data = request.args.to_dict()
-    body = dm_details_v1(data["token"], int(data["dm_id"]))
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    body = dm_details_v1(token, dm_id)
     return dumps({
         "name": body["name"],
         "members": body["members"]
@@ -313,9 +328,11 @@ def dm_leave():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():
-    data = request.args.to_dict()
-    body = dm_messages_v1(data["token"], int(
-        data["dm_id"]), int(data["start"]))
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    start = int(request.args.get('start'))
+
+    body = dm_messages_v1(token, dm_id, start)
 
     return dumps({
         "messages": body["messages"],
