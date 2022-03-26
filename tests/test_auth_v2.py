@@ -1,5 +1,6 @@
 import code
 from os import access
+from xml.dom.expatbuilder import parseFragment
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
@@ -98,6 +99,7 @@ def test_login_incorrect_email(user_1):
 
 # test when login password is incorrect
 
+
 def test_login_incorrect_password(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
         "email": "bryan.le@gmailcom",
@@ -109,6 +111,7 @@ def test_login_incorrect_password(user_1):
     })
 
 # test registered account is logged in correctly
+
 
 def test_login_correct(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
@@ -294,9 +297,9 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
         "token": body2['token'],
         "channel_id": channel_public['channel_id'],
     })
-    details = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    details = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": int(channel_public['channel_id'])
     })
     body3 = details.json()
     for users in body3['all_members']:
@@ -328,9 +331,9 @@ def test_handles_appends_correctly(user_1, channel_public):
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
         })
-    data = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    data = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": int(channel_public['channel_id'])
     })
     body = data.json()
     for users in body['all_members']:

@@ -163,7 +163,7 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "start": starting_value
@@ -192,7 +192,7 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
 
 
 def test_channel_messages_channel_id_error(user_1, invalid_channel_id, invalid_starting_value):
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": invalid_channel_id,
         "start": invalid_starting_value
@@ -204,7 +204,7 @@ def test_channel_messages_channel_id_error(user_1, invalid_channel_id, invalid_s
 
 
 def test_channel_messages_unauthorised_user(channel_public, user_2, starting_value):
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
         "start": starting_value
@@ -223,7 +223,7 @@ def test_messages_send(user_1, channel_public, message_text, starting_value):
     })
 
     payload = request.json()
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "start": starting_value
@@ -307,7 +307,7 @@ def test_messages_send_50(user_1, channel_public, message_text, starting_value):
             "message": message_text
         })
 
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "start": starting_value
@@ -336,7 +336,7 @@ def test_messages_send_51(user_1, channel_public, message_text, starting_value):
             "message": message_text
         })
 
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "start": starting_value

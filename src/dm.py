@@ -298,8 +298,9 @@ def dm_messages_v1(token, dm_id, start):
         if dm_id == dm["dm_id"]:
             curr_dm = dm
 
-    if curr_dm["messages_list"] == [] or len(curr_dm["messages_list"]) < start:
-        raise InputError(description="start value gerater than messaegs in dm")
+    if len(curr_dm["messages_list"]) < start:
+        raise InputError("start value gerater than messaegs in dm")
+
     # for m in reversed(store["messages"]):
     #     if end == -1 and curr >= len(messages_list):
     #         break
@@ -327,7 +328,6 @@ def dm_messages_v1(token, dm_id, start):
             break
         for m in store["messages"]:
             if id == m["message_id"]:
-                print("entered here")
                 ret_dict = {
                     "message_id": m["message_id"],
                     "u_id": m["u_id"],
