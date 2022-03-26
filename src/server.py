@@ -1,7 +1,7 @@
 from operator import methodcaller
 import sys
 import signal
-from json import dumps, load
+from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
@@ -43,17 +43,16 @@ APP.register_error_handler(Exception, defaultHandler)
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
-# try:
-#     # load_data_store()
-# except Exception:
-#     pass
+try:
+    load_data_store()
+except Exception:
+    pass
 
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def login_v2():
     data = request.get_json()
     body = auth_login_v1(data["email"], data["password"])
-    save_data_store()
     return dumps({
         "token": body['token'],
         "auth_user_id": body['auth_user_id']
@@ -120,7 +119,7 @@ def channel_join_v2():
     })
 
 
-@APP.route("/channel/detail/v2", methods=['POST'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_v2():
     data = request.get_json()
     body = channel_details_v1(data['token'], data['channel_id'])
@@ -191,7 +190,6 @@ def channel_removeowner():
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v2():
     clear_v1()
-    save_data_store()
     return dumps({
 
     })
