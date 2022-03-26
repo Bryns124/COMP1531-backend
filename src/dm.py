@@ -34,7 +34,7 @@ def dm_create_v1(token, u_ids):
     auth_user_id = decode_token(token)['auth_user_id']
 
     if check_duplicate(auth_user_id, u_ids):
-        raise InputError("there are duplicate u id's")
+        raise InputError(description="there are duplicate u id's")
 
     if check_invalid_id(store, u_ids):
         raise InputError
@@ -148,10 +148,10 @@ def dm_remove_v1(token, dm_id):
     auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
-        raise InputError("dm id does not exist")
+        raise InputError(description="dm id does not exist")
 
     if not is_dm_owner(store, auth_user_id, dm_id):
-        raise AccessError("user is not owner of dm")
+        raise AccessError(description="user is not owner of dm")
 
     i = 0
     while i < len(store["dms"]):
@@ -209,10 +209,10 @@ def dm_details_v1(token, dm_id):
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
-        raise InputError("dm does not exist")
+        raise InputError(description="dm does not exist")
 
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError("user is not part of dm")
+        raise AccessError(description="user is not part of dm")
 
     for dm in store['dms']:
         if dm_id == dm["dm_id"]:
@@ -248,10 +248,10 @@ def dm_leave_v1(token, dm_id):
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
-        raise InputError("dm id does nto exist")
+        raise InputError(description="dm id does nto exist")
 
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError("user is not part of dm")
+        raise AccessError(description="user is not part of dm")
 
     for dm in store["dms"]:
         if dm_id == dm["dm_id"]:
@@ -289,10 +289,10 @@ def dm_messages_v1(token, dm_id, start):
     u_id = decode_token(token)['auth_user_id']
 
     if not valid_dm_id(store, dm_id):
-        raise InputError("dm id does not exist")
+        raise InputError(description="dm id does not exist")
 
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError("user is not part of dm")
+        raise AccessError(description="user is not part of dm")
 
     for dm in store["dms"]:
         if dm_id == dm["dm_id"]:
@@ -300,6 +300,7 @@ def dm_messages_v1(token, dm_id, start):
 
     if len(curr_dm["messages_list"]) < start:
         raise InputError("start value gerater than messaegs in dm")
+
     # for m in reversed(store["messages"]):
     #     if end == -1 and curr >= len(messages_list):
     #         break
