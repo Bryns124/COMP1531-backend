@@ -326,7 +326,7 @@ def test_channel_addowner_invalid_user(channel_public, invalid_user_id, user_1):
 
 def test_channel_addowner_owner_not_in_channel(user_1, user_2, channel_public):
     """
-    This test checks to see that a InputError is raised when owner is not a member 
+    This test checks to see that a InputError is raised when owner is not a member
     of that channel.
     """
     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
