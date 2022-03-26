@@ -299,7 +299,7 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
         "channel_id": channel_public['channel_id']
     })
     body3 = details.json()
-    for users in body3['channels']['all_members']:
+    for users in body3['all_members']:
         if users['u_id'] == body['auth_user_id']:
             assert users['name_first'] == name_first
             assert users['name_last'] == name_last
@@ -333,7 +333,7 @@ def test_handles_appends_correctly(user_1, channel_public):
         "channel_id": channel_public['channel_id']
     })
     body = data.json()
-    for users in body['channels']['all_members']:
+    for users in body['all_members']:
         assert users['handle_str'] in handles
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
