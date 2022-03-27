@@ -95,6 +95,8 @@ def message_senddm_v1(token, dm_id, message):
     return {"message_id": message_id}
 
 def validate_mid(messages, message_id):
+    if messages == []:
+        raise InputError(description="incorrect message id")
     for message in messages:
         if message_id == message["message_id"]:
             return
