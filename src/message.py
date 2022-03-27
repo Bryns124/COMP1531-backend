@@ -95,6 +95,8 @@ def message_senddm_v1(token, dm_id, message):
     return {"message_id": message_id}
 
 def validate_mid(messages, message_id):
+    if messages == []:
+        raise InputError(description="incorrect message id")
     for message in messages:
         if message_id == message["message_id"]:
             return
@@ -141,9 +143,9 @@ def message_edit_v1(token, message_id, message):
     validate_mid(store["messages"], message_id)
     message_access(store, message_id, u_id)
 
-    for message in store["messages"]:
-        if message["message_id"] == message_id:
-            message["message"] = message
+    for msg in store["messages"]:
+        if msg["message_id"] == message_id:
+            msg["message"] = message
 
     data_store.set(store)
     return {}
