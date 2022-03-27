@@ -160,15 +160,15 @@ def member_details(user_id):
     users = store['users']
     for user in users:
         if user['u_id'] == user_id:
-            return {
-                'u_id': user['u_id'],
-                'email': user['email'],
-                'name_first': user['name_first'],
-                'name_last': user['name_last'],
-                'handle_str': user['handle_str']
-            }
-    # returns None if user is not found,
-    return {'name', 'is_public', 'owner_members', "all_members"}
+            active_user = user
+
+    return {
+        'u_id': active_user['u_id'],
+        'email': active_user['email'],
+        'name_first': active_user['name_first'],
+        'name_last': active_user['name_last'],
+        'handle_str': active_user['handle_str']
+    }
 
 
 def channel_messages_v1(token, channel_id, start):
