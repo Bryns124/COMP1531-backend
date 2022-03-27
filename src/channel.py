@@ -244,7 +244,7 @@ def channel_join_v1(token, channel_id):
     """
     store = data_store.get()
 
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+    decode_token(token)['auth_user_id']
 
     if not channel_validity(channel_id, store):
         raise InputError(description="Channel id is invalid.")

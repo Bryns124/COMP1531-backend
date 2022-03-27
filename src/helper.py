@@ -56,9 +56,10 @@ def validate_token(token_data):
     store = data_store.get()
     token_valid = False
     for user in store['users']:
-        for session in user['session_id']:
-            if token_data['session_id'] == session:
-                token_valid = True
+        if user['u_id'] == token_data['auth_user_id']:
+            for session in user['session_id']:
+                if token_data['session_id'] == session:
+                    token_valid = True
 
     if not token_valid:
         raise AccessError(description="This token is invalid.")
@@ -82,7 +83,8 @@ def valid_auth_user_id(auth_user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise AccessError(description="This auth_user_id does not exist in the datastore.")
+        raise AccessError(
+            description="This auth_user_id does not exist in the datastore.")
 
 
 def channel_validity(channel_id, store):
