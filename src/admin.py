@@ -115,8 +115,8 @@ def admin_user_remove_v1(token, u_id):
     removed_user = {
         "u_id": u_id,
         "email": target_user["email"],
-        "first_name": "Removed",
-        "last_name": "user",
+        "name_first": "Removed",
+        "name_last": "user",
         "handle_str": target_user["handle_str"]
     }
     store["removed_users"].append(removed_user)

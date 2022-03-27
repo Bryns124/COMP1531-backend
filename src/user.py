@@ -73,18 +73,19 @@ def user_profile_v1(token, u_id):
     """
     store = data_store.get()
     decode_token(token)
+    
+    for user in store['removed_users']:
+        if user['u_id'] == u_id:
+            user_details = extract_user_details(user)
+            return {'user': user_details}
+
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user_details = extract_user_details(user)
+    
     valid_user_id(u_id)
-
-    for users in store['users']:
-        if users['u_id'] == u_id:
-            user = extract_user_details(users)
-
-    for users in store['removed_users']:
-        if users['u_id'] == u_id:
-            user = extract_user_details(users)
-
     return {
-        'user': user
+        'user': user_details
     }
 
 

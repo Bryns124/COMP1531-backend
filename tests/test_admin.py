@@ -233,27 +233,27 @@ def test_channel_messages_removed_admin_user_remove_v1(user_1, user_2, public_ch
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
-#     requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
+def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
+    requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
 
-#     request_user_profile_v1 = requests.get(f"{BASE_URL}/user/profile/v1", params={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
-#     assert request_user_profile_v1.status_code == 200
-#     payload = request_user_profile_v1.json()
+    request_user_profile_v1 = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert request_user_profile_v1.status_code == 200
+    payload = request_user_profile_v1.json()
 
-#     assert payload == {
-#         "u_id": 2,
-#         "email": "adi@gmail.com",
-#         "name_first": "Removed",
-#         "name_last": "user",
-#         "handle_str": "adiyatrahman"
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    assert payload["user"] == {
+        "u_id": 2,
+        "email": "adi@gmail.com",
+        "name_first": "Removed",
+        "name_last": "user",
+        "handle_str": "adiyatrahman"
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
