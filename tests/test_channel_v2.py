@@ -6,7 +6,7 @@ from distutils.command.config import config
 import src.server
 from src.error import InputError, AccessError
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 import requests
 import urllib
@@ -14,7 +14,7 @@ import jwt
 import pytest
 
 ##MAY CHANGE PORT LATER##
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 # Users

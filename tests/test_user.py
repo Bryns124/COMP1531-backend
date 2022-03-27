@@ -5,7 +5,7 @@ from src.auth import auth_register_v1
 from src.other import clear_v1
 from src.error import AccessError, InputError
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 from flask import Flask
 import requests
@@ -13,7 +13,7 @@ import urllib
 import jwt
 import requests
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 @pytest.fixture

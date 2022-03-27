@@ -2,7 +2,7 @@ import pytest
 import src.server
 from src.error import AccessError, InputError
 from src.helper import SECRET, generate_timestamp, decode_token
-from src.config import port
+from src.config import port, url
 import json
 from flask import Flask
 import requests
@@ -10,7 +10,7 @@ import urllib
 import jwt
 import pytest
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 @pytest.fixture

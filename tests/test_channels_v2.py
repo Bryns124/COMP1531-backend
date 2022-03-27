@@ -5,14 +5,14 @@ import pytest
 from src.error import AccessError, InputError
 import src.server
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 from flask import request, Flask
 import jwt
 import pytest
 import requests
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 requests.delete(f"{BASE_URL}/clear/v1", json={
 
