@@ -81,6 +81,15 @@ initial_object = {
         #       ],
         # }
     ],
+    "removed_users": [
+        # {
+        # 'u_id' : , check if is ok
+        # 'email': "", check if using empty string is ok
+        # 'name_first': "",
+        # 'name_last': "",
+        # 'handle_str': "" ,
+        # }
+    ]
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE

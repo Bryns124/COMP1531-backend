@@ -99,7 +99,7 @@ def create_user(email, password, name_first, name_last):
             'channels_joined': [],
         }
     else:
-        new_id = len(store['users']) + 1
+        new_id = len(store['users']) + len(store["removed_users"]) + 1
         user = {
             'u_id': new_id,
             'session_id': [],
