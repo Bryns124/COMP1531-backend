@@ -170,8 +170,9 @@ def save_data_store():
     """
     Opens a file called datastore.p and saves the datastore within.
     """
+    curr = data_store.get()
     with open('datastore.p', 'wb') as FILE:
-        pickle.dump(data_store.get(), FILE)
+        pickle.dump(curr, FILE)
 
 
 def load_data_store():
