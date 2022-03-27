@@ -203,6 +203,18 @@ def test_channel_messages_channel_id_error(user_1, invalid_channel_id, invalid_s
     })
 
 
+def test_channel_messages_starting_value_error(user_1, channel_public, invalid_starting_value):
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": invalid_starting_value
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
 def test_channel_messages_unauthorised_user(channel_public, user_2, starting_value):
     r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_2['token'],
