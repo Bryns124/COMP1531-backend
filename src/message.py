@@ -55,6 +55,7 @@ def messages_send_v1(token, channel_id, message):
     data_store.set(store)
     return {"message_id": message_id}
 
+
 def validate_message(message):
     if len(message) >= 1 and len(message) <= 1000:
         return
@@ -94,6 +95,7 @@ def message_senddm_v1(token, dm_id, message):
     data_store.set(store)
     return {"message_id": message_id}
 
+
 def validate_mid(messages, message_id):
     if messages == []:
         raise InputError(description="incorrect message id")
@@ -101,6 +103,7 @@ def validate_mid(messages, message_id):
         if message_id == message["message_id"]:
             return
     raise InputError(description="incorrect message id")
+
 
 def message_access(store, message_id, u_id):
     for message in store["messages"]:
@@ -119,6 +122,7 @@ def message_access(store, message_id, u_id):
                 return
 
     raise AccessError(description="no access to message")
+
 
 def message_edit_v1(token, message_id, message):
     """edits a message based on the message id
@@ -149,6 +153,7 @@ def message_edit_v1(token, message_id, message):
 
     data_store.set(store)
     return {}
+
 
 def message_remove_v1(token, message_id):
     """rempves a message based on the message id
@@ -182,10 +187,12 @@ def message_remove_v1(token, message_id):
     data_store.set(store)
     return {}
 
+
 def remove_ch_message(store, message_id):
     for channel in store['channels']:
         if message_id in channel['messages_list']:
             channel['messages_list'].remove(message_id)
+
 
 def remove_dm_message(store, message_id):
     for dm in store['dms']:
