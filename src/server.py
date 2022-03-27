@@ -7,7 +7,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
-from src.message import messages_send_v1, message_senddm_v1
+from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.helper import save_data_store, load_data_store
@@ -53,6 +53,7 @@ except Exception:
 def login_v2():
     data = request.get_json()
     body = auth_login_v1(data["email"], data["password"])
+    save_data_store()
     return dumps({
         "token": body['token'],
         "auth_user_id": body['auth_user_id']
@@ -114,6 +115,7 @@ def channels_listall_v2():
 def channel_join_v2():
     data = request.get_json()
     channel_join_v1(data['token'], data['channel_id'])
+    save_data_store()
     return dumps({
 
     })
@@ -141,6 +143,7 @@ def channel_invite_v2():
     data = request.get_json()
     channel_invite_v1(
         data['token'], data['channel_id'], data['u_id'])
+    save_data_store()
     return dumps({
 
     })
@@ -167,6 +170,7 @@ def channel_leave():
     data = request.get_json()
     channel_leave_v1(
         data['token'], data['channel_id'])
+    save_data_store()
     return dumps({
 
     })
@@ -179,6 +183,7 @@ def channel_addowner():
     data = request.get_json()
     channel_addowner_v1(
         data['token'], data['channel_id'], data['u_id'])
+    save_data_store()
     return dumps({
 
     })
@@ -189,6 +194,7 @@ def channel_removeowner():
     data = request.get_json()
     channel_removeowner_v1(
         data['token'], data['channel_id'], data['u_id'])
+    save_data_store()
     return dumps({
 
     })
@@ -197,6 +203,7 @@ def channel_removeowner():
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_v2():
     clear_v1()
+    save_data_store()
     return dumps({
 
     })
@@ -219,6 +226,7 @@ def clear_v2():
 def message_send():
     body = request.get_json()
     data = messages_send_v1(body['token'], body['channel_id'], body['message'])
+    save_data_store()
     return dumps({
         "message_id": data['message_id']
     })
@@ -262,6 +270,7 @@ def user_profile_setname():
     data = request.get_json()
     user_profile_setname_v1(
         data['token'], data['name_first'], data['name_last'])
+    save_data_store()
     return dumps({})
 
 
@@ -269,21 +278,35 @@ def user_profile_setname():
 def user_profile_setemail():
     data = request.get_json()
     user_profile_setemail_v1(data['token'], data['email'])
+    save_data_store()
     return dumps({})
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit():
+    data = request.get_json()
+    message_edit_v1(data["token"], data["message_id"], data["message"])
+    save_data_store()
+    return dumps({})
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove():
+    data = request.get_json()
+    message_remove_v1(data["token"], data["message_id"])
+    save_data_store()
+    return dumps({})
 
 @APP.route("/user/profile/sethandle/v1", methods=['PUT'])
 def user_profile_sethandle():
     data = request.get_json()
     user_profile_sethandle_v1(data['token'], data['handle_str'])
+    save_data_store()
     return dumps({})
-
 
 @APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     data = request.get_json()
     body = dm_create_v1(data['token'], data['u_ids'])
-
+    save_data_store()
     return dumps({
         "dm_id": body["dm_id"]
     })
@@ -294,7 +317,6 @@ def dm_list():
     token = request.args.get('token')
 
     body = dm_list_v1(token)
-
     return dumps({
         'dms': body['dms']
     })
@@ -304,6 +326,7 @@ def dm_list():
 def dm_remove():
     data = request.get_json()
     dm_remove_v1(data['token'], data["dm_id"])
+    save_data_store()
     return dumps({})
 
 
@@ -323,6 +346,7 @@ def dm_details():
 def dm_leave():
     data = request.get_json()
     dm_leave_v1(data['token'], data["dm_id"])
+    save_data_store()
     return dumps({})
 
 
@@ -333,7 +357,6 @@ def dm_messages():
     start = int(request.args.get('start'))
 
     body = dm_messages_v1(token, dm_id, start)
-
     return dumps({
         "messages": body["messages"],
         "start": body["start"],
@@ -345,7 +368,7 @@ def dm_messages():
 def message_senddm():
     data = request.get_json()
     body = message_senddm_v1(data["token"], data["dm_id"], data["message"])
-
+    save_data_store()
     return dumps({
         "message_id": body["message_id"]
     })
