@@ -63,14 +63,19 @@ def user_profile_v1(token, u_id):
     """
     store = data_store.get()
     decode_token(token)
+    
+    for user in store['removed_users']:
+        if user['u_id'] == u_id:
+            user_details = extract_user_details(user)
+            return {'user': user_details}
+
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            user_details = extract_user_details(user)
+    
     valid_user_id(u_id)
-
-    for users in store['users']:
-        if users['u_id'] == u_id:
-            user = extract_user_details(users)
-
     return {
-        'user': user
+        'user': user_details
     }
 
 
@@ -92,8 +97,7 @@ def valid_user_id(user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise InputError(
-            description="This auth_user_id does not exist in the datastore.")
+        raise InputError(description="This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):
@@ -112,11 +116,11 @@ def user_profile_setname_v1(token, name_first, name_last):
     decode_token(token)
 
     if not name_length_check(name_first):
-        raise InputError(
-            description="The length of the new first name has to be within 1 and 50 characters inclusive")
+        raise InputError(description=
+            "The length of the new first name has to be within 1 and 50 characters inclusive")
     if not name_length_check(name_last):
-        raise InputError(
-            description="The length of the new last name has to be within 1 and 50 characters inclusive")
+        raise InputError(description=
+            "The length of the new last name has to be within 1 and 50 characters inclusive")
 
     auth_user_id = decode_token(token)['auth_user_id']
 
@@ -145,8 +149,8 @@ def user_profile_setemail_v1(token, email):
     decode_token(token)
 
     if not valid_email(email):
-        raise InputError(
-            description="Email entered is not of valid format or is already in use by another user")
+        raise InputError(description=
+            "Email entered is not of valid format or is already in use by another user")
 
     auth_user_id = decode_token(token)['auth_user_id']
 
