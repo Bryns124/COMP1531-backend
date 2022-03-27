@@ -1,3 +1,4 @@
+from ast import In
 from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
@@ -331,6 +332,17 @@ def channel_addowner_v1(token, channel_id, u_id):
             if not (auth_user_id in channel['owner_members']):
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
+            if u_id in channel['owner_members']:
+                raise InputError(
+                    description="User id is already a ownder of the channel.")
+    if not channel_validity(channel_id, store):
+        raise InputError(description="Channel id is invalid.")
+
+    if not user_validity(u_id, store):
+        raise InputError(description="User id is invalid.")
+
+    if not already_member(u_id, channel_id, store):
+        raise InputError(description="User id is not in channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
@@ -342,15 +354,6 @@ def channel_addowner_v1(token, channel_id, u_id):
         if channel["channel_id"] == channel_id:
             channel["owner_members"].append(u_id)
             break
-
-    if not channel_validity(channel_id, store):
-        raise InputError(description="Channel id is invalid.")
-
-    if not user_validity(u_id, store):
-        raise InputError(description="User id is invalid.")
-
-    if already_member(auth_user_id, channel_id, store):
-        raise InputError(description="Owner is not in channel.")
 
     data_store.set(store)
     return {}
