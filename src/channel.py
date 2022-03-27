@@ -182,11 +182,11 @@ def member_details(user_id):
 
 
 def channel_messages_v1(token, channel_id, start):
-    """_summary_
+    """
     Taking a valid user it pulls a list of up to 50 messages from a starting
     point and returns them.
     Args:
-        auth_user_id (_u_id): The valid id of the user calling the messages.
+        token (string): The token of the user calling the messages.
         channel_id (channel_id): The channel_id of the channel which to call the
         messages from.
         start (int): A starting index value.
@@ -202,8 +202,8 @@ def channel_messages_v1(token, channel_id, start):
         _type_: _description_
     """
     store = data_store.get()
-    validate_token(token)
 
+    decode_token(token)
     channel_exist = False
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
@@ -212,11 +212,11 @@ def channel_messages_v1(token, channel_id, start):
 
     if not channel_exist:
         raise InputError(
-            "The input channel_id does not exist in the datastore.")
+            description="The input channel_id does not exist in the datastore.")
 
     if len(active_channel['messages_list']) < start:
         raise InputError(
-            "Your start value is greater than the messages in the channel.")
+            description="Your start value is greater than the messages in the channel.")
 
     in_channel = False
     for members in active_channel['all_members']:
@@ -225,7 +225,7 @@ def channel_messages_v1(token, channel_id, start):
             in_channel = True
 
     if not in_channel:
-        raise AccessError("You are not part of that channel.")
+        raise AccessError(description="You are not part of that channel.")
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
     number_of_messages = 0
@@ -242,21 +242,10 @@ def channel_messages_v1(token, channel_id, start):
         returned_messages['end'] = (start + 50)
     else:
         returned_messages['end'] = -1
-    # print(returned_messages)
 
     return returned_messages
-    # {
-    #     'messages': [
-    #         {
-    #             'message_id': 1,
-    #             'u_id': 1,
-    #             'message': 'Hello world',
-    #             'time_created': 1582426789,
-    #         }
-    #     ],
-    #     'start': 0,
-    #     'end': 50,
-    # }
+
+
 
 
 def channel_join_v1(token, channel_id):

@@ -166,36 +166,36 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# def test_dm_messages_removed_admin_user_remove_v1(user_1, user_2, create_dm_2_user):
+def test_dm_messages_removed_admin_user_remove_v1(user_1, user_2, create_dm_2_user):
     
-#     time_sent = generate_timestamp()
-#     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
-#         "token": user_2["token"],
-#         "dm_id": create_dm_2_user["dm_id"],
-#         "message": "Birds aren't real"
-#     })
+    time_sent = generate_timestamp()
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2["token"],
+        "dm_id": create_dm_2_user["dm_id"],
+        "message": "Birds aren't real"
+    })
 
-#     assert request_send.status_code == 200
+    assert request_send.status_code == 200
 
-#     requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
+    requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
 
-#     response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
-#         "token": user_1["token"],
-#         "dm_id": create_dm_2_user["dm_id"],
-#         "start": 0
-#     })
-#     assert response.status_code == 200
-#     assert response.json()["messages"][0]["message_id"] == 1
-#     assert response.json()["messages"][0]["u_id"] == 2
-#     assert response.json()["messages"][0]["message"] == "Removed user"
-#     assert response.json()["messages"][0]["time_sent"] >= time_sent
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+        "token": user_1["token"],
+        "dm_id": create_dm_2_user["dm_id"],
+        "start": 0
+    })
+    assert response.status_code == 200
+    assert response.json()["messages"][0]["message_id"] == 1
+    assert response.json()["messages"][0]["u_id"] == 2
+    assert response.json()["messages"][0]["message"] == "Removed user"
+    assert response.json()["messages"][0]["time_sent"] >= time_sent
 
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# write test for removed dm too
+
 def test_channel_messages_removed_admin_user_remove_v1(user_1, user_2, public_channel_user1):
     request_invite = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
