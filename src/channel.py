@@ -381,7 +381,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
                 if len(channel['owner_members']) == 1:
                     raise InputError(
                         description="Auththorised user is the only owner of the channel.")
-                pass
             else:
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")

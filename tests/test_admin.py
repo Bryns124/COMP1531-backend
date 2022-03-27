@@ -12,6 +12,8 @@ from src.helper import SECRET, generate_timestamp
 from src.config import port
 from flask import request, Flask
 
+from src.user import users_all_v1
+
 
 BASE_URL = f"http://127.0.0.1:{port}/"
 
@@ -78,6 +80,15 @@ def create_dm_2_user(user_1, user_2):
     return r.json()
 
 
+@pytest.fixture
+def create_dm_3_user(user_1, user_2, user_3):
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
+        "token": user_2['token'],
+        "u_ids": [user_1['auth_user_id'], user_3['auth_user_id']]
+    })
+    return r.json()
+
+
 def test_invalid_u_id_admin_user_remove_v1(user_invalid, user_1):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
         "token": user_invalid,
@@ -105,6 +116,15 @@ def test_nonglobal_owner_admin_user_remove_v1(user_1, user_2):
     })
     assert request_admin_user_remove_v1.status_code == AccessError.code
 
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_admin_user_remove_invalid_u_id(user_1, invalid_user_id):
+    request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": invalid_user_id,
+    })
+    assert request_admin_user_remove_v1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -166,9 +186,56 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
+def test_admin_user_remove_removing_channel_owner(user_1, user_2, user_3, create_dm_3_user):
+    requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+
+    r = requests.get(f"{BASE_URL}/dm/details/v1", params={
+        "token": user_1["token"],
+        "dm_id": 1
+    })
+    payload = r.json()
+    assert payload["name"] == "adiyatrahman, alicewan, michaelchai"
+    assert payload['members'] == [
+        user_1['auth_user_id'],
+        user_3['auth_user_id']
+    ]
+
+    response = requests.get(f"{BASE_URL}/users/all/v1", params={
+        "token": user_1["token"]
+    })
+    assert response.status_code == 200
+    assert response.json()["users"] == [
+        {
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "name_first": "Alice",
+            "name_last": "Wan",
+            "handle_str": "alicewan"
+        },
+        {
+            "u_id": 3,
+            "email": "michael@gmail.com",
+            "name_first": "Michael",
+            "name_last": "Chai",
+            "handle_str": "michaelchai"
+        }
+    ]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_dm_messages_removed_admin_user_remove_v1(user_1, user_2, create_dm_2_user):
-    
+
     time_sent = generate_timestamp()
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1["token"],
+        "dm_id": create_dm_2_user["dm_id"],
+        "message": "Birds aren't real"
+    })
+
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_2["token"],
         "dm_id": create_dm_2_user["dm_id"],
@@ -182,13 +249,13 @@ def test_dm_messages_removed_admin_user_remove_v1(user_1, user_2, create_dm_2_us
         "u_id": user_2["auth_user_id"]
     })
 
-    response = requests.get(f"{BASE_URL}/dm/messages/v1", json={
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1["token"],
         "dm_id": create_dm_2_user["dm_id"],
         "start": 0
     })
     assert response.status_code == 200
-    assert response.json()["messages"][0]["message_id"] == 1
+    assert response.json()["messages"][0]["message_id"] == 2
     assert response.json()["messages"][0]["u_id"] == 2
     assert response.json()["messages"][0]["message"] == "Removed user"
     assert response.json()["messages"][0]["time_sent"] >= time_sent
@@ -219,7 +286,7 @@ def test_channel_messages_removed_admin_user_remove_v1(user_1, user_2, public_ch
         "u_id": user_2["auth_user_id"]
     })
 
-    response = requests.get(f"{BASE_URL}/channel/messages/v2", json={
+    response = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1["token"],
         "channel_id": public_channel_user1["channel_id"],
         "start": 0
@@ -423,6 +490,43 @@ def test_promoting_user_2_admin_userpermission_change_v1(user_1, user_2, user_3)
             "name_last": "Rahman",
             "handle_str": "adiyatrahman"
         }
+    ]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_promoting_user_2_admin_userpermission_change_v1_multiple_users(user_1, user_2, user_3):
+    requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json={
+        "token": user_1["token"],
+        "u_id": user_3["auth_user_id"],
+        "permission_id": 1
+    })
+
+    requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_3["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+
+    response = requests.get(f"{BASE_URL}/users/all/v1", params={
+        "token": user_1["token"]
+    })
+
+    payload = response.json()
+
+    assert payload["users"] == [
+        {
+            "u_id": 1,
+            "email": "alice@gmail.com",
+            "name_first": "Alice",
+            "name_last": "Wan",
+            "handle_str": "alicewan"
+        }, {
+            "u_id": 3,
+            "email": "michael@gmail.com",
+            "name_first": "Michael",
+            "name_last": "Chai",
+            "handle_str": "michaelchai"
+        }
+
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 

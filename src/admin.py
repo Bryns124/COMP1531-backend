@@ -55,7 +55,6 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     for user in store["users"]:
         if user["u_id"] == u_id:
             store["users"][i]["permission_id"] = permission_id
-            break
         i += 1
 
     data_store.set(store)
@@ -146,8 +145,8 @@ def remove_id_from_group(u_id, group_type):
     for group in store[group_type]:
         if u_id in group["all_members"]:
             store[group_type][i]["all_members"].remove(u_id)
-            if u_id in group["owner_members"]:
-                store[group_type][i]["owner_members"].remove(u_id)
+        if u_id in group["owner_members"]:
+            store[group_type][i]["owner_members"].remove(u_id)
         i += 1
 
     data_store.set(store)

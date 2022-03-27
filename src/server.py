@@ -14,8 +14,7 @@ from src.helper import save_data_store, load_data_store
 from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1, remove_id_from_group
-from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1
-from src.dm import dm_leave_v1, dm_messages_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 
 
 def quit_gracefully(*args):
@@ -229,7 +228,7 @@ def message_send():
     data = messages_send_v1(body['token'], body['channel_id'], body['message'])
     save_data_store()
     return dumps({
-        'message_id': body['message_id']
+        'message_id': data['message_id']
     })
 
 
@@ -400,9 +399,10 @@ def admin_userpermission_change():
     admin_userpermission_change_v1(
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
-    
+
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully)  # For coverage

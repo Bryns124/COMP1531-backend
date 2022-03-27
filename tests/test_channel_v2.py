@@ -666,6 +666,21 @@ def test_channel_removeowner_second_ownder(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
+def test_channel_removeowner_invalid_u_id(user_1, invalid_user_id, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the u_id
+    of a user who is not an owner of the channel.
+    """
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": invalid_user_id
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_channel_removeowner_only_one_owner(user_1, channel_public):
     """
     This test checks to see that an InputError is raised when removing the only
