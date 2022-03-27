@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.helper import decode_token, valid_auth_user_id, validate_token
+from src.helper import decode_token, validate_token
 from src.auth import email_check, duplicate_email_check
 """User has the 5 functions: users_all, user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
 Functions:
@@ -47,6 +47,16 @@ def extract_user_details(user):
     }
     return users
 
+# def extract_removed_user_details(user):
+#     users = {
+#         'u_id': user['u_id'],
+#         'email': user['email'],
+#         'name_first': "Removed",
+#         'name_last': "user",
+#         'handle_str': user['handle_str']
+#     }
+#     return users
+
 
 def user_profile_v1(token, u_id):
     """returns a the details of one particular user with the associated user_id
@@ -66,6 +76,10 @@ def user_profile_v1(token, u_id):
     valid_user_id(u_id)
 
     for users in store['users']:
+        if users['u_id'] == u_id:
+            user = extract_user_details(users)
+
+    for users in store['removed_users']:
         if users['u_id'] == u_id:
             user = extract_user_details(users)
 
@@ -92,7 +106,7 @@ def valid_user_id(user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise InputError("This auth_user_id does not exist in the datastore.")
+        raise InputError(description="This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):
@@ -108,13 +122,13 @@ def user_profile_setname_v1(token, name_first, name_last):
         None
     """
     store = data_store.get()
-    validate_token(token)
+    decode_token(token)
 
     if not name_length_check(name_first):
-        raise InputError(
+        raise InputError(description=
             "The length of the new first name has to be within 1 and 50 characters inclusive")
     if not name_length_check(name_last):
-        raise InputError(
+        raise InputError(description=
             "The length of the new last name has to be within 1 and 50 characters inclusive")
 
     auth_user_id = decode_token(token)['auth_user_id']
@@ -141,10 +155,10 @@ def user_profile_setemail_v1(token, email):
         None
     """
     store = data_store.get()
-    validate_token(token)
+    decode_token(token)
 
     if not valid_email(email):
-        raise InputError(
+        raise InputError(description=
             "Email entered is not of valid format or is already in use by another user")
 
     auth_user_id = decode_token(token)['auth_user_id']
@@ -171,10 +185,10 @@ def user_profile_sethandle_v1(token, handle_str):
         None
     """
     store = data_store.get()
-    validate_token(token)
+    decode_token(token)
 
     if not valid_handle_string(store, handle_str):
-        raise InputError("""
+        raise InputError(description="""
                          The length of the handle is between 3 and 20 characters,
                          or it contains non-alphanumeric characters,
                          or it is already in-use""")
