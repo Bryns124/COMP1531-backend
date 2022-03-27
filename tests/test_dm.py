@@ -407,16 +407,16 @@ def test_dm_send_access_error_1(user_3, create_dm_2_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_send_access_error_2(user_1, create_dm_2_user):
+def test_dm_send_multiple_dms(user_1, create_dm_3_user, create_dm_2_user):
     response1 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
-        "dm_id": 1,
+        "dm_id": 2,
         "message": "hello"
     })
 
     response2 = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
-        "dm_id": 1,
+        "dm_id": 2,
         "message": "world"
     })
 
