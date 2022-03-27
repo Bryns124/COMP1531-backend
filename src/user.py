@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.helper import decode_token, validate_token
+from src.helper import decode_token, valid_auth_user_id, validate_token
 from src.auth import email_check, duplicate_email_check
 """User has the 5 functions: users_all, user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
 Functions:
@@ -26,7 +26,7 @@ def users_all_v1(token):
         dictionary: containing list of dictionaries with the details of the users
     """
     store = data_store.get()
-    validate_token(token)
+    decode_token(token)
 
     user_list = []
     for users in store['users']:
@@ -40,7 +40,7 @@ def users_all_v1(token):
 def extract_user_details(user):
     users = {
         'u_id': user['u_id'],
-        'email': user['e_mail'],
+        'email': user['email'],
         'name_first': user['name_first'],
         'name_last': user['name_last'],
         'handle_str': user['handle_str']
@@ -62,8 +62,8 @@ def user_profile_v1(token, u_id):
         dictionary: containing the details of the user's profile
     """
     store = data_store.get()
-    validate_token(token)
-    u_id = decode_token(token)['auth_user_id']
+    decode_token(token)
+    valid_user_id(u_id)
 
     for users in store['users']:
         if users['u_id'] == u_id:
@@ -72,6 +72,27 @@ def user_profile_v1(token, u_id):
     return {
         'user': user
     }
+
+
+def valid_user_id(user_id):
+    """_summary_
+    Validates that the input auth_user_id exists in the datastore
+    Args:
+        auth_user_id (u_id): The input u_id
+
+    Raises:
+        AccessError: If the u_id input does not exist in the system, an access error is raised.
+    """
+    store = data_store.get()
+
+    auth_user_exist = False
+
+    for user in store['users']:
+        if user_id == user['u_id']:
+            auth_user_exist = True
+
+    if not auth_user_exist:
+        raise InputError("This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):

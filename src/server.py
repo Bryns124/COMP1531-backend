@@ -7,7 +7,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1
-from src.message import messages_send_v1
+from src.message import messages_send_v1, message_senddm_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1, remove_id_from_group
@@ -15,6 +15,8 @@ from src.user import users_all_v1, user_profile_v1
 from operator import methodcaller
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.helper import save_data_store, load_data_store
+from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1
+from src.dm import dm_leave_v1, dm_messages_v1
 
 
 def quit_gracefully(*args):
@@ -67,12 +69,12 @@ def auth_register_v2():
     })
 
 
-
-@ APP.route("/channels/create/v2", methods=['POST'])
+@APP.route("/channels/create/v2", methods=['POST'])
 def channels_create_v2():
     data = request.get_json()
     body = channels_create_v1(
         data['token'], data['name'], data['is_public'])
+    save_data_store()
     return dumps({
         'channel_id': body['channel_id']
     })
@@ -105,32 +107,22 @@ def channel_join_v2():
     })
 
 
-@ APP.route("/channel/details/v2", methods=['GET'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_v2():
     data = request.get_json()
     body = channel_details_v1(data['token'], data['channel_id'])
     return dumps({
-        "channels": body
+        "name": body['name'],
+        "is_public": body['is_public'],
+        "owner_members": body['owner_members'],
+        "all_members": body['all_members']
     })
 
 
-@ APP.route("/clear/v1", methods=['DELETE'])
+@APP.route("/clear/v1", methods=['DELETE'])
 def clear_v2():
     clear_v1()
     return dumps({
-
-    })
-
-
-@ APP.route("/channel/messages/v2", methods=['GET'])
-def channel_message_v2():
-    data = request.get_json()
-    body = channel_messages_v1(
-        data['token'], data['channel_id'], data['start'])
-    return dumps({
-        "messages": body['messages'],
-        "start": body['start'],
-        "end": body['end']
 
     })
 
@@ -153,13 +145,13 @@ def echo():
         'data': data
     })
 
-## channel_invite, users_all, user_profile
-
 
 @APP.route("/user/profile/v1", methods=['GET'])
 def user_profile():
     token = request.args.get('token')
-    u_id = request.args.get('u_id')
+    u_id = int(request.args.get('u_id'))
+
+    # data = request.get_json()
     body = user_profile_v1(token, u_id)
     return dumps({
         'user': body['user']
@@ -170,9 +162,21 @@ def user_profile():
 def users_all():
     # data = request.get_json()
     token = request.args.get('token')
+
     body = users_all_v1(token)
     return dumps({
         'users': body['users']
+    })
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_messages_v2():
+    data = request.get_json()
+    body = channel_messages_v1(
+        data['token'], data['channel_id'], data['start'])
+    return dumps({
+        'messages': body['messages'],
+        'start': body['start'],
+        'end': body['end']
     })
 
 
@@ -185,15 +189,58 @@ def channel_invite_v2():
 
     })
 
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create():
+    data = request.get_json()
+    body = dm_create_v1(data['token'], data['u_ids'])
 
-@ APP.route("/admin/user/remove/v1", methods=['DELETE'])
+    return dumps({
+        "dm_id": body["dm_id"]
+    })
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages():
+    data = request.get_json()
+    body = dm_messages_v1(data["token"], data["dm_id"], data["start"])
+
+    return dumps({
+        "messages": body["messages"],
+        "start": body["start"],
+        "end": body["end"]
+    })
+
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details():
+    data = request.get_json()
+    # token = request.args.get("token")
+    # dm_id = request.args.get("dm_id")
+    # body = dm_details_v1(token, dm_id)
+    body = dm_details_v1(data["token"], data["dm_id"])
+    return dumps({
+        "name": body["name"],
+        "members": body["members"]
+    })
+
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_senddm():
+    data = request.get_json()
+    body = message_senddm_v1(data["token"], data["dm_id"], data["message"])
+
+    return dumps({
+        "message_id": body["message_id"]
+    })
+
+
+
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove():
     body = request.get_json()
     admin_user_remove_v1(body['token'], body['u_id'])
     return dumps({})
 
 
-@ APP.route("/admin/userpermission/change/v1", methods=['POST'])
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change():
     body = request.get_json()
     admin_userpermission_change_v1(

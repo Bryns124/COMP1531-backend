@@ -16,8 +16,9 @@ def clear_v1():
     store = data_store.get()
     store['users'] = []
     store['channels'] = []
-    store['DM'] = []
+    store['dms'] = []
     store['messages'] = []
+    store['removed_users'] = []
     data_store.set(store)
 
     return {}

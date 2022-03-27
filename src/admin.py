@@ -18,9 +18,10 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     Input: {token, u_id, permission_id}
     Output: {}
     """
-    store = data_store.get()
-
     auth_user_id = decode_token(token)["auth_user_id"]
+    valid_auth_user_id(auth_user_id)
+
+    store = data_store.get()
 
     number_of_global_owners = 0
     user_exist = False
@@ -35,13 +36,11 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         if user['permission_id'] == 1:
             number_of_global_owners += 1
 
-    valid_auth_user_id(auth_user_id)
+    if not user_exist:
+        raise InputError("The input u_id does not exist in the datastore.")
 
     if auth_user["permission_id"] != 1:
         raise AccessError("You do not have permission for this command.")
-
-    if not user_exist:
-        raise InputError("The input u_id does not exist in the datastore.")
 
     if not permission_id in [1, 2]:
         raise InputError("Invalid permission id.")
@@ -101,7 +100,7 @@ def admin_user_remove_v1(token, u_id):
     if auth_user["permission_id"] != 1:
         raise AccessError("The authorised user is not a global user.")
 
-    if number_of_global_owners < 2:
+    if (number_of_global_owners < 2) and (target_user["permission_id"] == 1):
         raise InputError("You cannot remove the only global owner.")
 
     remove_id_from_group(u_id, "channels")
