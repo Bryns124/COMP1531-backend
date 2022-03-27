@@ -54,73 +54,6 @@ def messages_send_v1(token, channel_id, message):
 
     data_store.set(store)
     return {"message_id": message_id}
-# {message_id}
-
-#{token, channel_id, message}
-
-# def message_edit_v1(token, message_id, message):
-#     """edits a message based on the message id
-
-#     Args:
-#         token (string): user's token
-#         channel_id (int): channel id of where the message will be sent
-#         message (string): contains the message
-
-#     Returns:
-#         dictionary: empty dictionary
-#     """
-#     validate_token(token)
-#     validate_message(message)
-#     store = data_store.get()
-
-#     for message in store['messages']:
-#         if message['message_id'] == message_id:
-#             message['message'] == message
-
-#     data_store.set(store)
-
-#     return {}
-# #{}
-# def message_remove_v1(token, message_id):
-#     """removes message based on message id
-#         the message is removed from the list of message ID's
-#         the "actual' message if NOT removed from datastore message
-
-#     Args:
-#         token (string): user's token
-#         channel_id (int): channel id of where the message will be sent
-#         message (string): contains the message
-
-#     Returns:
-#         dictionary: empty dictionary
-#     """
-#     validate_token(token)
-#     store = data_store.get()
-
-#     for message in store['messages']:
-#         if message['message_id'] == message_id:
-#             if (message['is_ch_message']):
-#                 remove_ch_message(message_id)
-#             else:
-#                 remove_dm_message(message_id)
-
-#     data_store.set(store)
-#     return {}
-# #{}
-# def remove_ch_message(message_id):
-#     store = data_store.get()
-#     for channel in store['channels']:
-#         if message_id in channel['messages_list']:
-#             channel['messages_list'].remove(message_id)
-#     data_store.set(store)
-
-# def remove_dm_message(message_id):
-#     store = data_store.get()
-#     for dm in store['dms']:
-#         if message_id in dm['messages_list']:
-#             dm['messages_list'].remove(message_id)
-#     data_store.set(store)
-
 
 def validate_message(message):
     if len(message) >= 1 and len(message) <= 1000:
@@ -160,3 +93,99 @@ def message_senddm_v1(token, dm_id, message):
 
     data_store.set(store)
     return {"message_id": message_id}
+
+def validate_mid(messages, message_id):
+    for message in messages:
+        if message_id == message["message_id"]:
+            return
+    raise InputError(description="incorrect message id")
+
+def message_access(store, message_id, u_id):
+    for message in store["messages"]:
+        if message_id == message["message_id"]:
+            break
+    if u_id == message["u_id"]:
+        return
+    if message["is_ch_message"] == True:
+        for ch in store["channels"]:
+            if message_id in ch['messages_list'] and u_id in ch["owner_members"]:
+                return
+
+    if message["is_ch_message"] == False:
+        for dm in store["dms"]:
+            if message_id in dm['messages_list'] and u_id in dm["owner_members"]:
+                return
+
+    raise AccessError(description="no access to message")
+
+def message_edit_v1(token, message_id, message):
+    """edits a message based on the message id
+
+    Args:
+        token (string): user's token
+        channel_id (int): channel id of where the message will be sent
+        message (string): contains the message
+
+    Raises:
+        InputError: message exceeds 1000 characters
+        InputError: message ID is not valid
+        AccessError: user it not owner or user did not send message
+
+    Returns:
+        dictionary: empty dictionary
+    """
+    u_id = decode_token(token)['auth_user_id']
+    validate_message(message)
+    store = data_store.get()
+
+    validate_mid(store["messages"], message_id)
+    message_access(store, message_id, u_id)
+
+    for message in store["messages"]:
+        if message["message_id"] == message_id:
+            message["message"] = message
+
+    data_store.set(store)
+    return {}
+
+def message_remove_v1(token, message_id):
+    """rempves a message based on the message id
+
+    Args:
+        token (string): user's token
+        channel_id (int): channel id of where the message will be sent
+        message (string): contains the message
+
+    Raises:
+        InputError: message exceeds 1000 characters
+        InputError: message ID is not valid
+        AccessError: user it not owner or user did not send message
+
+    Returns:
+        dictionary: empty dictionary
+    """
+    u_id = decode_token(token)['auth_user_id']
+    store = data_store.get()
+
+    validate_mid(store["messages"], message_id)
+    message_access(store, message_id, u_id)
+
+    for message in store["messages"]:
+        if message["message_id"] == message_id:
+            if message["is_ch_message"]:
+                remove_ch_message(store, message_id)
+            elif not message["is_ch_message"]:
+                remove_dm_message(store, message_id)
+
+    data_store.set(store)
+    return {}
+
+def remove_ch_message(store, message_id):
+    for channel in store['channels']:
+        if message_id in channel['messages_list']:
+            channel['messages_list'].remove(message_id)
+
+def remove_dm_message(store, message_id):
+    for dm in store['dms']:
+        if message_id in dm['messages_list']:
+            dm['messages_list'].remove(message_id)
