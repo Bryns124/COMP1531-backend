@@ -576,7 +576,7 @@ def test_channel_messages_v1(user_1, channel_public):
 #     })
 #     assert request_channel_remove_owner.status_code == InputError.code
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
+#
 
 def test_channel_details_input_error(user_1, invalid_channel_id):
     r = requests.get(f"{BASE_URL}/channel/details/v2", params={
