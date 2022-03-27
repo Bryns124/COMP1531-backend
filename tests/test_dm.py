@@ -68,7 +68,6 @@ def create_dm_3_user(user_1, user_2, user_3):
 def starting_value():
     return 0
 
-
 @pytest.fixture
 def invalid_message_text():
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
@@ -529,8 +528,7 @@ def test_dm_messages_multiple_51(user_1, create_dm_2_user, starting_value):
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-
-def test_message_edit_invalid_message(user_1, create_dm_2_user, invalid_message_text):
+def test_message_edit_invalid_message(user_1,create_dm_2_user, invalid_message_text):
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": 1,
@@ -545,8 +543,7 @@ def test_message_edit_invalid_message(user_1, create_dm_2_user, invalid_message_
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-
-def test_message_edit_invalid_mid(user_1, create_dm_2_user):
+def test_message_edit_invalid_mid(user_1,create_dm_2_user):
     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
         "token": user_1["token"],
         "message_id": 1,
@@ -554,7 +551,6 @@ def test_message_edit_invalid_mid(user_1, create_dm_2_user):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
 
 def test_message_edit_no_access(user_1, user_2, create_dm_2_user):
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -571,58 +567,55 @@ def test_message_edit_no_access(user_1, user_2, create_dm_2_user):
     assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+# def test_message_edit1(user_1,create_dm_2_user):
+#     requests.post(f"{BASE_URL}/message/senddm/v1", json={
+#         "token": user_1['token'],
+#         "dm_id": 1,
+#         "message": "hello world"
+#     })
 
-def test_message_edit1(user_1, create_dm_2_user):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_1['token'],
-        "dm_id": 1,
-        "message": "hello world"
-    })
+#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+#         "token": user_1["token"],
+#         "message_id": 1,
+#         "message": "new message"
+#     })
+#     payload = r.json()
+#     assert payload == {}
 
-    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-        "token": user_1["token"],
-        "message_id": 1,
-        "message": "new message"
-    })
-    payload = r.json()
-    assert payload == {}
+#     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+#         "token": user_1['token'],
+#         "dm_id": 1,
+#         "start": 0
+#     })
+#     assert r2.status_code == 200
+#     payload = r2.json()
+#     assert payload["messages"][-1]["message"] == "new message"
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-    r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-        "token": user_1['token'],
-        "dm_id": 1,
-        "start": 0
-    })
-    assert r2.status_code == 200
-    payload = r2.json()
-    assert payload["messages"][-1]["message"] == "new message"
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+# def test_message_edit2(user_1,create_dm_3_user):
+#     requests.post(f"{BASE_URL}/message/senddm/v1", json={
+#         "token": user_3['token'],
+#         "dm_id": 1,
+#         "message": "hello world"
+#     })
 
+#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+#         "token": user_1["token"],
+#         "message_id": 1,
+#         "message": "new message"
+#     })
+#     payload = r.json()
+#     assert payload == {}
 
-def test_message_edit2(user_1, user_3, create_dm_3_user):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_3['token'],
-        "dm_id": 1,
-        "message": "hello world"
-    })
-
-    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-        "token": user_1["token"],
-        "message_id": 1,
-        "message": "new message"
-    })
-    payload = r.json()
-    assert payload == {}
-
-    r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-        "token": user_1['token'],
-        "dm_id": 1,
-        "start": 0
-    })
-    assert r2.status_code == 200
-    payload = r2.json()
-    assert payload["messages"][-1]["message"] == "new message"
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
+#     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+#         "token": user_1['token'],
+#         "dm_id": 1,
+#         "start": 0
+#     })
+#     assert r2.status_code == 200
+#     payload = r2.json()
+#     assert payload["messages"][-1]["message"] == "new message"
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_message_remove_invalid_mid(user_1, create_dm_2_user):
     r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
@@ -631,7 +624,6 @@ def test_message_remove_invalid_mid(user_1, create_dm_2_user):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
 
 def test_message_remove_no_access(user_1, user_2, create_dm_2_user):
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -646,7 +638,6 @@ def test_message_remove_no_access(user_1, user_2, create_dm_2_user):
     })
     assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
 
 def test_message_remove1(user_1, user_2, create_dm_2_user):
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -673,7 +664,6 @@ def test_message_remove1(user_1, user_2, create_dm_2_user):
     payload = r2.json()
     assert payload["messages"][-1]["message"] == "hello"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
 
 def test_message_remove2(user_1, user_2, create_dm_3_user):
     requests.post(f"{BASE_URL}/message/senddm/v1", json={

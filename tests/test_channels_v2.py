@@ -17,6 +17,8 @@ BASE_URL = f"http://127.0.0.1:{port}/"
 requests.delete(f"{BASE_URL}/clear/v1", json={
 
 })
+
+
 @pytest.fixture
 def user_1():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -68,6 +70,7 @@ def private_second_channel_user1(user_1):
         "is_public": False
     })
     return r.json()
+
 
 @pytest.fixture
 def invalid_message_text():
@@ -319,6 +322,7 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
 
     })
 
+
 def test_message_remove_invalid_mid(user_1, public_channel_user1):
     r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
         "token": user_1["token"],
@@ -326,6 +330,7 @@ def test_message_remove_invalid_mid(user_1, public_channel_user1):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_remove_no_access(user_1, user_2, public_channel_user1):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -343,6 +348,7 @@ def test_message_remove_no_access(user_1, user_2, public_channel_user1):
     })
     assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_remove1(user_1, public_channel_user1):
     requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -369,6 +375,7 @@ def test_message_remove1(user_1, public_channel_user1):
     payload = r2.json()
     assert payload["messages"][-1]["message"] == "hello"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_remove2(user_1, user_2, public_channel_user1):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -400,6 +407,7 @@ def test_message_remove2(user_1, user_2, public_channel_user1):
     assert payload["messages"][-1]["message"] == "hello"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_message_edit_invalid_message(user_1, public_channel_user1, invalid_message_text):
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -415,6 +423,7 @@ def test_message_edit_invalid_message(user_1, public_channel_user1, invalid_mess
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_message_edit_invalid_mid(user_1, public_channel_user1):
     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
         "token": user_1["token"],
@@ -423,6 +432,7 @@ def test_message_edit_invalid_mid(user_1, public_channel_user1):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_edit_no_access(user_1, user_2, public_channel_user1):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -442,6 +452,7 @@ def test_message_edit_no_access(user_1, user_2, public_channel_user1):
     })
     assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_edit1(user_1, public_channel_user1):
     requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -467,6 +478,7 @@ def test_message_edit1(user_1, public_channel_user1):
     payload = r2.json()
     assert payload["messages"][-1]["message"] == "new message"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_message_edit2(user_1, user_2, public_channel_user1):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
