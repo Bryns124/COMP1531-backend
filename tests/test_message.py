@@ -6,7 +6,7 @@ from src.message import messages_send_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 from src.helper import SECRET, generate_timestamp
-from src.config import port
+from src.config import port, url
 import json
 import requests
 import urllib
@@ -14,7 +14,7 @@ import jwt
 import pytest
 
 ##MAY CHANGE PORT LATER##
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 # Users
@@ -227,7 +227,32 @@ def test_channel_messages_unauthorised_user(channel_public, user_2, starting_val
     })
 
 
-def test_messages_send(user_1, channel_public, message_text, starting_value):
+def test_messages_send_2(user_1, channel_public, message_text, starting_value):
+    request = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+
+    payload = request.json()
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": starting_value
+    })
+    body = r.json()
+    assert body['messages'][-1]['message_id'] == payload["message_id"]
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_messages_send_multiple_channels(user_1, channel_private, channel_public, message_text, starting_value):
     request = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],

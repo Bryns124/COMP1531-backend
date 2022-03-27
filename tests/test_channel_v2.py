@@ -6,7 +6,7 @@ from distutils.command.config import config
 import src.server
 from src.error import InputError, AccessError
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 import requests
 import urllib
@@ -14,7 +14,7 @@ import jwt
 import pytest
 
 ##MAY CHANGE PORT LATER##
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 # Users
@@ -332,251 +332,369 @@ def test_channel_messages_v1(user_1, channel_public):
 
 
 # Tests for channel/addowner
-# def test_channel_addowner(user_1, user_2, channel_public):
-#     """
-#     This test makes a user an owner of the channel.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     request_channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id']
-#     })
-#     data = request_channel_details.json()
-#     assert data == {
-#         'name': 'Test Channel',
-#         'is_public': True,
-#         'owner_members': [
-#             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-#              'name_last': 'Test', 'handle_str': 'mikeytest'},
-#             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-#              'name_last': 'Test', 'handle_str': 'migueltest'}
-#         ],
-#         'all_members': [
-#             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-#              'name_last': 'Test', 'handle_str': 'mikeytest'},
-#             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-#              'name_last': 'Test', 'handle_str': 'migueltest'}
-#         ]
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_addowner_invalid_channel(channel_public, invalid_channel_id, user_1):
-#     """
-#     This test checks to see that a InputError is raised when channel is invalid.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": invalid_channel_id,
-#         "u_id": user_1['auth_user_id']
-#     })
-#     assert request_channel_add_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addowner(user_1, user_2, channel_public):
+    """
+    This test makes a user an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    request_channel_details = requests.get(f"{BASE_URL}/channel/details/v2", params={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = request_channel_details.json()
+    assert data == {
+        'name': 'Test Channel',
+        'is_public': True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+             'name_last': 'Test', 'handle_str': 'migueltest'}
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+             'name_last': 'Test', 'handle_str': 'migueltest'}
+        ]
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_addowner_invalid_user(channel_public, invalid_user_id, user_1):
-#     """
-#     This test checks to see that a InputError is raised when user is invalid.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": invalid_user_id
-#     })
-#     assert request_channel_add_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addowner_invalid_channel(channel_public, invalid_channel_id, user_1):
+    """
+    This test checks to see that a InputError is raised when channel is invalid.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id,
+        "u_id": user_1['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_addowner_owner_not_in_channel(user_1, user_2, channel_public):
-#     """
-#     This test checks to see that a InputError is raised when owner is not a member
-#     of that channel.
-#     """
-#     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     assert request_channel_add_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addowner_invalid_user(channel_public, invalid_user_id, user_1):
+    """
+    This test checks to see that a InputError is raised when user is invalid.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": invalid_user_id
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_addowner_user_already_owner(user_1, user_2, channel_public):
-#     """
-#     This test checks to see that a InputError is raised when user is already an
-#     owner of the channel.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id']
-#     })
-
-#     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     assert request_channel_add_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addowner_owner_not_in_channel(user_1, user_2, channel_private_access):
+    """
+    This test checks to see that a InputError is raised when owner is not a member
+    of that channel.
+    """
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_private_access['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_addowner_user_not_owner(user_2, user_no_access, channel_public):
-#     """
-#     This test checks to see that an AccessError is raised when channel is
-#     valid and the authorised user does not have owner permissions in the channel
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id']
-#     })
+def test_channel_addowner_user_already_owner(user_1, user_2, channel_public):
+    """
+    This test checks to see that a InputError is raised when user is already an
+    owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
 
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_no_access['token'],
-#         "channel_id": channel_public['channel_id']
-#     })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
 
-#     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_no_access['auth_user_id']
-#     })
-#     assert request_channel_add_owner.status_code == AccessError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# # Tests for channel/removeowner
-# def test_channel_removeowner(user_1, user_2, channel_public):
-#     """
-#     This test removes an user as an owner of the channel.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     request_channel_details = requests.get(f"{BASE_URL}/channel/details/v2", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id']
-#     })
-#     data = request_channel_details.json()
-#     assert data == {
-#         'name': 'Test Channel',
-#         'is_public': True,
-#         'owner_members': [
-#             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-#              'name_last': 'Test', 'handle_str': 'mikeytest'},
-#         ],
-#         'all_members': [
-#             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-#              'name_last': 'Test', 'handle_str': 'mikeytest'},
-#             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-#              'name_last': 'Test', 'handle_str': 'migueltest'}
-#         ]
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_removeowner_invalid_channel(channel_public, invalid_channel_id, user_1):
-#     """
-#     This test checks to see that a InputError is raised when channel is invalid.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_1['auth_user_id']
-#     })
-#     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": invalid_channel_id,
-#         "u_id": user_1['auth_user_id']
-#     })
-#     assert request_channel_remove_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addowner_user_not_owner(user_2, user_no_access, channel_public):
+    """
+    This test checks to see that an AccessError is raised when channel is
+    valid and the authorised user does not have owner permissions in the channel
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_no_access['token'],
+        "channel_id": channel_public['channel_id']
+    })
+
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_no_access['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_removeowner_invalid_user(channel_public, invalid_user_id, user_1, user_2):
-#     """
-#     This test checks to see that a InputError is raised when user is invalid.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
-#     requests.post(f"{BASE_URL}/channel/addowner/v1", json={
-#         "token": user_2['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_1['auth_user_id']
-#     })
-#     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": invalid_user_id
-#     })
-#     assert request_channel_remove_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_addownder_user_not_in_channel(user_1, channel_public, user_2):
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+# Tests for channel/removeowner
 
 
-# def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
-#     """
-#     This test checks to see that an InputError is raised when removing the u_id
-#     of a user who is not an owner of the channel.
-#     """
-#     requests.post(f"{BASE_URL}/channel/join/v2", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#     })
+def test_channel_removeowner(user_1, user_2, channel_public):
+    """
+    This test removes an user as an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    request_channel_details = requests.get(f"{BASE_URL}/channel/details/v2", params={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = request_channel_details.json()
+    assert data == {
+        'name': 'Test Channel',
+        'is_public': True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+             'name_last': 'Test', 'handle_str': 'migueltest'}
+        ]
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-#     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     assert request_channel_remove_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_channel_removeowner_multiple_channels(user_1, user_2, channel_private, channel_public):
+    """
+    This test removes an user as an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    request_channel_details = requests.get(f"{BASE_URL}/channel/details/v2", params={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+    data = request_channel_details.json()
+    assert data == {
+        'name': 'Test Channel',
+        'is_public': True,
+        'owner_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+        ],
+        'all_members': [
+            {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
+             'name_last': 'Test', 'handle_str': 'mikeytest'},
+            {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
+             'name_last': 'Test', 'handle_str': 'migueltest'}
+        ]
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_channel_removeowner_only_one_owner(user_1, user_2, channel_public):
-#     """
-#     This test checks to see that an InputError is raised when removing the only
-#     owner of the channel.
-#     """
-#     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "u_id": user_2['auth_user_id']
-#     })
-#     assert request_channel_remove_owner.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_channel_removeowner_invalid_channel(channel_public, invalid_channel_id, user_1):
+    """
+    This test checks to see that a InputError is raised when channel is invalid.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_1['auth_user_id']
+    })
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": invalid_channel_id,
+        "u_id": user_1['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_invalid_user(channel_public, invalid_user_id, user_1, user_2):
+    """
+    This test checks to see that a InputError is raised when user is invalid.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_1['auth_user_id']
+    })
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": invalid_user_id
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the u_id
+    of a user who is not an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_user_no_access(user_1, user_2, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the u_id
+    of a user who is not an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_1['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_second_ownder(user_1, user_2, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the u_id
+    of a user who is not an owner of the channel.
+    """
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_invalid_u_id(user_1, invalid_user_id, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the u_id
+    of a user who is not an owner of the channel.
+    """
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": invalid_user_id
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_only_one_owner(user_1, channel_public):
+    """
+    This test checks to see that an InputError is raised when removing the only
+    owner of the channel.
+    """
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_1['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 #
+
 
 def test_channel_details_input_error(user_1, invalid_channel_id):
     r = requests.get(f"{BASE_URL}/channel/details/v2", params={

@@ -1,5 +1,6 @@
 import code
 from os import access
+from urllib import response
 from xml.dom.expatbuilder import parseFragment
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
@@ -9,7 +10,7 @@ from src.other import clear_v1
 from src.helper import decode_token
 from src.error import InputError, AccessError
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 import requests
 import urllib
@@ -17,7 +18,7 @@ import jwt
 import pytest
 
 ##MAY CHANGE PORT LATER##
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 # Users
@@ -366,6 +367,21 @@ def test_auth_logout_user_2(user_1, channel_public, user_2):
         "channel_id": channel_public['channel_id'],
     })
     assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_auth_logout_after_login(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "test123456"
+    })
+    body = r.json()
+    response = requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": body['token']
+    })
+    assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })

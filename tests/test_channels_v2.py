@@ -5,14 +5,14 @@ import pytest
 from src.error import AccessError, InputError
 import src.server
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 from flask import request, Flask
 import jwt
 import pytest
 import requests
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 requests.delete(f"{BASE_URL}/clear/v1", json={
 
@@ -424,10 +424,25 @@ def test_message_edit_invalid_message(user_1, public_channel_user1, invalid_mess
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_message_edit_invalid_mid(user_1, public_channel_user1):
+def test_message_edit_invalid_mid_empty(user_1, public_channel_user1):
     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
         "token": user_1["token"],
         "message_id": 1,
+        "message": "user 1 new message"
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit_invalid_mid(user_1, public_channel_user1):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 2,
         "message": "user 1 new message"
     })
     assert r.status_code == InputError.code
