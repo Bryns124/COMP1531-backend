@@ -1,22 +1,27 @@
 import pytest
-from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
-from src.auth import auth_register_v1
-from src.other import clear_v1
+# from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
+# from src.auth import auth_register_v1
+# from src.other import clear_v1
 from src.error import AccessError, InputError
+import src.server
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 from flask import request, Flask
 import jwt
 import pytest
 import requests
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
+
+requests.delete(f"{BASE_URL}/clear/v1", json={
+
+})
 
 
 @pytest.fixture
 def user_1():
-    r = request.post(f"{BASE_URL}/auth/register/v2", json={
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "alice@gmail.com",
         "password": "123456",
         "name_first": "Alice",
@@ -25,10 +30,9 @@ def user_1():
     return r.json()
 
 
-
 @pytest.fixture
 def user_2():
-    r = request.post(f"{BASE_URL}/auth/register/v2", json={
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "adi@gmail.com",
         "password": "abcdef",
         "name_first": "Adiyat",
@@ -68,27 +72,30 @@ def private_second_channel_user1(user_1):
     return r.json()
 
 
+@pytest.fixture
+def invalid_message_text():
+    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
+
 
 def test_listall_no_channel(user_1):
     """
     test for if no channels have been created
     """
-    response = request.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
-    payload = response.json()
-    assert payload["channels"] == []
+    body = response.json()
+    assert body["channels"] == []
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-
 
 
 def test_listall_public(user_1, public_channel_user1):
     """
     test for listing public channels
     """
-    response = request.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -101,13 +108,12 @@ def test_listall_public(user_1, public_channel_user1):
     })
 
 
-
-def test_listall_private(user_2, private_channel_user2):
+def test_listall_private(user_1, private_channel_user2):
     """
     test for listing private channel
     """
-    response = request.get(f"{BASE_URL}/channels/listall/v2", json={
-        "token": user_2["token"]
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
+        "token": user_1["token"]
     })
     payload = response.json()
     assert payload["channels"] == [{
@@ -119,12 +125,11 @@ def test_listall_private(user_2, private_channel_user2):
     })
 
 
-
-def test_listall_both(user_1, public_channel_user1, private_channel_user2):
+def test_listall_both(user_1, user_2, public_channel_user1, private_channel_user2):
     """
     test if two channels are created by separate users
     """
-    response = request.get(f"{BASE_URL}/channels/listall/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/listall/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -242,7 +247,7 @@ def test_channel_list_private(user_2, private_channel_user2):
     Assumption: The token is correct
     Assumption: The user is only a member of one channel
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_2["token"]
     })
     payload = response.json()
@@ -263,7 +268,7 @@ def test_channel_list_public(user_1, public_channel_user1):
     Assumption: The token is correct
     Assumption: The user is only a member of one channel
     """
-    response = request.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -278,13 +283,12 @@ def test_channel_list_public(user_1, public_channel_user1):
     })
 
 
-
 def test_channel_list_empty(user_2):
     """
     Test to check if an empty list of dictionaries is returned if the user is not a member of any channels
     Assumption: The token is correct
     """
-    response = request.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_2["token"]
     })
     payload = response.json()
@@ -300,7 +304,7 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
     when the user creates and is the owner of multiple channels
     Assumption: The token is correct
     """
-    response = requests.get(f"{BASE_URL}/channels/list/v2", json={
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params={
         "token": user_1["token"]
     })
     payload = response.json()
@@ -317,3 +321,205 @@ def test_channel_list_multiple_created(user_1, public_channel_user1, private_sec
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
+def test_message_remove_invalid_mid(user_1, public_channel_user1):
+    r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_remove_no_access(user_1, user_2, public_channel_user1):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": public_channel_user1['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+    r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_2["token"],
+        "message_id": 1,
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_remove1(user_1, public_channel_user1):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello"
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "world"
+    })
+    r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_1["token"],
+        "message_id": 2,
+    })
+    assert r.status_code == 200
+    r2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "hello"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_remove2(user_1, user_2, public_channel_user1):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": public_channel_user1["channel_id"],
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_2['token'],
+        "channel_id": 1,
+        "message": "hello"
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_2['token'],
+        "channel_id": 1,
+        "message": "world"
+    })
+    r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
+        "token": user_1["token"],
+        "message_id": 2,
+    })
+    assert r.status_code == 200
+    r2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "hello"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit_invalid_message(user_1, public_channel_user1, invalid_message_text):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": invalid_message_text
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit_invalid_mid_empty(user_1, public_channel_user1):
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "user 1 new message"
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit_invalid_mid(user_1, public_channel_user1):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 2,
+        "message": "user 1 new message"
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit_no_access(user_1, user_2, public_channel_user1):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": public_channel_user1["channel_id"],
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_2["token"],
+        "message_id": 1,
+        "message": "no access"
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit1(user_1, public_channel_user1):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "new message"
+    })
+    payload = r.json()
+    assert payload == {}
+
+    r2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "new message"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_edit2(user_1, user_2, public_channel_user1):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": public_channel_user1["channel_id"],
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_2['token'],
+        "channel_id": 1,
+        "message": "hello world"
+    })
+
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "new message"
+    })
+    payload = r.json()
+    assert payload == {}
+
+    r2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "new message"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
