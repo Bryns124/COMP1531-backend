@@ -348,12 +348,10 @@ def channel_addowner_v1(token, channel_id, u_id):
         if user["u_id"] == u_id:
             user["channels_owned"].append(channel_id)
             user["channels_joined"].append(channel_id)
-            break
 
     for channel in store['channels']:
         if channel["channel_id"] == channel_id:
             channel["owner_members"].append(u_id)
-            break
 
     data_store.set(store)
     return {}
@@ -381,10 +379,9 @@ def channel_removeowner_v1(token, channel_id, u_id):
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             if auth_user_id in channel['owner_members']:
-                if len(channel['owner_members']) == 1:
+                if len(channel['owner_members']) == 1 and u_id in channel['owner_members']:
                     raise InputError(
-                        description="Auththorised user is the only owner of the channel.")
-                pass
+                        description="User id is the only owner of the channel.")
             else:
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
@@ -395,19 +392,17 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if not user_validity(u_id, store):
         raise InputError(description="User id is invalid.")
 
-    if not already_member(auth_user_id, channel_id, store):
-        raise InputError(description="Owner is not in channel.")
+    if not already_member(u_id, channel_id, store):
+        raise InputError(description="User id is not in channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
             user["channels_owned"].remove(channel_id)
             user["channels_joined"].remove(channel_id)
-            break
 
     for channel in store['channels']:
         if channel["channel_id"] == channel_id:
             channel["owner_members"].remove(u_id)
-            break
 
     data_store.set(store)
     return {}

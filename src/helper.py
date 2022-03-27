@@ -180,7 +180,4 @@ def load_data_store():
     Opens a file called datastore.p and loads it into datstore.
     """
     with open('datastore.p', 'rb') as FILE:
-        original = json.load(FILE)
-        store = data_store.get()
-        store = original
-        # data_store.set(pickle.load(FILE))
+        data_store.set(pickle.load(FILE))
