@@ -357,12 +357,12 @@ def test_message_remove1(user_1, public_channel_user1):
     })
     r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
         "token": user_1["token"],
-        "message_id": 1,
+        "message_id": 2,
     })
     assert r.status_code == 200
     r2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
-        "channel_id": 2,
+        "channel_id": 1,
         "start": 0
     })
     assert r2.status_code == 200
