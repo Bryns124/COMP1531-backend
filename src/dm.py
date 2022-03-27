@@ -37,7 +37,7 @@ def dm_create_v1(token, u_ids):
         raise InputError(description="there are duplicate u id's")
 
     if check_invalid_id(store, u_ids):
-        raise InputError
+        raise InputError(description="There is a invalid u_id")
 
     if store["dms"] == []:
         new_dm_id = 1

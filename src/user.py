@@ -92,7 +92,7 @@ def valid_user_id(user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
-        raise InputError("This auth_user_id does not exist in the datastore.")
+        raise InputError(description="This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):
@@ -111,10 +111,10 @@ def user_profile_setname_v1(token, name_first, name_last):
     decode_token(token)
 
     if not name_length_check(name_first):
-        raise InputError(
+        raise InputError(description=
             "The length of the new first name has to be within 1 and 50 characters inclusive")
     if not name_length_check(name_last):
-        raise InputError(
+        raise InputError(description=
             "The length of the new last name has to be within 1 and 50 characters inclusive")
 
     auth_user_id = decode_token(token)['auth_user_id']
@@ -144,7 +144,7 @@ def user_profile_setemail_v1(token, email):
     decode_token(token)
 
     if not valid_email(email):
-        raise InputError(
+        raise InputError(description=
             "Email entered is not of valid format or is already in use by another user")
 
     auth_user_id = decode_token(token)['auth_user_id']
@@ -174,7 +174,7 @@ def user_profile_sethandle_v1(token, handle_str):
     decode_token(token)
 
     if not valid_handle_string(store, handle_str):
-        raise InputError("""
+        raise InputError(description="""
                          The length of the handle is between 3 and 20 characters,
                          or it contains non-alphanumeric characters,
                          or it is already in-use""")
