@@ -652,12 +652,12 @@ def test_message_remove1(user_1, user_2, create_dm_2_user):
     })
     r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
         "token": user_1["token"],
-        "message_id": 1,
+        "message_id": 2,
     })
     assert r.status_code == 200
     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1['token'],
-        "dm_id": 2,
+        "dm_id": 1,
         "start": 0
     })
     assert r2.status_code == 200
