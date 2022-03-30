@@ -6,6 +6,13 @@ from src.helper import decode_token, generate_token, validate_token, already_mem
 """
 Channel contains the functionality which allows for the inviting of users, calling the
 details of channels, calling messages and joining channels. ß
+
+    channel_invite_v1: allows a user to invite another user to a channel.
+    channel_details_v1: provides the details of a channel.
+    channel_messages_v1: returns all the messages within a channel.
+    channel_join_v1: allows a user to join a channel.
+    channel_leave_v1: allows a user to leave a channel.
+
 """
 
 
@@ -14,9 +21,9 @@ def channel_invite_v1(token, channel_id, u_id):
     Allows a authorized user to invite another user to a channel they are apart of.
 
     Args:
-        auth_user_id (u_id): A valid user who is apart of the channel/
+        token (string): The token of the user who is apart of the channel.
         channel_id (channel_id): The channel id auth_user is inviting to.
-        u_id (u_id): A valid second user who is being invited
+        u_id (u_id): A valid second user who is being invited.
 
     Raises:
         InputError: u_id dos not exist in datastore.
@@ -153,23 +160,23 @@ def member_details(user_id):
     users = store['users']
     for user in users:
         if user['u_id'] == user_id:
-            return {
-                'u_id': user['u_id'],
-                'email': user['email'],
-                'name_first': user['name_first'],
-                'name_last': user['name_last'],
-                'handle_str': user['handle_str']
-            }
-    # returns None if user is not found,
-    return {'name', 'is_public', 'owner_members', "all_members"}
+            active_user = user
+
+    return {
+        'u_id': active_user['u_id'],
+        'email': active_user['email'],
+        'name_first': active_user['name_first'],
+        'name_last': active_user['name_last'],
+        'handle_str': active_user['handle_str']
+    }
 
 
 def channel_messages_v1(token, channel_id, start):
-    """_summary_
+    """
     Taking a valid user it pulls a list of up to 50 messages from a starting
     point and returns them.
     Args:
-        auth_user_id (_u_id): The valid id of the user calling the messages.
+        token (string): The token of the user calling the messages.
         channel_id (channel_id): The channel_id of the channel which to call the
         messages from.
         start (int): A starting index value.
@@ -191,18 +198,19 @@ def channel_messages_v1(token, channel_id, start):
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel_exist = True
+            active_channel = channel
 
     if not channel_exist:
         raise InputError(
             description="The input channel_id does not exist in the datastore.")
 
-    if len(store['channels'][channel_id - 1]['messages']) < start:
+    if len(active_channel['messages_list']) < start:
         raise InputError(
             description="Your start value is greater than the messages in the channel.")
 
     in_channel = False
-
-    for members in store['channels'][channel_id - 1]['all_members']:
+    for members in active_channel['all_members']:
+        # do i need to contunue using tokens or do i need to extract auth_user_id
         if members == decode_token(token)['auth_user_id']:
             in_channel = True
 
@@ -210,10 +218,14 @@ def channel_messages_v1(token, channel_id, start):
         raise AccessError(description="You are not part of that channel.")
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
-    for messages in store['channels'][channel_id - 1]['messages']:
-        if messages['message_id'] >= start & messages['message_id'] < (start + 50):
-            returned_messages['messages'].append(messages)
-        elif messages['message_id'] == (start + 50):
+    number_of_messages = 0
+    for message_id in list(reversed(active_channel['messages_list']))[start: start + 50]:
+        for message in store['messages']:
+            if message['message_id'] == message_id:
+                returned_messages['messages'].append(message)
+                number_of_messages += 1
+
+        if number_of_messages == 50:
             returned_full = True
 
     if returned_full:
@@ -232,7 +244,7 @@ def channel_join_v1(token, channel_id):
     """
     store = data_store.get()
 
-    valid_auth_user_id(decode_token(token)['auth_user_id'])
+    decode_token(token)['auth_user_id']
 
     if not channel_validity(channel_id, store):
         raise InputError(description="Channel id is invalid.")
@@ -313,13 +325,10 @@ def channel_addowner_v1(token, channel_id, u_id):
     """
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
-    valid_auth_user_id(auth_user_id)
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            if auth_user_id in channel['owner_members']:
-                pass
-            else:
+            if not (auth_user_id in channel['owner_members']):
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
 
@@ -365,7 +374,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
     """
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
-    valid_auth_user_id(auth_user_id)
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:

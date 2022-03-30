@@ -1,5 +1,6 @@
 import code
 from os import access
+from xml.dom.expatbuilder import parseFragment
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
@@ -68,37 +69,13 @@ def channel_public(user_1):
         "is_public": True
     })
     return r.json()
-# def test_message_edit(user_1):
-#     # craete channel, send message
-#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-#         "token": user_1["token"],
-#         "message_id": 1,
-#         "message": "user 1 new message"
-#     })
-#     payload = r.json()
-#     assert payload == {}
-#     clear_v1()
 
 
-def test_login_invalid_email():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_login_invalid_email(email_1):
 
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle@gmailcom",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryanle@gmial.com",
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryan..le@gmail.com",
+        "email": email_1,
         "password": "password123",
     })
     assert r.status_code == InputError.code
@@ -125,7 +102,7 @@ def test_login_incorrect_email(user_1):
 
 def test_login_incorrect_password(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "bryan.le@gmailcom",
+        "email": "mikey@unsw.com",
         "password": "password456",
     })
     assert r.status_code == InputError.code
@@ -171,10 +148,11 @@ def test_auth_register_user_created_sucessfully_v2():
     })
 
 
-def test_register_invalid_email_v2():
+@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
+def test_register_invalid_email_v2(email_1):
     # not sure how to fit all the invalid email cases
     request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmailcom",
+        "email": email_1,
         "password": "password123",
         "name_first": "Bryan",
         "name_last": "Le"
@@ -319,9 +297,9 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
         "token": body2['token'],
         "channel_id": channel_public['channel_id'],
     })
-    details = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    details = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": int(channel_public['channel_id'])
     })
     body3 = details.json()
     for users in body3['all_members']:
@@ -340,8 +318,8 @@ def test_handle_generated_correctly_v2(user_1, channel_public, name_first, name_
 
 def test_handles_appends_correctly(user_1, channel_public):
     handles = ["mikeytest", "abcdef", 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
-               'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10']
-    for _ in range(12):
+               'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10', 'abcdef11', 'abcdef12', 'abcdef13', 'abcdef14', 'abcdef15', 'abcdef16', 'abcdef17', 'abcdef18', 'abcdef19', 'abcdef20']
+    for _ in range(22):
         request = requests.post(f"{BASE_URL}/auth/register/v2", json={
             "email": f"bryanle{_}@gmail.com",
             "password": "password123",
@@ -353,9 +331,9 @@ def test_handles_appends_correctly(user_1, channel_public):
             "token": body['token'],
             "channel_id": channel_public['channel_id'],
         })
-    data = requests.get(f"{BASE_URL}/channel/details/v2", json={
+    data = requests.get(f"{BASE_URL}/channel/details/v2", params={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id']
+        "channel_id": int(channel_public['channel_id'])
     })
     body = data.json()
     for users in body['all_members']:
@@ -371,6 +349,20 @@ def test_auth_logout(user_1, channel_public):
     })
     r = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    assert r.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={
+
+    })
+
+
+def test_auth_logout_user_2(user_1, channel_public, user_2):
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_2['token']
+    })
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
     })
     assert r.status_code == AccessError.code

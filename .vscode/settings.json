@@ -1,4 +1,9 @@
 {
+<<<<<<< HEAD
     "python.pythonPath": "/tmp_amd/adams/export/adams/1/z5361001/1531/1531/bin/python3",
     "python.linting.pylintEnabled": true
+=======
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+>>>>>>> 79df815fa1982f60aa6874d83a3355aeb0426e94
 }
