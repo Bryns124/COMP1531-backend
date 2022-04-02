@@ -3,7 +3,7 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import decode_token, generate_token
+from src.helper import decode_token, generate_token, load_user
 import hashlib
 """
 Auth has three main functions: register, login and logout
@@ -55,15 +55,17 @@ def auth_register_v1(email, password, name_first, name_last):
     if not email_check(email):
         raise InputError(description="Email entered is not a valid email")
     if duplicate_email_check(email):
-        raise InputError(description="Email entered has already been registered")
+        raise InputError(
+            description="Email entered has already been registered")
     if len(password) < 6:
-        raise InputError(description="Password entered must be longer than 6 characters")
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description=
-            "First name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="First name entered must be between 1 and 50 characters inclusive")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description=
-            "Last name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="Last name entered must be between 1 and 50 characters inclusive")
 
     user = create_user(email, password, name_first, name_last)
     return {
@@ -167,11 +169,8 @@ def auth_logout_v1(token):
         token (string): token of user, obtained when logging on or when registering.
     """
     store = data_store.get()
-
-    for user in store['users']:
-        if user['u_id'] == decode_token(token)['auth_user_id']:
-            user['session_id'].remove(decode_token(token)['session_id'])
-
+    user = load_user(decode_token(token)['auth_user_id'])
+    user['session_id'][decode_token(token)['session_id'] - 1] = False
     data_store.set(store)
 
 ###############################################################

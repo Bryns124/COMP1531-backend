@@ -25,6 +25,11 @@ Example usage:
 '''
 
 # YOU SHOULD MODIFY THIS OBJECT BELOW
+from curses.ascii import US
+from email import message
+from lib2to3.pytree import Base
+
+
 initial_object = {
     'users': [
         # {
@@ -63,7 +68,7 @@ initial_object = {
         #     'end': 75,
         # }
     ],
-    'messages':[
+    'messages': [
         #        {
         #            'message_id': 1,
         #            'u_id': 1,
@@ -95,7 +100,6 @@ initial_object = {
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 # YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
-
 
 class Datastore:
     def __init__(self):
