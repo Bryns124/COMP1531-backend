@@ -21,8 +21,7 @@ def generate_token(u_id):
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == u_id:
-            user['session_id'].append(
-                True)  # potential bug
+            user['session_id'].append(True)  # potential bug
     token = jwt.encode(
         {'auth_user_id': u_id, 'session_id': len(user['session_id'])}, SECRET, algorithm="HS256")
     data_store.set(store)
