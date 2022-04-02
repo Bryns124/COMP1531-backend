@@ -1,7 +1,8 @@
 from base64 import decode
+from json import load
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details
+from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details, load_channel , load_message, load_user
 
 """
 Channel contains the functionality which allows for the inviting of users, calling the
@@ -35,17 +36,9 @@ def channel_invite_v1(token, channel_id, u_id):
         dictionary: nothing! nothing is returned after a invite
     """
     store = data_store.get()
-
-    user_exist = False
     auth_user_id = decode_token(token)['auth_user_id']
     valid_auth_user_id(auth_user_id)
-    for user in store['users']:
-        if u_id == user['u_id']:
-            user_exist = True
-
-    if not user_exist:
-        raise InputError(
-            description="The input u_id does not exist in the datastore.")
+    load_user(auth_user_id)
 
     if not channel_validity(channel_id, store):
         raise InputError(
@@ -59,13 +52,14 @@ def channel_invite_v1(token, channel_id, u_id):
         raise AccessError(
             description="You are not apart of the channel you are trying to invite to.")
 
-    for channel in store['channels']:
-        for user in store['users']:
-            if u_id == user['u_id']:
-                invited_member = user['u_id']
-                user['channels_joined'].append(channel)
-        if channel["channel_id"] == channel_id:
-            channel['all_members'].append(invited_member)
+    user = load_user(u_id)
+    channel = load_channel(channel_id)
+    
+    invited_member = user['u_id']
+    user['channels_joined'].append(channel)
+    channel['all_members'].append(invited_member)
+
+
     data_store.set(store)
     return {
     }

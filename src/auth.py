@@ -3,7 +3,7 @@ import re
 from src.data_store import data_store, User
 from src.error import InputError
 import jwt
-from src.helper import decode_token, generate_token
+from src.helper import decode_token, generate_token, load_user
 import hashlib
 # from src.userclass.py import User
 
@@ -131,12 +131,10 @@ def auth_logout_v1(token):
         token (string): token of user, obtained when logging on or when registering.
     """
     store = data_store.get()
-
-    for user in store['users']:
-        if user['u_id'] == decode_token(token)['auth_user_id']:
-            user['session_id'].remove(decode_token(token)['session_id'])
-
+    user = load_user(decode_token(token)['auth_user_id'])
+    user['session_id'][decode_token(token)['session_id'] - 1] = False
     data_store.set(store)
+
 
 ###############################################################
 ##                 Checking functions                        ##
@@ -153,49 +151,6 @@ def hash_password(password):
         string: Hashed password
     """
     return hashlib.sha256(password.encode()).hexdigest()
-
-
-def create_handle(name_first, name_last):
-    """
-    Creates the user's handle with the first name and last name.
-    If the user's handle is more than 20 characters, it is cut off at 20 characters
-    If the user's handle already exists, append the handle with the smallest number
-    (starting from 0).
-
-    :name_first: the user's first name
-    :name_last: the user's last name
-    :return: the user's handle
-    :rtype: string
-    """
-    store = data_store.get()
-
-    handle = name_first.lower() + name_last.lower()
-    handle = ''.join(filter(str.isalnum, handle))
-    handle = handle[:20]
-
-    i = 0
-    for user in store['users']:
-        if user.handle_str == handle:
-            if i == 0:
-                handle += str(0)
-                i += 1
-                continue
-            if i == 10:
-                handle = handle[:-1] + str(i)
-                i += 1
-                continue
-            if i % 10 == 1 and i > 10:
-                handle = handle[:-2] + str(i)
-                i += 1
-                continue
-            if i % 10 == 0:
-                handle = handle[:-2] + str(i)
-                i += 1
-                continue
-            handle = handle[:-1] + str(i % 10)
-            i += 1
-
-    return handle
 
 
 def email_check(email):

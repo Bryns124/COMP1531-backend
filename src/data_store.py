@@ -98,7 +98,6 @@ initial_object = {
 
 # YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
 
-
 class Datastore:
     def __init__(self):
         self.__store = initial_object

@@ -21,10 +21,9 @@ def generate_token(u_id):
     store = data_store.get()
     for user in store['users']:
         if user['u_id'] == u_id:
-            user['session_id'].append(
-                len(user['session_id']) + 1)  # potential bug
+            user['session_id'].append(True)  # potential bug
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': len(user['session_id'])}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
 
@@ -57,9 +56,8 @@ def validate_token(token_data):
     token_valid = False
     for user in store['users']:
         if user['u_id'] == token_data['auth_user_id']:
-            for session in user['session_id']:
-                if token_data['session_id'] == session:
-                    token_valid = True
+            if user['session_id'][token_data['session_id'] - 1] == True:
+                token_valid = True
 
     if not token_valid:
         raise AccessError(description="This token is invalid.")
@@ -181,3 +179,35 @@ def load_data_store():
     """
     with open('datastore.p', 'rb') as FILE:
         data_store.set(pickle.load(FILE))
+
+
+def load_channel(channel_id):
+    store = data_store.get()
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            return channel
+    raise InputError(description="Could not locate channel")
+
+
+def load_user(u_id):
+    store = data_store.get()
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            return user
+    raise InputError(description="Could not locate user")
+
+
+def load_message(message_id):
+    store = data_store.get()
+    for message in store['messages']:
+        if message['message_id'] == message_id:
+            return message
+    raise InputError(description="Could not locate message")
+
+
+def load_dm(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return dm
+    raise InputError(description="Could not locate dm")
