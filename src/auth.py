@@ -5,6 +5,8 @@ from src.error import InputError
 import jwt
 from src.helper import decode_token, generate_token
 import hashlib
+from src.userclass.py import User
+
 """
 Auth has three main functions: register, login and logout
 
@@ -65,10 +67,13 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(description=
             "Last name entered must be between 1 and 50 characters inclusive")
 
-    user = create_user(email, password, name_first, name_last)
+    new_user = User(
+        session_id, password, permission_id,
+        email, name_first, name_last, channels, dms, messages_sent, handle
+    )
     return {
-        'token': generate_token(user['u_id']),
-        'auth_user_id': user['u_id']
+        'token': generate_token(User(new_user).auth_user_id),
+        'auth_user_id': User(new_user).auth_user_id
     }
 
 
