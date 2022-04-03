@@ -28,7 +28,7 @@ import hashlib
 # YOU SHOULD MODIFY THIS OBJECT BELOW
 
 initial_object = {
-    'users': [
+    'users': {
         # {
         # 'u_id' : , check if is ok
         # 'session_id':[],
@@ -41,8 +41,8 @@ initial_object = {
         # 'channels_owned' : [],
         # 'channels_joined' : [],
         # }
-    ],
-    'channels': [
+    },
+    'channels': {
         # {
         #     'channel_id' : ,
         #     'channel_name' : "",
@@ -53,8 +53,8 @@ initial_object = {
         #     'start': 25,
         #     'end': 75,
         # }
-    ],
-    'dms': [
+    },
+    'dms': {
         # {
         #     'dm_id' : ,
         #     'name' : "",
@@ -64,7 +64,7 @@ initial_object = {
         #     'start': 25,
         #     'end': 75,
         # }
-    ],
+    },
     'messages': [
         #        {
         #            'message_id': 1,

@@ -14,9 +14,9 @@ def clear_v1():
         empty dictionary: {} as this is the inital stage of data_store
     """
     store = data_store.get()
-    store['users'] = []
-    store['channels'] = []
-    store['dms'] = []
+    store['users'] = {}
+    store['channels'] = {}
+    store['dms'] = {}
     store['messages'] = []
     store['removed_users'] = []
     data_store.set(store)

@@ -31,7 +31,7 @@ def auth_login_v1(email, password):
     :return: token, u_id
     """
     store = data_store.get()
-    for user in store['users']:
+    for user in store['users'].values():
         if user.email == email:
             if user.password == hash_password(password):
                 return {
@@ -72,7 +72,8 @@ def auth_register_v1(email, password, name_first, name_last):
     new_user = User(email, name_first, name_last,
                     create_handle(name_first, name_last), hash_password(password))
     store = data_store.get()
-    store['users'].append({'{new_user.id}': new_user})
+    store['users'][new_user.u_id] = new_user
+    data_store.set(store)
     return {
         'token': generate_token(new_user.u_id),
         'auth_user_id': new_user.u_id
@@ -132,7 +133,7 @@ def auth_logout_v1(token):
     """
     store = data_store.get()
     user = load_user(decode_token(token)['auth_user_id'])
-    user.session_id[decode_token(token)['session_id'] - 1] = False
+    user.session_id[decode_token(token)['session_id']] = False
     data_store.set(store)
 
 
@@ -158,7 +159,7 @@ def create_handle(name_first, name_last):
     handle = handle[:20]
 
     i = 0
-    for user in store['users']:
+    for user in store['users'].values():
         if user.handle_str == handle:
             if i == 0:
                 handle += str(0)
@@ -217,7 +218,11 @@ def duplicate_email_check(email):
     """
     store = data_store.get()
     does_email_exist = False
-    for user in store['users']:
-        if user.email == email:
-            does_email_exist = True
-    return does_email_exist
+    try:
+        for user in store['users'].values():
+            if user.email == email:
+                does_email_exist = True
+        return does_email_exist
+    except:
+        does_email_exist = True
+        return does_email_exist

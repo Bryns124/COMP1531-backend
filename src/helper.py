@@ -19,11 +19,9 @@ def generate_token(u_id):
     """
     valid_auth_user_id(u_id)
     store = data_store.get()
-    for user in store['users']:
-        if user.u_id == u_id:
-            user.session_id.append(True)  # potential bug
+    store['users'][u_id].session_id.append(True)
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': len(user['session_id'])}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': len(store['users'][u_id].session_id) - 1}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
 
@@ -74,13 +72,9 @@ def valid_auth_user_id(auth_user_id):
     """
     store = data_store.get()
 
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user.u_id:
-            auth_user_exist = True
-
-    if not auth_user_exist:
+    try:
+        store['users'][auth_user_id]
+    except:
         raise AccessError(
             description="This auth_user_id does not exist in the datastore.")
 
@@ -191,10 +185,10 @@ def load_channel(channel_id):
 
 def load_user(u_id):
     store = data_store.get()
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            return user
-    raise InputError(description="Could not locate user")
+    try:
+        return store['users'][u_id].values()
+    except:
+        raise InputError(description="Could not locate user")
 
 
 def load_message(message_id):
