@@ -26,70 +26,27 @@ Example usage:
 
 # YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [
-        # {
-        # 'u_id' : , check if is ok
-        # 'session_id':[],
-        # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
-        # 'email': "", check if using empty string is ok
-        # 'name_first': "",
-        # 'name_last': "",
-        # 'handle_str': "" ,
-        # 'password': "",
-        # 'channels_owned' : [],
-        # 'channels_joined' : [],
-        # }
-    ],
-    'channels': [
-        # {
-        #     'channel_id' : ,
-        #     'channel_name' : "",
-        #     'is_public' : None, #check if we can use None
-        #     'owner_members' : ['u_id'], #check again if this is leagal
-        #     'all_members' : ['u_id'],
-        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
-        #     'start': 25,
-        #     'end': 75,
-        # }
-    ],
-    'dms': [
-        # {
-        #     'dm_id' : ,
-        #     'name' : "",
-        #     'owner_members' : ['u_id'], #check again if this is leagal
-        #     'all_members' : ['u_id'],
-        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
-        #     'start': 25,
-        #     'end': 75,
-        # }
-    ],
-    'messages':[
-        #        {
-        #            'message_id': 1,
-        #            'u_id': 1,
-        #            'message': 'Hello world',
-        #            'time_sent': 1582426789,
-        #            'is_ch_message': True, #this is a channel message
-        #        },
-        #        {
-        #            'message_id': 1,
-        #            'u_id': 1,
-        #            'message': 'Hello world',
-        #            'time_sent': 1582426789,
-        #            'is_ch_message': False, #this is a dm message
-        #        }
-        #       ],
-        # }
-    ],
-    "removed_users": [
-        # {
-        # 'u_id' : , check if is ok
-        # 'email': "", check if using empty string is ok
-        # 'name_first': "",
-        # 'name_last': "",
-        # 'handle_str': "" ,
-        # }
-    ]
+    "users" : {
+        # auth_user_id : class object,
+        # auth_user_id : class object
+    },
+    "channels" : {
+        # channel_id : class object,
+        # channel_id : class object
+    },
+    "dms" : {
+        # dm_id : clas object,
+        # dm_id : class object
+    },
+    "messages" : {
+        # message_id : clas object,
+        # message_id : class object
+    },
+    "removed_users" :{
+        # channel_id : class object,
+        # channel_id : class object
+    }
+
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
