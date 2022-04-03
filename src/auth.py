@@ -1,10 +1,11 @@
 from operator import truediv
 import re
-from src.data_store import data_store, User
+from src.data_store import data_store
 from src.error import InputError
 import jwt
 from src.helper import generate_token, decode_token, load_user
 import hashlib
+from src.userclass import User
 
 
 def auth_login_v1(email, password):
