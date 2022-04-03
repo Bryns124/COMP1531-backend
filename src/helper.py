@@ -38,7 +38,11 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    token_data = jwt.decode(token, SECRET, algorithms="HS256")
+    try :
+        token_data = jwt.decode(token, SECRET, algorithms="HS256")
+    except:
+        # raise Error
+        pass
     validate_token(token_data)
     return token_data
 
