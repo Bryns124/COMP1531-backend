@@ -12,10 +12,10 @@ class User:
         self.email = email
         self.handle = handle
         self.password = password
-        self.channels_owned = []
-        self.channels_joined = []
-        self.messages_sent = []
-        self.dms_own = []
+        self.channels_owned = {}
+        self.channels_joined = {}
+        self.messages_sent = {}
+        self.dms_own = {}
         self.set_session_id()
 
     def set_u_id(self):
@@ -34,6 +34,12 @@ class User:
 
     def check_session(self, session_id):
         return self.session_id[session_id]
+
+    def add_ch_owned(self, ch_id, ch_object):
+        self.channels_owned[ch_id] = ch_object
+
+    def add_ch_joined(self, ch_id, ch_object):
+        self.channels_joined[ch_id] = ch_object
 
     def set_permission_id(self):
         try:
