@@ -120,7 +120,7 @@ class User:
 
 
 class Base_channel:
-    def __init__(self, auth_user_id, name, is_public):
+    def __init__(self, auth_user_id, name):
         self.id = self.set_ch_id()
         self.name = name
         self.owner_members = []
@@ -152,16 +152,40 @@ class Base_channel:
     def set_end(self):
         return 50
 
+    def get_type(self):
+        store = data_store.get()
+        if self.id in store['channels']:
+            return "channel"
+        elif self.id in store['dms']:
+            return "dm"
 
+    def check_msg_list(self, message_id):
+        if message_id in self.message_list:
+            return True
+        else:
+            return False
 class Channel(Base_channel):
     def __init__(self, is_public):
         self.is_public = is_public
 
 
-class message:
-    def __init__(self, message_id, u_id, message, time_sent, is_ch_message):
-        self.message_id = message_id
+class Message:
+    def __init__(self, u_id, message, time_sent, parent):
+        self.id = self.set_message_id()
         self.u_id = u_id
         self.message = message
         self.time_sent = time_sent
-        self.is_ch_message = is_ch_message
+        self.parent = parent
+
+    def set_message_id(self):
+        store = data_store.get()
+        if store['messages'] == {}:
+            return 1
+        else:
+            return len(store['messages']) + 1
+
+    def get_owner(self):
+        return self.u_id
+
+    def get_parent_type(self):
+        return self.parent.get_type
