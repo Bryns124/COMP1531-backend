@@ -3,23 +3,8 @@ import re
 from src.data_store import data_store, User
 from src.error import InputError
 import jwt
-from src.helper import decode_token, generate_token, load_user
+from src.helper import generate_token, decode_token, load_user
 import hashlib
-# from src.userclass.py import User
-
-"""
-Auth has three main functions: register, login and logout
-
-Functions:
-    auth_login_v1: logs in a registered user
-    auth_register_v1: registers a new user
-    auth_logout_v1: logs a user out
-
-        create_user: initialises a new user
-            create_handle: creates handle for new user
-        email_check: checks if email is valid
-        duplicate_email_check: checks if email has already been registered.
-"""
 
 
 def auth_login_v1(email, password):
@@ -44,16 +29,6 @@ def auth_login_v1(email, password):
 
 
 def auth_register_v1(email, password, name_first, name_last):
-    """
-    Registers in a new user given the email, password, first name and last name.
-
-    :param email: the user's email
-    :param password: the user's password
-    :name_first: the user's first name
-    :name_last: the user's last name
-    :return: token, u_id
-    :rtype: dictionary
-    """
     if not email_check(email):
         raise InputError(description="Email entered is not a valid email")
     if duplicate_email_check(email):
@@ -69,60 +44,17 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(
             description="Last name entered must be between 1 and 50 characters inclusive")
 
-    new_user = User(email, name_first, name_last,
-                    create_handle(name_first, name_last), hash_password(password))
+    new_user = User(
+        email,  name_first, name_last, create_handle(
+            name_first, name_last), hash_password(password)
+    )
     store = data_store.get()
     store['users'][new_user.u_id] = new_user
     data_store.set(store)
     return {
-        'token': generate_token(new_user.u_id),
-        'auth_user_id': new_user.u_id
+        "token": generate_token(new_user.u_id),
+        "auth_user_id": new_user.u_id
     }
-
-
-# def create_user(email, password, name_first, name_last):
-#     """
-#     Initialises the user's details and saves it into data_store.
-
-#     :param email: the user's email
-#     :param password: the user's password
-#     :name_first: the user's first name
-#     :name_last: the user's last name
-#     :return: the user's details
-#     :rtype: dictionary
-#     """
-#     store = data_store.get()
-#     if (store['users'] == []):
-#         new_id = len(store['users']) + 1
-#         user = {
-#             'u_id': new_id,
-#             'session_id': [],
-#             'email': email,
-#             'permission_id': 1,
-#             'name_first': name_first,
-#             'name_last': name_last,
-#             'handle_str': create_handle(name_first, name_last),
-#             'password': hash_password(password),
-#             'channels_owned': [],
-#             'channels_joined': [],
-#         }
-#     else:
-#         new_id = len(store['users']) + len(store["removed_users"]) + 1
-#         user = {
-#             'u_id': new_id,
-#             'session_id': [],
-#             'email': email,
-#             'permission_id': 2,
-#             'name_first': name_first,
-#             'name_last': name_last,
-#             'handle_str': create_handle(name_first, name_last),
-#             'password': hash_password(password),
-#             'channels_owned': [],
-#             'channels_joined': [],
-#         }
-#     store['users'].append(user)
-#     data_store.set(store)
-#     return user
 
 
 def auth_logout_v1(token):
@@ -182,17 +114,9 @@ def create_handle(name_first, name_last):
 
     return handle
 
-
-def hash_password(password):
-    """_summary_
-    Encodes the password given when registering.
-    Args:
-        password (string): Users input plantext password.
-
-    Returns:
-        string: Hashed password
-    """
-    return hashlib.sha256(password.encode()).hexdigest()
+########################################
+###### - - HELPER FUNCTIONS - - #######
+######################################
 
 
 def email_check(email):
@@ -206,6 +130,18 @@ def email_check(email):
     regex = re.compile(
         r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     return bool(re.fullmatch(regex, email))
+
+
+def hash_password(password):
+    """_summary_
+    Encodes the password given when registering.
+    Args:
+        password (string): Users input plantext password.
+
+    Returns:
+        string: Hashed password
+    """
+    return hashlib.sha256(password.encode()).hexdigest()
 
 
 def duplicate_email_check(email):

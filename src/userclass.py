@@ -1,35 +1,49 @@
-from src.helper import decode_token, generate_token
+from src.data_store import data_store
 
-u_id = 1
 class User:
-
     def __init__(
-        self, session_id, password, permission_id,
-        email, name_first, name_last, channels, dms, messages_sent, handle
+        self, email, password, name_first, name_last, handle
     ):
-        global u_id
+        self.auth_user_id = self.set_u_id()
+        self.permission_id = 0
+        self.session_id = []  # double check if correct
+        self.name_first = name_first
+        self.name_last = name_last
+        self.email = email
+        self.handle = handle
+        self.password = password
+        self.channels_owned = {}
+        self.channels_joined = {}
+        self.messages_sent = {}
+        self.dms_own = {}
+        self.set_session_id()
 
+    def set_u_id(self):
+        try:
+            store = data_store.get()
+            return len(store['users']) + 1
+        except:
+            return 1
 
-        self.__auth_user_id = u_id
-        self.__session_id = session_id
-        self.__password = password
-        self.__permission_id = permission_id
-        self.__email = email
-        self.__name_first = name_first
-        self.__name_last = name_last
-        self.__channels = channels
-        self.__dms = dms
-        self.__messages_sent = messages_sent
-        self.__handle = handle
+    def set_session_id(self):
+        self.session_id.append(True)
+        return len(self.session_id) - 1 #session ids are starting at 2 for some reason
 
-        u_id += 1
+    def session_logout(self, session_id):
+        self.session_id[session_id] = False #might be indexed wrong
 
-    def setname(self, new_name_first, new_name_last):
-        self.__name_first = new_name_first
-        self.__name_last = new_name_last
+    def check_session(self, session_id):
+        return self.session_id[session_id]
 
-    def setemail(self, new_email):
-        self.__email = new_email
+    def add_ch_owned(self, ch_id, ch_object):
+        self.channels_owned[ch_id] = ch_object
 
-    def sethandle(self, new_handle):
-        self.__handle = new_handle
+    def add_ch_joined(self, ch_id, ch_object):
+        self.channels_joined[ch_id] = ch_object
+
+    def set_permission_id(self):
+        try:
+            len(data_store.get()['users'])
+            return 2
+        except:
+            return 1

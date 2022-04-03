@@ -2,6 +2,8 @@ from base64 import decode
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
+from src.userclass import User
+from src.channeldmclass import Channel
 """Channels has the 3 functions: create, list, listall
 
 Functions:
@@ -27,59 +29,28 @@ def channels_list_v1(token):
 
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
+    owned_dict = store["users"][auth_user_id].channels_owned
+    joined_dict = store["users"][auth_user_id].channels_joined
 
-    for accounts in store['users']:
-        if accounts['u_id'] == auth_user_id:
-            output_list = create_list_dictionary(accounts)
+    output = []
+
+    for owned in owned_dict:
+        new_owned = {
+            "channel_id" : owned,
+            "name" : owned_dict[owned].name
+        }
+        output.append(new_owned)
+
+    for joined in joined_dict:
+        new_joined = {
+            "channel_id" : joined,
+            "name" : joined_dict[joined].name
+        }
+        output.append(new_joined)
+
     return {
-        'channels': output_list
+        'channels': output
     }
-    # {
-    #     'channels': [
-    #         {
-    #             'channel_id': (channel id)
-    #             'name': (channel name)
-    #         }
-    #     ]
-    # }
-
-
-def create_list_dictionary(accounts):
-    """ Appends the list of dictionaries stored in the 'channels_owned'
-    and 'channels_joined' dictionaries in the data store, representing all
-    the channels the user is associated with.
-
-    Args:
-        Accounts: accounts is the account of that given user
-    Raises:
-        None
-
-    Returns:
-        List of dictionaries
-    """
-
-    output_list = []
-    for owned in accounts['channels_owned']:
-        channel = {
-            'channel_id': owned['channel_id'],
-            'name': owned['name']
-        }
-        output_list.append(channel)
-
-    for joined in accounts['channels_joined']:
-        channel = {
-            'channel_id': joined['channel_id'],
-            'name': joined['name']
-        }
-        output_list.append(channel)
-    return output_list
-    # [
-    #     {
-    #         'channel_id': (channel id),
-    #         'name': (channel name)
-    #     }
-    # ]
-
 
 def channels_listall_v1(token):
     """ Lists all the channels created, both private and public
@@ -94,15 +65,15 @@ def channels_listall_v1(token):
         Dictionary containing list of dictionaries:
     """
 
-    store = data_store.get()
-    store_channels = store['channels']
     decode_token(token)['auth_user_id']
+    channels = data_store.get()["channels"]
+
 
     all_channels = []
-    for channel in store_channels:
+    for channel in channels:
         channel_dict = {
-            'channel_id': channel['channel_id'],
-            'name': channel['name'],
+            "channel_id" : channel,
+            "name" : channels[channel].name
         }
         all_channels.append(channel_dict)
 
@@ -147,25 +118,13 @@ def channels_create_v1(token, name, is_public):
         raise InputError(
             description="The name of the channel cannot be less than 1 character.")
 
-    new_channel_id = len(store['channels']) + 1
-    new_channel = {
-        'channel_id': new_channel_id,
-        'name': name,
-        'is_public': is_public,
-        'owner_members': [auth_user_id],
-        'all_members': [auth_user_id],
-        'messages_list': [],
-        'start': 0,  # ditto
-        'end': 50,
-    }
-
-    for users in store['users']:
-        if users['u_id'] == auth_user_id:
-            users['channels_owned'].append(new_channel)
-
-    store['channels'].append(new_channel)
+    new_channel = Channel(auth_user_id, name, is_public)
+    store = data_store.get()
+    store["channels"][new_channel.channel_id] = new_channel
+    store["users"][auth_user_id].add_ch_owned(new_channel.channel_id, new_channel)
+    new_channel.add_owner(auth_user_id)
     data_store.set(store)
 
     return {
-        'channel_id': store['channels'][-1]['channel_id']
+        'channel_id': new_channel.channel_id
     }
