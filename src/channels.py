@@ -3,7 +3,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
 from src.userclass import User
-from src.channeldmclass import Channel
+from src.channelclass import Channel
 """Channels has the 3 functions: create, list, listall
 
 Functions:
@@ -29,24 +29,16 @@ def channels_list_v1(token):
 
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
-    owned_dict = store["users"][auth_user_id].channels_owned
-    joined_dict = store["users"][auth_user_id].channels_joined
+    channels = store["users"][auth_user_id].all_channels
 
     output = []
 
-    for owned in owned_dict:
-        new_owned = {
-            "channel_id" : owned,
-            "name" : owned_dict[owned].name
+    for channel in channels:
+        temp = {
+            "channel_id" : channel,
+            "name" : channels[channel].name
         }
-        output.append(new_owned)
-
-    for joined in joined_dict:
-        new_joined = {
-            "channel_id" : joined,
-            "name" : joined_dict[joined].name
-        }
-        output.append(new_joined)
+        output.append(temp)
 
     return {
         'channels': output
@@ -122,7 +114,10 @@ def channels_create_v1(token, name, is_public):
     store = data_store.get()
     store["channels"][new_channel.channel_id] = new_channel
     store["users"][auth_user_id].add_ch_owned(new_channel.channel_id, new_channel)
-    new_channel.add_owner(auth_user_id)
+    store["users"][auth_user_id].add_channel(new_channel.channel_id, new_channel)
+
+    new_channel.add_owner(auth_user_id, store["users"][auth_user_id])
+    new_channel.add_member(auth_user_id, store["users"][auth_user_id])
     data_store.set(store)
 
     return {

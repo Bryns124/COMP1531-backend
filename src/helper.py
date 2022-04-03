@@ -4,6 +4,8 @@ from datetime import timezone
 import datetime
 import jwt
 import pickle
+from src.userclass import User
+from src.channelclass import Channel
 
 SECRET = "ANT"
 
@@ -88,9 +90,8 @@ def channel_validity(channel_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            return True
+    if channel_id in store["channels"]:
+        return True
     return False
 
 
@@ -104,9 +105,8 @@ def user_validity(u_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for users in store['users']:
-        if users['u_id'] == u_id:
-            return True
+    if u_id in store["users"]:
+        return True
     return False
 
 
@@ -122,10 +122,12 @@ def already_member(auth_user_id, channel_id, store):
     Returns:
         Boolean: Returns true if the user already is a member of the channel
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
-                return True
+    channels = store["users"][auth_user_id].all_channels
+    if channel_id in channels:
+        return True
+    # members = store["channels"][channel_id].all_members
+    # if auth_user_id in members:
+    #     return True
     return False
 
 
@@ -184,9 +186,9 @@ def load_channel(channel_id):
 
 def load_user(u_id):
     store = data_store.get()
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            return user
+    if u_id in store["users"]:
+        return True
+
     raise InputError(description="Could not locate user")
 
 

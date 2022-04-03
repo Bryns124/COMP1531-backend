@@ -13,7 +13,7 @@ class User:
         self.handle = handle
         self.password = password
         self.channels_owned = {}
-        self.channels_joined = {}
+        self.all_channels = {}
         self.messages_sent = {}
         self.dms_own = {}
         self.set_session_id()
@@ -38,8 +38,15 @@ class User:
     def add_ch_owned(self, ch_id, ch_object):
         self.channels_owned[ch_id] = ch_object
 
-    def add_ch_joined(self, ch_id, ch_object):
-        self.channels_joined[ch_id] = ch_object
+    def remove_ch_owned(self, ch_id):
+        remove = self.channels_owned.pop(ch_id, None)
+
+    def add_channel(self, ch_id, ch_object):
+        self.all_channels[ch_id] = ch_object
+
+    def channel_leave(self, ch_id):
+        leave_all = self.all_channels.pop(ch_id, None)
+        leave_owner = self.channels_owned.pop(ch_id, None)
 
     def set_permission_id(self):
         try:
