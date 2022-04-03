@@ -5,7 +5,7 @@ from src.auth import auth_register_v1
 from src.other import clear_v1
 from src.error import AccessError, InputError
 from src.helper import SECRET
-from src.config import port
+from src.config import port, url
 import json
 from flask import Flask
 import requests
@@ -13,7 +13,7 @@ import urllib
 import jwt
 import requests
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 
 
 @pytest.fixture
@@ -280,3 +280,28 @@ def test_setname_lastname_long(user_1):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_user_profile_removed_user(user_1, user_2):
+    request_delete = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert request_delete.status_code == 200
+
+    response = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+
+    payload = response.json()
+    assert payload == {
+        'user': {
+            'u_id': user_2['auth_user_id'],
+            'email': "adi@gmail.com",
+            'name_first': "Removed",
+            'name_last': "user",
+            'handle_str': "adiyatrahman"
+        }
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+

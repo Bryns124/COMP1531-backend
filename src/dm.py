@@ -157,7 +157,6 @@ def dm_remove_v1(token, dm_id):
     while i < len(store["dms"]):
         if store["dms"][i]["dm_id"] == dm_id:
             del store["dms"][i]
-            break
         i += 1
 
     data_store.set(store)

@@ -26,15 +26,7 @@ def channels_list_v1(token):
     """
 
     store = data_store.get()
-    auth_user_exist = False
     auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError(description="Access Denied")
 
     for accounts in store['users']:
         if accounts['u_id'] == auth_user_id:
@@ -104,15 +96,7 @@ def channels_listall_v1(token):
 
     store = data_store.get()
     store_channels = store['channels']
-    auth_user_id = decode_token(token)['auth_user_id']
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError(description="Access Denied")
+    decode_token(token)['auth_user_id']
 
     all_channels = []
     for channel in store_channels:
@@ -154,14 +138,6 @@ def channels_create_v1(token, name, is_public):
 
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
-    auth_user_exist = False
-
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError
 
     if len(name) > 20:
         raise InputError(
@@ -171,11 +147,7 @@ def channels_create_v1(token, name, is_public):
         raise InputError(
             description="The name of the channel cannot be less than 1 character.")
 
-    if store == {}:
-        new_channel_id = 1
-    else:
-        new_channel_id = len(store['channels']) + 1
-
+    new_channel_id = len(store['channels']) + 1
     new_channel = {
         'channel_id': new_channel_id,
         'name': name,
