@@ -630,20 +630,25 @@ def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_channel_removeowner_user_no_access(user_1, user_2, channel_public):
+def test_channel_removeowner_user_no_access(user_2, user_no_access, channel_public):
     """
-    This test checks to see that an InputError is raised when removing the u_id
-    of a user who is not an owner of the channel.
+    This test checks to see that an AccessError is raised when the user removing a
+    u_id is not an owner permissions
     """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_1['token'],
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_no_access['token'],
         "channel_id": channel_public['channel_id'],
     })
 
     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
-        "u_id": user_1['auth_user_id']
+        "u_id": user_no_access['auth_user_id']
     })
     assert request_channel_remove_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})

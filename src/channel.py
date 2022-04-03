@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details
+from src.helper import decode_token, generate_token, validate_token, already_member, is_global_owner, channel_validity, user_validity, valid_auth_user_id, extract_channel_details
 
 """
 Channel contains the functionality which allows for the inviting of users, calling the
@@ -328,9 +328,13 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            if not (auth_user_id in channel['owner_members']):
+            if (auth_user_id not in channel['owner_members']) or (auth_user_id not in channel['owner_members'] and not is_global_owner(store)):
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
+            if (auth_user_id not in channel['all_members']):
+                if (auth_user_id not in channel['owner_members']) and is_global_owner(store):
+                    raise AccessError(
+                        description="Global owner does not have owner permissions as not a member of channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
@@ -383,8 +387,9 @@ def channel_removeowner_v1(token, channel_id, u_id):
                         description="Auththorised user is the only owner of the channel.")
                 pass
             else:
-                raise AccessError(
-                    description="Authorised user does not have owner permissions in channel.")
+                if is_global_owner(store):
+                    raise AccessError(
+                        description="Authorised user does not have owner permissions in channel.")
 
     if not channel_validity(channel_id, store):
         raise InputError(description="Channel id is invalid.")
