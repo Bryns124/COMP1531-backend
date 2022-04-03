@@ -4,6 +4,7 @@ from datetime import timezone
 import datetime
 import jwt
 import pickle
+from src.classes import User, Channel
 
 SECRET = "ANT"
 
@@ -19,9 +20,11 @@ def generate_token(u_id):
     """
     valid_auth_user_id(u_id)
     store = data_store.get()
-    store['users'][u_id].session_id.append(True)
+    user_object = store["users"][u_id]
+    s_id = user_object.set_session_id()
+
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': len(store['users'][u_id].session_id) - 1}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': s_id}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
 
@@ -49,16 +52,6 @@ def validate_token(token_data):
     Raises:
         AccessError: Raised when the session_id is invalid.
     """
-    valid_auth_user_id(token_data['auth_user_id'])
-    store = data_store.get()
-    token_valid = False
-    for user in store['users']:
-        if user.u_id == token_data['auth_user_id']:
-            if user.session_id[token_data['session_id'] - 1] == True:
-                token_valid = True
-
-    if not token_valid:
-        raise AccessError(description="This token is invalid.")
 
     valid_auth_user_id(token_data['auth_user_id'])
     users = data_store.get()["users"]
@@ -97,9 +90,8 @@ def channel_validity(channel_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            return True
+    if channel_id in store["channels"]:
+        return True
     return False
 
 
@@ -113,9 +105,8 @@ def user_validity(u_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for users in store['users']:
-        if users['u_id'] == u_id:
-            return True
+    if u_id in store["users"]:
+        return True
     return False
 
 
@@ -131,10 +122,9 @@ def already_member(auth_user_id, channel_id, store):
     Returns:
         Boolean: Returns true if the user already is a member of the channel
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
-                return True
+    channels = store["users"][auth_user_id].all_channels
+    if channel_id in channels:
+        return True
     return False
 
 
@@ -193,10 +183,10 @@ def load_channel(channel_id):
 
 def load_user(u_id):
     store = data_store.get()
-    try:
-        return store['users'][u_id].values()
-    except:
-        raise InputError(description="Could not locate user")
+    if u_id in store["users"]:
+        return True
+
+    raise InputError(description="Could not locate user")
 
 
 def load_message(message_id):

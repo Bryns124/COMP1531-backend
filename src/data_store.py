@@ -75,117 +75,117 @@ global data_store
 data_store = Datastore()
 
 
-class User:
+# class User:
 
-    def __init__(self, email, name_first, name_last, handle_str, password):
-        self.u_id = self.set_u_id()
-        self.permission_id = 0
-        self.session_id = []  # double check if correct
-        self.name_first = name_first
-        self.name_last = name_last
-        self.email = email
-        self.handle_str = handle_str
-        self.password = password
-        self.channels_owned = []
-        self.channels_joined = []
-        self.messages_sent = []
-        self.dms_own = []
-        self.set_session_id()
+#     def __init__(self, email, name_first, name_last, handle_str, password):
+#         self.u_id = self.set_u_id()
+#         self.permission_id = 0
+#         self.session_id = []  # double check if correct
+#         self.name_first = name_first
+#         self.name_last = name_last
+#         self.email = email
+#         self.handle_str = handle_str
+#         self.password = password
+#         self.channels_owned = []
+#         self.channels_joined = []
+#         self.messages_sent = []
+#         self.dms_own = []
+#         self.set_session_id()
 
-    def set_u_id(self):
-        try:
-            store = data_store.get()
-            return len(store['users']) + 1
-        except:
-            return 1
+#     def set_u_id(self):
+#         try:
+#             store = data_store.get()
+#             return len(store['users']) + 1
+#         except:
+#             return 1
 
-    def set_session_id(self):
-        self.session_id.append(True)
+#     def set_session_id(self):
+#         self.session_id.append(True)
 
-    def set_permission_id(self):
-        try:
-            len(data_store.get()['users'])
-            return 2
-        except:
-            return 1
+#     def set_permission_id(self):
+#         try:
+#             len(data_store.get()['users'])
+#             return 2
+#         except:
+#             return 1
 
-    def check_session(self, session_id):
-        return self.session_id[session_id]
+#     def check_session(self, session_id):
+#         return self.session_id[session_id]
 
-    def add_ch_owned(self, ch_id, ch_object):
-        self.channels_owned[ch_id] = ch_object
+#     def add_ch_owned(self, ch_id, ch_object):
+#         self.channels_owned[ch_id] = ch_object
 
-    def add_ch_joined(self, ch_id, ch_object):
-        self.channels_joined[ch_id] = ch_object
-
-
-class Base_channel:
-    def __init__(self, auth_user_id, name):
-        self.id = self.set_ch_id()
-        self.name = name
-        self.owner_members = []
-        self.all_members = []
-        self.message_list = []
-        self.start = self.set_start()
-        self.end = self.set_end()
-        self.add_owner(auth_user_id)
-        self.add_member(auth_user_id)
-
-    def set_ch_id(self):
-        try:
-            store = data_store.get()
-            return len(store['channels']) + 1
-        except:
-            return 1
-
-    def add_owner(self, auth_user_id):
-        store = data_store.get()
-        self.owner_members[auth_user_id] = store["users"][auth_user_id]
-
-    def add_member(self, auth_user_id):
-        store = data_store.get()
-        self.all_members[auth_user_id] = store["users"][auth_user_id]
-
-    def set_start(self):
-        return 0
-
-    def set_end(self):
-        return 50
-
-    def get_type(self):
-        store = data_store.get()
-        if self.id in store['channels']:
-            return "channel"
-        elif self.id in store['dms']:
-            return "dm"
-
-    def check_msg_list(self, message_id):
-        if message_id in self.message_list:
-            return True
-        else:
-            return False
-class Channel(Base_channel):
-    def __init__(self, is_public):
-        self.is_public = is_public
+#     def add_ch_joined(self, ch_id, ch_object):
+#         self.channels_joined[ch_id] = ch_object
 
 
-class Message:
-    def __init__(self, u_id, message, time_sent, parent):
-        self.id = self.set_message_id()
-        self.u_id = u_id
-        self.message = message
-        self.time_sent = time_sent
-        self.parent = parent
+# class Base_channel:
+#     def __init__(self, auth_user_id, name):
+#         self.id = self.set_ch_id()
+#         self.name = name
+#         self.owner_members = []
+#         self.all_members = []
+#         self.message_list = []
+#         self.start = self.set_start()
+#         self.end = self.set_end()
+#         self.add_owner(auth_user_id)
+#         self.add_member(auth_user_id)
 
-    def set_message_id(self):
-        store = data_store.get()
-        if store['messages'] == {}:
-            return 1
-        else:
-            return len(store['messages']) + 1
+#     def set_ch_id(self):
+#         try:
+#             store = data_store.get()
+#             return len(store['channels']) + 1
+#         except:
+#             return 1
 
-    def get_owner(self):
-        return self.u_id
+#     def add_owner(self, auth_user_id):
+#         store = data_store.get()
+#         self.owner_members[auth_user_id] = store["users"][auth_user_id]
 
-    def get_parent_type(self):
-        return self.parent.get_type
+#     def add_member(self, auth_user_id):
+#         store = data_store.get()
+#         self.all_members[auth_user_id] = store["users"][auth_user_id]
+
+#     def set_start(self):
+#         return 0
+
+#     def set_end(self):
+#         return 50
+
+#     def get_type(self):
+#         store = data_store.get()
+#         if self.id in store['channels']:
+#             return "channel"
+#         elif self.id in store['dms']:
+#             return "dm"
+
+#     def check_msg_list(self, message_id):
+#         if message_id in self.message_list:
+#             return True
+#         else:
+#             return False
+# class Channel(Base_channel):
+#     def __init__(self, is_public):
+#         self.is_public = is_public
+
+
+# class Message:
+#     def __init__(self, u_id, message, time_sent, parent):
+#         self.id = self.set_message_id()
+#         self.u_id = u_id
+#         self.message = message
+#         self.time_sent = time_sent
+#         self.parent = parent
+
+#     def set_message_id(self):
+#         store = data_store.get()
+#         if store['messages'] == {}:
+#             return 1
+#         else:
+#             return len(store['messages']) + 1
+
+#     def get_owner(self):
+#         return self.u_id
+
+#     def get_parent_type(self):
+#         return self.parent.get_type

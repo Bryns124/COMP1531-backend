@@ -1,6 +1,7 @@
-from src.data_store import data_store, Message
+from src.data_store import data_store
 from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp
 from src.error import AccessError, InputError
+from src.classes import Message
 from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner
@@ -28,9 +29,9 @@ def messages_send_v1(token, channel_id, message):
     if not already_member(u_id, channel_id, store):
         raise AccessError(description="User is not a member of the channel")
     validate_message(message)
-
+    parent = store['channels'][channel_id]
     new_message = Message(u_id, message, generate_timestamp(),
-                          store['channels'][channel_id].values())
+                          parent)
     store['channels'][channel_id].message_list.append(new_message.id)
     store['messages'][new_message.id] = new_message
     data_store.set(store)
