@@ -20,8 +20,8 @@ def generate_token(u_id):
     valid_auth_user_id(u_id)
     store = data_store.get()
     for user in store['users']:
-        if user['u_id'] == u_id:
-            user['session_id'].append(True)  # potential bug
+        if user.u_id == u_id:
+            user.session_id.append(True)  # potential bug
     token = jwt.encode(
         {'auth_user_id': u_id, 'session_id': len(user['session_id'])}, SECRET, algorithm="HS256")
     data_store.set(store)
@@ -55,8 +55,8 @@ def validate_token(token_data):
     store = data_store.get()
     token_valid = False
     for user in store['users']:
-        if user['u_id'] == token_data['auth_user_id']:
-            if user['session_id'][token_data['session_id'] - 1] == True:
+        if user.u_id == token_data['auth_user_id']:
+            if user.session_id[token_data['session_id'] - 1] == True:
                 token_valid = True
 
     if not token_valid:
@@ -77,7 +77,7 @@ def valid_auth_user_id(auth_user_id):
     auth_user_exist = False
 
     for user in store['users']:
-        if auth_user_id == user['u_id']:
+        if auth_user_id == user.u_id:
             auth_user_exist = True
 
     if not auth_user_exist:

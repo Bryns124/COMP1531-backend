@@ -98,6 +98,7 @@ initial_object = {
 
 # YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
 
+
 class Datastore:
     def __init__(self):
         self.__store = initial_object
@@ -151,6 +152,7 @@ class User:
         except:
             return 1
 
+
 class Base_channel:
     def __init__(self, id, name, owner_members, all_members, message_list, start, end):
         self.id = id
@@ -161,7 +163,7 @@ class Base_channel:
         self.start = start
         self.end = end
 
-    def channel_create(self):
+    def set_id(self):
         pass
 
 

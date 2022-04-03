@@ -32,11 +32,11 @@ def auth_login_v1(email, password):
     """
     store = data_store.get()
     for user in store['users']:
-        if user['email'] == email:
-            if user['password'] == hash_password(password):
+        if user.email == email:
+            if user.password == hash_password(password):
                 return {
-                    'token': generate_token(user['u_id']),
-                    'auth_user_id': user['u_id']
+                    'token': generate_token(user.u_id),
+                    'auth_user_id': user.u_id
                 }
             raise InputError(description="Password is incorrect")
 
@@ -72,7 +72,7 @@ def auth_register_v1(email, password, name_first, name_last):
     new_user = User(email, name_first, name_last,
                     create_handle(name_first, name_last), hash_password(password))
     store = data_store.get()
-    store['users'][{new_user.u_id}] = new_user
+    store['users'].append({'{new_user.id}': new_user})
     return {
         'token': generate_token(new_user.u_id),
         'auth_user_id': new_user.u_id
@@ -132,13 +132,54 @@ def auth_logout_v1(token):
     """
     store = data_store.get()
     user = load_user(decode_token(token)['auth_user_id'])
-    user['session_id'][decode_token(token)['session_id'] - 1] = False
+    user.session_id[decode_token(token)['session_id'] - 1] = False
     data_store.set(store)
 
 
 ###############################################################
 ##                 Checking functions                        ##
 ###############################################################
+def create_handle(name_first, name_last):
+    """
+    Creates the user's handle with the first name and last name.
+    If the user's handle is more than 20 characters, it is cut off at 20 characters
+    If the user's handle already exists, append the handle with the smallest number
+    (starting from 0).
+
+    :name_first: the user's first name
+    :name_last: the user's last name
+    :return: the user's handle
+    :rtype: string
+    """
+    store = data_store.get()
+
+    handle = name_first.lower() + name_last.lower()
+    handle = ''.join(filter(str.isalnum, handle))
+    handle = handle[:20]
+
+    i = 0
+    for user in store['users']:
+        if user.handle_str == handle:
+            if i == 0:
+                handle += str(0)
+                i += 1
+                continue
+            if i == 10:
+                handle = handle[:-1] + str(i)
+                i += 1
+                continue
+            if i % 10 == 1 and i > 10:
+                handle = handle[:-2] + str(i)
+                i += 1
+                continue
+            if i % 10 == 0:
+                handle = handle[:-2] + str(i)
+                i += 1
+                continue
+            handle = handle[:-1] + str(i % 10)
+            i += 1
+
+    return handle
 
 
 def hash_password(password):
