@@ -172,3 +172,35 @@ def load_data_store():
     """
     with open('datastore.p', 'rb') as FILE:
         data_store.set(pickle.load(FILE))
+
+
+def load_channel(channel_id):
+    store = data_store.get()
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            return channel
+    raise InputError(description="Could not locate channel")
+
+
+def load_user(u_id):
+    store = data_store.get()
+    for user in store['users']:
+        if user['u_id'] == u_id:
+            return user
+    raise InputError(description="Could not locate user")
+
+
+def load_message(message_id):
+    store = data_store.get()
+    for message in store['messages']:
+        if message['message_id'] == message_id:
+            return message
+    raise InputError(description="Could not locate message")
+
+
+def load_dm(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return dm
+    raise InputError(description="Could not locate dm")

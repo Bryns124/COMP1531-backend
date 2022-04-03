@@ -31,15 +31,17 @@ def auth_register_v1(email, password, name_first, name_last):
     if not email_check(email):
         raise InputError(description="Email entered is not a valid email")
     if duplicate_email_check(email):
-        raise InputError(description="Email entered has already been registered")
+        raise InputError(
+            description="Email entered has already been registered")
     if len(password) < 6:
-        raise InputError(description="Password entered must be longer than 6 characters")
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description=
-            "First name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="First name entered must be between 1 and 50 characters inclusive")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description=
-            "Last name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="Last name entered must be between 1 and 50 characters inclusive")
 
     handle = create_handle(name_first, name_last)
     new_user = User(
