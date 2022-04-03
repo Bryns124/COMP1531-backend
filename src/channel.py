@@ -1,7 +1,7 @@
 from base64 import decode
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, is_global_owner, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details
+from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details
 
 """
 Channel contains the functionality which allows for the inviting of users, calling the
@@ -328,12 +328,9 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            if (auth_user_id not in channel['owner_members']) or (is_global_owner(store) and auth_user_id not in channel['owner_members']):
+            if not (auth_user_id in channel['owner_members']):
                 raise AccessError(
                     description="Authorised user does not have owner permissions in channel.")
-            elif (auth_user_id not in channel['all_members'] and is_global_owner(store)):
-                raise AccessError(
-                    description="Global owner cannot add an owner if not a member of the channel.")
 
     for user in store['users']:
         if user["u_id"] == u_id:
@@ -380,16 +377,14 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            if (auth_user_id not in channel['owner_members']) or (is_global_owner(store) and auth_user_id not in channel['owner_members']):
-                raise AccessError(
-                    description="Authorised user does not have owner permissions in channel.")
-            elif auth_user_id not in channel['all_members']:
-                if is_global_owner(store):
-                    raise AccessError(
-                        description="Global owner cannot add an owner if not a member of the channel.")
+            if auth_user_id in channel['owner_members']:
                 if len(channel['owner_members']) == 1:
                     raise InputError(
                         description="Auththorised user is the only owner of the channel.")
+                pass
+            else:
+                raise AccessError(
+                    description="Authorised user does not have owner permissions in channel.")
 
     if not channel_validity(channel_id, store):
         raise InputError(description="Channel id is invalid.")
