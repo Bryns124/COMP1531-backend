@@ -21,11 +21,14 @@ def generate_token(u_id):
     """
     valid_auth_user_id(u_id)
     store = data_store.get()
-    store['users'][u_id].session_id.append(True)
+    user_object = store["users"][u_id]
+    s_id = user_object.set_session_id()
+
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': len(store['users'][u_id].session_id) - 1}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': s_id}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
+
 
 
 def decode_token(token):
@@ -51,16 +54,6 @@ def validate_token(token_data):
     Raises:
         AccessError: Raised when the session_id is invalid.
     """
-    valid_auth_user_id(token_data['auth_user_id'])
-    store = data_store.get()
-    token_valid = False
-    for user in store['users']:
-        if user.u_id == token_data['auth_user_id']:
-            if user.session_id[token_data['session_id'] - 1] == True:
-                token_valid = True
-
-    if not token_valid:
-        raise AccessError(description="This token is invalid.")
 
     valid_auth_user_id(token_data['auth_user_id'])
     users = data_store.get()["users"]
@@ -69,6 +62,7 @@ def validate_token(token_data):
             if users[user].check_session(token_data['session_id']):
                 return True
     raise AccessError(description="This token is invalid.")
+
 
 
 def valid_auth_user_id(auth_user_id):
@@ -87,7 +81,6 @@ def valid_auth_user_id(auth_user_id):
 
     raise AccessError(
         description="This auth_user_id does not exist in the datastore.")
-
 
 def channel_validity(channel_id, store):
     """
@@ -134,9 +127,6 @@ def already_member(auth_user_id, channel_id, store):
     channels = store["users"][auth_user_id].all_channels
     if channel_id in channels:
         return True
-    # members = store["channels"][channel_id].all_members
-    # if auth_user_id in members:
-    #     return True
     return False
 
 
