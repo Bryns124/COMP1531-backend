@@ -19,12 +19,11 @@ def generate_token(u_id):
     """
     valid_auth_user_id(u_id)
     store = data_store.get()
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            user['session_id'].append(
-                len(user['session_id']) + 1)  # potential bug
+    user_object = store["users"][u_id]
+    s_id = user_object.set_session_id()
+
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': s_id}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
 
@@ -52,18 +51,14 @@ def validate_token(token_data):
     Raises:
         AccessError: Raised when the session_id is invalid.
     """
+
     valid_auth_user_id(token_data['auth_user_id'])
-    store = data_store.get()
-    token_valid = False
-    for user in store['users']:
-        if user['u_id'] == token_data['auth_user_id']:
-            for session in user['session_id']:
-                if token_data['session_id'] == session:
-                    token_valid = True
-
-    if not token_valid:
-        raise AccessError(description="This token is invalid.")
-
+    users = data_store.get()["users"]
+    for user in users:
+        if users[user].auth_user_id == token_data["auth_user_id"]:
+            if users[user].check_session(token_data['session_id']):
+                return True
+    raise AccessError(description="This token is invalid.")
 
 def valid_auth_user_id(auth_user_id):
     """
@@ -76,15 +71,11 @@ def valid_auth_user_id(auth_user_id):
     """
     store = data_store.get()
 
-    auth_user_exist = False
+    if auth_user_id in store['users']:
+        return True
 
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError(
-            description="This auth_user_id does not exist in the datastore.")
+    raise AccessError(
+        description="This auth_user_id does not exist in the datastore.")
 
 
 def channel_validity(channel_id, store):
