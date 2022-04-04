@@ -4,6 +4,7 @@ from datetime import timezone
 import datetime
 import jwt
 import pickle
+from src.classes import User, Channel
 
 SECRET = "ANT"
 
@@ -19,12 +20,11 @@ def generate_token(u_id):
     """
     valid_auth_user_id(u_id)
     store = data_store.get()
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            user['session_id'].append(
-                len(user['session_id']) + 1)  # potential bug
+    user_object = store["users"][u_id]
+    s_id = user_object.set_session_id()
+
     token = jwt.encode(
-        {'auth_user_id': u_id, 'session_id': user['session_id'][-1]}, SECRET, algorithm="HS256")
+        {'auth_user_id': u_id, 'session_id': s_id}, SECRET, algorithm="HS256")
     data_store.set(store)
     return token
 
@@ -38,7 +38,11 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    token_data = jwt.decode(token, SECRET, algorithms="HS256")
+    try :
+        token_data = jwt.decode(token, SECRET, algorithms="HS256")
+    except:
+        # raise Error
+        pass
     validate_token(token_data)
     return token_data
 
@@ -52,17 +56,14 @@ def validate_token(token_data):
     Raises:
         AccessError: Raised when the session_id is invalid.
     """
-    valid_auth_user_id(token_data['auth_user_id'])
-    store = data_store.get()
-    token_valid = False
-    for user in store['users']:
-        if user['u_id'] == token_data['auth_user_id']:
-            for session in user['session_id']:
-                if token_data['session_id'] == session:
-                    token_valid = True
 
-    if not token_valid:
-        raise AccessError(description="This token is invalid.")
+    valid_auth_user_id(token_data['auth_user_id'])
+    users = data_store.get()["users"]
+    for user in users:
+        if users[user].auth_user_id == token_data["auth_user_id"]:
+            if users[user].check_session(token_data['session_id']):
+                return True
+    raise AccessError(description="This token is invalid.")
 
 
 def valid_auth_user_id(auth_user_id):
@@ -76,15 +77,11 @@ def valid_auth_user_id(auth_user_id):
     """
     store = data_store.get()
 
-    auth_user_exist = False
+    if auth_user_id in store['users']:
+        return True
 
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise AccessError(
-            description="This auth_user_id does not exist in the datastore.")
+    raise AccessError(
+        description="This auth_user_id does not exist in the datastore.")
 
 
 def channel_validity(channel_id, store):
@@ -97,9 +94,8 @@ def channel_validity(channel_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            return True
+    if channel_id in store["channels"]:
+        return True
     return False
 
 
@@ -113,9 +109,8 @@ def user_validity(u_id, store):
     Returns:
         _Boolean: Returns if the channel exists or not.
     """
-    for users in store['users']:
-        if users['u_id'] == u_id:
-            return True
+    if u_id in store["users"]:
+        return True
     return False
 
 
@@ -131,10 +126,9 @@ def already_member(auth_user_id, channel_id, store):
     Returns:
         Boolean: Returns true if the user already is a member of the channel
     """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            if auth_user_id in channels['all_members'] or auth_user_id in channels['owner_members']:
-                return True
+    channels = store["users"][auth_user_id].all_channels
+    if channel_id in channels:
+        return True
     return False
 
 
@@ -188,3 +182,35 @@ def load_data_store():
     """
     with open('datastore.p', 'rb') as FILE:
         data_store.set(pickle.load(FILE))
+
+
+def load_channel(channel_id):
+    store = data_store.get()
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            return channel
+    raise InputError(description="Could not locate channel")
+
+
+def load_user(u_id):
+    store = data_store.get()
+    if u_id in store["users"]:
+        return True
+
+    raise InputError(description="Could not locate user")
+
+
+def load_message(message_id):
+    store = data_store.get()
+    for message in store['messages']:
+        if message['message_id'] == message_id:
+            return message
+    raise InputError(description="Could not locate message")
+
+
+def load_dm(dm_id):
+    store = data_store.get()
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            return dm
+    raise InputError(description="Could not locate dm")
