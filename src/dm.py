@@ -1,6 +1,5 @@
-from base64 import decode
-from re import U
 from src.data_store import data_store
+from src.classes import Base, Message, Dm
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
 """Dm has the 7 functions: create, list, remove, details, leave, messages, senddm
@@ -39,40 +38,31 @@ def dm_create_v1(token, u_ids):
     if check_invalid_id(store, u_ids):
         raise InputError(description="There is a invalid u_id")
 
-    if store["dms"] == []:
-        new_dm_id = 1
-    else:
-        new_dm_id = len(store['dms']) + 1
-
     handle_list = []
 
-    for user in store['users']:
-        if user["u_id"] == auth_user_id:
-            handle_list.append(user["handle_str"])
+    handle_list.append(store['users'][auth_user_id].handle)
 
     for ids in u_ids:
-        for users in store['users']:
-            if ids == users['u_id']:
-                handle_list.append(users['handle_str'])
+        handle_list.append(store['users'][ids].handle)
 
     handle_list.sort()
     new_name = ', '.join(handle_list)
 
-    new_dm = {
-        "dm_id": new_dm_id,
-        'name': new_name,
-        'owner_members': [auth_user_id],
-        'all_members': u_ids,
-        'messages_list': [],
-        'start': 25,
-        'end': 75,
-    }
-    store['dms'].append(new_dm)
+    new_dm = Dm(auth_user_id, new_name, u_ids)
+
+    store['dms'][new_dm.id] = new_dm
+    store["users"][auth_user_id].add_dm_owned(
+        new_dm.id, new_dm)
+    store['users'][auth_user_id].add_dm(new_dm.id, new_dm)
+    new_dm.add_owner(auth_user_id, store["users"][auth_user_id])
+    for id in u_ids:
+        new_dm.add_member(auth_user_id, store["users"][id])
+        store['users'][id].add_dm(new_dm.id, new_dm)
 
     data_store.set(store)
 
     return {
-        "dm_id": new_dm["dm_id"]
+        "dm_id": new_dm.id
     }
 
 
@@ -87,12 +77,18 @@ def check_duplicate(auth_user_id, u_id_list):
 def check_invalid_id(store, u_ids):
     '''Checks if any u_id passed in as argument for dm_create does not exist'''
     for ids in u_ids:
-        invalid = True
-        for user in store['users']:
-            if ids == user['u_id']:
-                invalid = False
-        if invalid == True:
+        # invalid = True
+        # for user in store['users']:
+        #     # if ids == user['u_id']:
+        #         invalid = False
+        # if invalid == True:
+        #     return True
+        try:
+            store['users'][ids]
+            pass
+        except:
             return True
+    return False
 
 
 def dm_list_v1(token):
@@ -112,19 +108,27 @@ def dm_list_v1(token):
     auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
 
-    for dm in store["dms"]:
-        if auth_user_id in dm["owner_members"] or auth_user_id in dm['all_members']:
-            new = {
-                "dm_id": dm["dm_id"],
-                "name": dm["name"]
-            }
-            dm_list.append(new)
+    dms = store["users"][auth_user_id].all_dm
+
+    for dm in dms:
+        new = {
+            "dm_id": dms,
+            "name": dms[dm].name
+        }
+        dm_list.append(new)
 
     data_store.set(store)
-
     return {
         'dms': dm_list
     }
+
+    # for dm in store["dms"]:
+    #     if auth_user_id in dm["owner_members"] or auth_user_id in dm['all_members']:
+    #         new = {
+    #             "dm_id": dm["dm_id"],
+    #             "name": dm["name"]
+    #         }
+    #         dm_list.append(new)
 
 
 def dm_remove_v1(token, dm_id):

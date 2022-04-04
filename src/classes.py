@@ -17,7 +17,8 @@ class User:
         self.all_channels = {}  # Channels owned and joined
         self.messages_sent = {}
         self.dms_own = {}
-        self.set_session_id() #fix later
+        self.all_dms = {} # ask
+        self.set_session_id()  # fix later
 
     def set_u_id(self):
         try:
@@ -40,11 +41,20 @@ class User:
     def add_ch_owned(self, ch_id, ch_object):
         self.channels_owned[ch_id] = ch_object
 
+    def add_dm_owned(self, dm_id, dm_object):
+        self.dms_own[dm_id] = dm_object
+
+    def remove_dm_owned(self, dm_id):
+        self.dms_own.pop(dm_id, None)
+
     def remove_ch_owned(self, ch_id):
         self.channels_owned.pop(ch_id, None)
 
     def add_channel(self, ch_id, ch_object):
         self.all_channels[ch_id] = ch_object
+
+    def add_dm(self, dm_id, dm_object):
+        self.all_dms[dm_id] = dm_object
 
     def channel_leave(self, ch_id):
         self.all_channels.pop(ch_id, None)
@@ -111,13 +121,23 @@ class Base:
             return False
 
 
+class Dm(Base):
+    def __init__(self, auth_user_id, name,  u_ids):
+        Base.__init__(self, auth_user_id, name)
+        self.id = self.set_dm_id()
+
+    def set_dm_id(self):
+        try:
+            store = data_store.get()
+            return len(store['dms']) + 1
+        except:
+            return 1
+
+
 class Channel(Base):
     def __init__(self, auth_user_id, name, is_public):
         Base.__init__(self, auth_user_id, name)
         self.is_public = is_public
-
-
-
 
 
 class Message:

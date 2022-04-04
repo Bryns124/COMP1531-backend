@@ -29,8 +29,8 @@ import hashlib
 
 initial_object = {
     "users": {
-        # auth_user_id : class object,
-        # auth_user_id : class object
+        # 'auth_user_id' : class object,
+        # 'auth_user_id' : class object
     },
     "channels": {
         # channel_id : class object,
