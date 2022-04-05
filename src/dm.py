@@ -1,3 +1,4 @@
+from src.channel import user_details
 from src.data_store import data_store
 from src.classes import Base, Message, Dm
 from src.error import InputError, AccessError
@@ -217,16 +218,20 @@ def dm_details_v1(token, dm_id):
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError(description="user is not part of dm")
 
-    for dm in store['dms']:
-        if dm_id == dm["dm_id"]:
-            name = dm["name"]
-            members = dm["owner_members"] + dm["all_members"]
+    dm_members_details = []
 
-    data_store.set(store)
+    members_dict = store["dms"][dm_id].all_members
+    # this was part of the base object so i assumed its all_members for
+    # members in a dm? michael check pls.
 
+    for member in members_dict:
+        member_current = user_details(members_dict[member])
+        dm_members_details.append(member_current)
+
+    dm = store["dms"][dm_id]
     return {
-        "name": name,
-        "members": members
+        "name": dm.name,
+        "members": dm_members_details
     }
 
 
@@ -256,13 +261,8 @@ def dm_leave_v1(token, dm_id):
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError(description="user is not part of dm")
 
-    for dm in store["dms"]:
-        if dm_id == dm["dm_id"]:
-            if is_dm_member(store, u_id, dm_id):
-                dm["all_members"].remove(u_id)
-            else:
-                dm["owner_members"].remove(u_id)
-
+    store["dms"][dm_id].user_leave(u_id)
+    store["users"][u_id].channel_leave(dm_id)
     data_store.set(store)
 
     return {}

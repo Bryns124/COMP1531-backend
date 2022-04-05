@@ -191,7 +191,7 @@ def channel_messages_v1(token, channel_id, start):
     for message_id in list(reversed(list(active_channel.message_list)))[start: start + 50]:
         returned_messages['messages'].append(
             {'message_id': store['messages'][message_id].id,
-             'u_id' : store['messages'][message_id].u_id,
+             'u_id': store['messages'][message_id].u_id,
              'message': store['messages'][message_id].message,
              'time_sent': store['messages'][message_id].time_sent})
         number_of_messages += 1
