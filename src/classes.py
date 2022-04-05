@@ -25,6 +25,8 @@ class User:
             store = data_store.get()
             return len(store['users']) + 1
         except:
+            store = data_store.get()
+            store["global_owners_count"] += 1
             return 1
 
     def set_session_id(self):
