@@ -132,6 +132,13 @@ def already_member(auth_user_id, channel_id, store):
     return False
 
 
+def is_global_owner(store):
+    for users in store['users']:
+        if users['u_id'] == 1:
+            return True
+    return False
+
+
 def extract_channel_details(channel_id, store):
     """
     A method which coppies the data in the input_channel and returns it.
