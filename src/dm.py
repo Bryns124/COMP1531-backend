@@ -1,6 +1,6 @@
 from src.channel import user_details
 from src.data_store import data_store
-from src.classes import Base, Message, Dm
+from src.classes import BaseChannel, Message, Dm
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
 """Dm has the 7 functions: create, list, remove, details, leave, messages, senddm
@@ -56,8 +56,9 @@ def dm_create_v1(token, u_ids):
         new_dm.id, new_dm)
     store['users'][auth_user_id].add_dm(new_dm.id, new_dm)
     new_dm.add_owner(auth_user_id, store["users"][auth_user_id])
+    new_dm.add_member(auth_user_id, store["users"][auth_user_id])
     for id in u_ids:
-        new_dm.add_member(auth_user_id, store["users"][id])
+        new_dm.add_member(id, store["users"][id])
         store['users'][id].add_dm(new_dm.id, new_dm)
 
     data_store.set(store)
@@ -108,16 +109,17 @@ def dm_list_v1(token):
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
+    try:
+        dms = store["users"][auth_user_id].all_dm
 
-    dms = store["users"][auth_user_id].all_dm
-
-    for dm in dms:
-        new = {
-            "dm_id": dms,
-            "name": dms[dm].name
-        }
-        dm_list.append(new)
-
+        for dm in dms:
+            new = {
+                "dm_id": dms,
+                "name": dms[dm].name
+            }
+            dm_list.append(new)
+    except:
+        pass
     data_store.set(store)
     return {
         'dms': dm_list
@@ -158,11 +160,16 @@ def dm_remove_v1(token, dm_id):
     if not is_dm_owner(store, auth_user_id, dm_id):
         raise AccessError(description="user is not owner of dm")
 
-    i = 0
-    while i < len(store["dms"]):
-        if store["dms"][i]["dm_id"] == dm_id:
-            del store["dms"][i]
-        i += 1
+    if not is_dm_member(store, auth_user_id, dm_id):
+        raise AccessError(description="That member is not apart of the dm")
+
+    # i = 0
+    # while i < len(store["dms"]):
+    #     if store["dms"][i]["dm_id"] == dm_id:
+    #         del store["dms"][i]
+    #     i += 1
+    store['dms'][dm_id].remove_all()
+    del store['dms'][dm_id]
 
     data_store.set(store)
 
@@ -173,25 +180,40 @@ def dm_remove_v1(token, dm_id):
 
 def valid_dm_id(store, dm_id):
     '''returns True if a dm with the dm_id passed in argument exists in data_store'''
-    for dms in store['dms']:
-        if dm_id == dms["dm_id"]:
-            return True
-    return False
+    # for dms in store['dms']:
+    #     if dm_id == dms["dm_id"]:
+    #         return True
+    # return False
+    try:
+        store['dms'][dm_id]
+        return True
+    except:
+        return False
 
 
 def is_dm_owner(store, auth_user_id, dm_id):
     '''the user with the given auth_user_id is an owner of the dm with the given dm_id'''
-    for dms in store['dms']:
-        if dms["dm_id"] == dm_id and auth_user_id in dms['owner_members']:
-            return True
-    return False
+    # for dms in store['dms']:
+    #     if dms["dm_id"] == dm_id and auth_user_id in dms['owner_members']:
+    #         return True
+    # return False
+    try:
+        store['dms'][dm_id].owner_members[auth_user_id]
+        return True
+    except:
+        return False
 
 
 def is_dm_member(store, auth_user_id, dm_id):
-    for dms in store['dms']:
-        if dms["dm_id"] == dm_id and auth_user_id in dms['all_members']:
-            return True
-    return False
+    # for dms in store['dms']:
+    #     if dms["dm_id"] == dm_id and auth_user_id in dms['all_members']:
+    #         return True
+    # return False
+    try:
+        store['dms'][dm_id].all_members[auth_user_id]
+        return True
+    except:
+        return False
 
 
 def dm_details_v1(token, dm_id):
