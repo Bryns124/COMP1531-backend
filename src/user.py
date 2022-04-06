@@ -12,7 +12,6 @@ Functions:
     user_profile_sethandle: Update the authorised user's hand (handle name)
 """
 
-
 def users_all_v1(token):
     """returns a list of all users and their associated details
 
@@ -30,7 +29,7 @@ def users_all_v1(token):
 
     user_list = []
     for users in store['users']:
-        user_list.append(extract_user_details(users))
+        user_list.append(extract_user_details(store["users"][users]))
 
     return {
         'users': user_list
@@ -39,14 +38,13 @@ def users_all_v1(token):
 
 def extract_user_details(user):
     users = {
-        'u_id': user['u_id'],
-        'email': user['email'],
-        'name_first': user['name_first'],
-        'name_last': user['name_last'],
-        'handle_str': user['handle_str']
+        'u_id': user.auth_user_id,
+        'email': user.email,
+        'name_first': user.name_first,
+        'name_last': user.name_last,
+        'handle_str': user.handle
     }
     return users
-
 
 def user_profile_v1(token, u_id):
     """returns a the details of one particular user with the associated user_id
@@ -63,17 +61,16 @@ def user_profile_v1(token, u_id):
     """
     store = data_store.get()
     decode_token(token)
-    
-    for user in store['removed_users']:
-        if user['u_id'] == u_id:
-            user_details = extract_user_details(user)
-            return {'user': user_details}
-
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            user_details = extract_user_details(user)
-    
     valid_user_id(u_id)
+
+    if u_id in store["removed_users"]:
+        user_details = extract_user_details(store["removed_users"][u_id])
+        return {'user': user_details}
+
+    if u_id in store["users"]:
+        user_details = extract_user_details(store["users"][u_id])
+
+
     return {
         'user': user_details
     }
@@ -90,14 +87,10 @@ def valid_user_id(user_id):
     """
     store = data_store.get()
 
-    auth_user_exist = False
+    if user_id in store["users"] or user_id in store["removed_users"]:
+        return True
 
-    for user in store['users']:
-        if user_id == user['u_id']:
-            auth_user_exist = True
-
-    if not auth_user_exist:
-        raise InputError(description="This auth_user_id does not exist in the datastore.")
+    raise InputError(description="This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):
@@ -113,7 +106,7 @@ def user_profile_setname_v1(token, name_first, name_last):
         None
     """
     store = data_store.get()
-    decode_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if not name_length_check(name_first):
         raise InputError(description=
@@ -122,12 +115,8 @@ def user_profile_setname_v1(token, name_first, name_last):
         raise InputError(description=
             "The length of the new last name has to be within 1 and 50 characters inclusive")
 
-    auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['name_first'] = name_first
-            user['name_last'] = name_last
+    store["users"][auth_user_id].name_first = name_first
+    store["users"][auth_user_id].name_last = name_last
 
     data_store.set(store)
     return {}
@@ -146,17 +135,13 @@ def user_profile_setemail_v1(token, email):
         None
     """
     store = data_store.get()
-    decode_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_email(email):
         raise InputError(description=
             "Email entered is not of valid format or is already in use by another user")
 
-    auth_user_id = decode_token(token)['auth_user_id']
-
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['email'] = email
+    store["users"][auth_user_id].email = email
 
     data_store.set(store)
     return {}
@@ -176,7 +161,7 @@ def user_profile_sethandle_v1(token, handle_str):
         None
     """
     store = data_store.get()
-    decode_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_handle_string(store, handle_str):
         raise InputError(description="""
@@ -184,11 +169,8 @@ def user_profile_sethandle_v1(token, handle_str):
                          or it contains non-alphanumeric characters,
                          or it is already in-use""")
 
-    auth_user_id = decode_token(token)['auth_user_id']
 
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['handle_str'] = handle_str
+    store["users"][auth_user_id].handle = handle_str
 
     data_store.set(store)
     return {}
@@ -225,6 +207,6 @@ def valid_handle_string(store, handle_str):
 def duplicate_handle(store, handle_str):
     '''returns True if the given handle string is already use'''
     for users in store['users']:
-        if handle_str == users['handle_str']:
+        if handle_str == store["users"][users].handle:
             return True
     return False
