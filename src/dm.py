@@ -218,6 +218,18 @@ def dm_details_v1(token, dm_id):
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError(description="user is not part of dm")
 
+    # for dm in store['dms']:
+    #     if dm_id == dm["dm_id"]:
+    #         name = dm["name"]
+    #         members = dm["owner_members"] + dm["all_members"]
+
+    # data_store.set(store)
+
+    # return {
+    #     "name": name,
+    #     "members": members
+    # }
+
     dm_members_details = []
 
     members_dict = store["dms"][dm_id].all_members
@@ -264,6 +276,14 @@ def dm_leave_v1(token, dm_id):
     store["dms"][dm_id].user_leave(u_id)
     store["users"][u_id].channel_leave(dm_id)
     data_store.set(store)
+    # for dm in store["dms"]:
+    #     if dm_id == dm["dm_id"]:
+    #         if is_dm_member(store, u_id, dm_id):
+    #             dm["all_members"].remove(u_id)
+    #         else:
+    #             dm["owner_members"].remove(u_id)
+
+    # data_store.set(store)
 
     return {}
 
