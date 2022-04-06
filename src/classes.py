@@ -17,7 +17,7 @@ class User:
         self.all_channels = {}  # Channels owned and joined
         self.messages_sent = {}
         self.dms_own = {}
-        self.all_dms = {} # ask
+        self.all_dms = {}  # ask
         self.set_session_id()  # fix later
 
     def set_u_id(self):
@@ -25,6 +25,8 @@ class User:
             store = data_store.get()
             return len(store['users']) + 1
         except:
+            store = data_store.get()
+            store["global_owners_count"] += 1
             return 1
 
     def set_session_id(self):
@@ -55,6 +57,9 @@ class User:
 
     def add_dm(self, dm_id, dm_object):
         self.all_dms[dm_id] = dm_object
+
+    def add_msg(self, msg_id, message_object):
+        self.messages_sent[msg_id] = message_object
 
     def channel_leave(self, ch_id):
         self.all_channels.pop(ch_id, None)

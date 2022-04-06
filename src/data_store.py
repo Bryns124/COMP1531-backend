@@ -47,8 +47,9 @@ initial_object = {
     "removed_users": {
         # channel_id : class object,
         # channel_id : class object
-    }
+    },
 
+    "global_owners_count" : 0
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE

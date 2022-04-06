@@ -32,6 +32,7 @@ def messages_send_v1(token, channel_id, message):
     parent = store['channels'][channel_id]
     new_message = Message(u_id, message, generate_timestamp(),
                           parent)
+    store['users'][u_id].add_msg(new_message.id, new_message)
     store['channels'][channel_id].message_list.append(new_message.id)
     store['messages'][new_message.id] = new_message
     data_store.set(store)
