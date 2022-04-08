@@ -110,11 +110,11 @@ def dm_list_v1(token):
     auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
     try:
-        dms = store["users"][auth_user_id].all_dm
+        dms = store["users"][auth_user_id].all_dms
 
         for dm in dms:
             new = {
-                "dm_id": dms,
+                "dm_id": dm,
                 "name": dms[dm].name
             }
             dm_list.append(new)
@@ -296,7 +296,7 @@ def dm_leave_v1(token, dm_id):
         raise AccessError(description="user is not part of dm")
 
     store["dms"][dm_id].user_leave(u_id)
-    store["users"][u_id].channel_leave(dm_id)
+    store["users"][u_id].dm_leave(dm_id)
     data_store.set(store)
     # for dm in store["dms"]:
     #     if dm_id == dm["dm_id"]:
@@ -339,11 +339,9 @@ def dm_messages_v1(token, dm_id, start):
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError(description="user is not part of dm")
 
-    for dm in store["dms"]:
-        if dm_id == dm["dm_id"]:
-            curr_dm = dm
+    curr_dm = store['dms'][dm_id]
 
-    if len(curr_dm["messages_list"]) < start:
+    if len(curr_dm.message_list) < start:
         raise InputError("start value gerater than messaegs in dm")
 
     # for m in reversed(store["messages"]):
@@ -361,29 +359,23 @@ def dm_messages_v1(token, dm_id, start):
     #         ret.append(ret_dict)
     #         curr += 1
 
-    if 50 > len(curr_dm["messages_list"]):
-        end = -1
-    elif 50 <= len(curr_dm["messages_list"]):
-        end = start + 50
+    returned_messages = {'messages': [], 'start': start, 'end': ""}
+    returned_full = False
+    number_of_messages = 0
+    for message_id in list(reversed(list(curr_dm.message_list)))[start: start + 50]:
+        returned_messages['messages'].append(
+            {'message_id': store['messages'][message_id].id,
+             'u_id': store['messages'][message_id].u_id,
+             'message': store['messages'][message_id].message,
+             'time_sent': store['messages'][message_id].time_sent})
+        number_of_messages += 1
 
-    ret = []
-    counter = 0
-    for id in curr_dm["messages_list"]:
-        if counter >= 50:
-            break
-        for m in store["messages"]:
-            if id == m["message_id"]:
-                ret_dict = {
-                    "message_id": m["message_id"],
-                    "u_id": m["u_id"],
-                    "message": m["message"],
-                    "time_sent": m["time_sent"]
-                }
-                ret.append(ret_dict)
-        counter += 1
-    # data_store.set(store)
-    return {
-        "messages": ret,
-        "start": start,
-        "end": end
-    }
+        if number_of_messages == 50:
+            returned_full = True
+
+    if returned_full:
+        returned_messages['end'] = (start + 50)
+    else:
+        returned_messages['end'] = -1
+
+    return returned_messages
