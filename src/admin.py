@@ -82,7 +82,7 @@ def admin_user_remove_v1(token, u_id):
     messages_dict = store["users"][u_id].messages_sent
 
     for message in messages_dict:
-        messsages_dict[message].message = "Removed user"
+        messages_dict[message].message = "Removed user"
 
     store["removed_users"][u_id] = store["users"].pop(u_id)
 
