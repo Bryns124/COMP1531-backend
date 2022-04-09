@@ -61,7 +61,7 @@ def channels_listall_v1(token):
     channels = data_store.get()["channels"]
 
     all_channels = []
-    for channel in channels: # can probably condense
+    for channel in channels:  # can probably condense
         channel_dict = {
             "channel_id": channel,
             "name": channels[channel].name
@@ -111,7 +111,8 @@ def channels_create_v1(token, name, is_public):
 
     new_channel = Channel(auth_user_id, name, is_public)
     store = data_store.get()
-    store["channels"][new_channel.id] = new_channel #move this into initalisation of channel object
+    # move this into initalisation of channel object
+    store["channels"][new_channel.id] = new_channel
     store["users"][auth_user_id].add_ch_owned(
         new_channel.id, new_channel)
     store["users"][auth_user_id].add_channel(
