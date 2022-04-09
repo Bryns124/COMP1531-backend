@@ -63,7 +63,7 @@ def user_profile_v1(token, u_id):
     """
     store = data_store.get()
     decode_token(token)
-    
+
     for user in store['removed_users']:
         if user['u_id'] == u_id:
             user_details = extract_user_details(user)
@@ -72,13 +72,15 @@ def user_profile_v1(token, u_id):
     for user in store['users']:
         if user['u_id'] == u_id:
             user_details = extract_user_details(user)
-    
+
+    # REMARK: this looks like it'll raise an AccessError rather than an
+    # InputError - double check your docs?
     valid_user_id(u_id)
     return {
         'user': user_details
     }
 
-
+# REMARK: Perhaps this should be a dedicated helper function?
 def valid_user_id(user_id):
     """_summary_
     Validates that the input auth_user_id exists in the datastore
@@ -97,6 +99,8 @@ def valid_user_id(user_id):
             auth_user_exist = True
 
     if not auth_user_exist:
+        # REMARK: Nope it raises an InputError - you should update your
+        # docstring
         raise InputError(description="This auth_user_id does not exist in the datastore.")
 
 
@@ -193,7 +197,8 @@ def user_profile_sethandle_v1(token, handle_str):
     data_store.set(store)
     return {}
 
-
+# REMARK: These helpers all seem to be copied from auth.py - why not move them
+# to the helpers module?
 def name_length_check(name):
     '''returns True if the length of the name is between 1 and 50 characters inclusive'''
     if len(name) > 50 or len(name) < 1:

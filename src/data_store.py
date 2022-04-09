@@ -24,6 +24,13 @@ Example usage:
     data_store.set(store)
 '''
 
+# REMARK: Make sure you keep your datastore.p outside of your src folder - it's
+# not source code
+# perhaps making a data directory might help?
+# You can also add your datastore (and other things that are runtime related)
+# to your .gitignore file, which will help ensure that you don't get merge
+# conflicts to do with them
+
 # YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [

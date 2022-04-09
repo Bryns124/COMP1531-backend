@@ -5,6 +5,7 @@ from src.error import InputError
 import jwt
 from src.helper import decode_token, generate_token
 import hashlib
+# REMARK: Docstrings should go above your imports
 """
 Auth has three main functions: register, login and logout
 
@@ -52,6 +53,8 @@ def auth_register_v1(email, password, name_first, name_last):
     :return: token, u_id
     :rtype: dictionary
     """
+    # REMARK: These helper functions are great but it would be better to have
+    # many of them be more central
     if not email_check(email):
         raise InputError(description="Email entered is not a valid email")
     if duplicate_email_check(email):
@@ -84,6 +87,9 @@ def create_user(email, password, name_first, name_last):
     :rtype: dictionary
     """
     store = data_store.get()
+    # REMARK: This is very repetitive - you'd only need one variable assignment
+    # in your if statement (which could even be done using a ternary statement)
+    #
     if (store['users'] == []):
         new_id = len(store['users']) + 1
         user = {
@@ -135,6 +141,9 @@ def create_handle(name_first, name_last):
     handle = ''.join(filter(str.isalnum, handle))
     handle = handle[:20]
 
+    # REMARK: I feel like there are simpler ways of doing this
+    # try using a new_handle variable so that you don't need to slice back to
+    # the original every time?
     i = 0
     for user in store['users']:
         if user['handle_str'] == handle:
@@ -162,6 +171,8 @@ def create_handle(name_first, name_last):
 
 def auth_logout_v1(token):
     """_summary_
+    # REMARK: (you probably want to remove these _summary_ things
+    # they're a placeholder for the summaries you're writing underneath them)
     Logs the user off, removing their current session_id from the datastore.
     Args:
         token (string): token of user, obtained when logging on or when registering.
@@ -199,6 +210,8 @@ def email_check(email):
     :return: whether the email is valid or not
     :rtype: boolean
     """
+    # REMARK: Perhaps keep this regex as a constant somewhere so you don't need
+    # to recompile it every time someone registers?
     regex = re.compile(
         r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     return bool(re.fullmatch(regex, email))

@@ -16,6 +16,8 @@ import pytest
 ##MAY CHANGE PORT LATER##
 BASE_URL = url
 
+# REMARK: This is a really long file - consider splitting up into multiple
+# files in the one test_channel package?
 
 # Users
 

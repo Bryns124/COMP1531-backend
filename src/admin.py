@@ -25,6 +25,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
 
     number_of_global_owners = 0
     user_exist = False
+    # REMARK: for loops like these take away from the main logic of the code
+    # and should thus be moved to helper functions
     for user in store['users']:
         if u_id == user['u_id']:
             user_exist = True
@@ -36,6 +38,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         if user['permission_id'] == 1:
             number_of_global_owners += 1
 
+    # REMARK: same goes for things like this - there's lots of repetition on
+    # code like this
     if not user_exist:
         raise InputError("The input u_id does not exist in the datastore.")
 
@@ -51,6 +55,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     if (number_of_global_owners < 2) & (permission_id == 2):
         raise InputError("Cannot demote only global user")
 
+    # REMARK: have a look at the enumerate() function for this - it's wayyyyyy
+    # more readable
     i = 0
     for user in store["users"]:
         if user["u_id"] == u_id:
@@ -81,6 +87,10 @@ def admin_user_remove_v1(token, u_id):
     store = data_store.get()
 
     number_of_global_owners = 0
+    # REMARK: You may want to assign target_user to None here, since it will
+    # prevent errors with type checkers like mypy, and is a bit easier to
+    # follow. An even better strategy would be to use a helper function for
+    # gathering user info
     user_exist = False
     for user in store['users']:
         if u_id == user['u_id']:
@@ -108,6 +118,9 @@ def admin_user_remove_v1(token, u_id):
     i = 0
     for message in store["messages"]:
         if message["u_id"] == u_id:
+            # REMARK: You could just edit the `message` variable, since it'll
+            # be the same thing - remember that everything in Python is a
+            # pointer
             store["messages"][i]["message"] = "Removed user"
         i += 1
 

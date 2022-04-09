@@ -86,7 +86,7 @@ def valid_auth_user_id(auth_user_id):
         raise AccessError(
             description="This auth_user_id does not exist in the datastore.")
 
-
+# REMARK: Make sure to use these helpers everywhere!
 def channel_validity(channel_id, store):
     """
     Checks for a valid channel
@@ -103,6 +103,10 @@ def channel_validity(channel_id, store):
     return False
 
 
+# REMARK: It might be easier for these to return the user data directly rather
+# than having to search through the datastore twice?
+# You could also raise an Exception here which would prevent even more repeated
+# code
 def user_validity(u_id, store):
     """_summary_
     Checks for a valid channel

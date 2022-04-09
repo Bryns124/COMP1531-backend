@@ -4,6 +4,11 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
 
+
+# REMARK: yo can probably remove these old tests now if your new tests cover
+# the same edge cases, since you're not really getting any coverage from these
+# anymore anyway
+
 # Fixture for testing incorrect login
 
 

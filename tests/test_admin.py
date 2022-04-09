@@ -88,7 +88,9 @@ def create_dm_3_user(user_1, user_2, user_3):
     })
     return r.json()
 
-
+# REMARK: Make sure you clear your datastore before the test starts, since
+# otherwise you'll get cascading test fails
+# Turn clearing into a fixture maybe?
 def test_invalid_u_id_admin_user_remove_v1(user_invalid, user_1):
     request_admin_user_remove_v1 = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
         "token": user_invalid,
@@ -157,7 +159,7 @@ def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-
+# REMARK: It'd be far nicer to have helper functions for sending all your requests
 def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
     requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json={
         "token": user_1["token"],

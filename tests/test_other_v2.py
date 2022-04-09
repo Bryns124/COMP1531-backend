@@ -17,6 +17,7 @@ BASE_URL = url
 
 # Users
 
+# REMARK: Having shared fixtures in a helper function somewhere could be cool
 
 @pytest.fixture()
 def user_1():
