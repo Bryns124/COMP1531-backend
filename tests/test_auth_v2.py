@@ -1,28 +1,16 @@
-import code
-from os import access
-from urllib import response
-from xml.dom.expatbuilder import parseFragment
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
-from src.channels import channels_create_v1, channels_list_v1
-from src.auth import auth_register_v1
-# from src.message import messages_send_v1
-from src.other import clear_v1
-from src.helper import decode_token
-from src.error import InputError, AccessError
-from src.helper import SECRET
+import pytest
+import src.server
+from src.error import AccessError, InputError
 from src.config import port, url
+from src.helper import SECRET
 import json
+from flask import Flask
 import requests
 import urllib
 import jwt
 import pytest
 
-##MAY CHANGE PORT LATER##
 BASE_URL = url
-
-
-# Users
-
 
 @pytest.fixture()
 def user_1():
@@ -34,7 +22,6 @@ def user_1():
     })
     return r.json()
 
-
 @pytest.fixture
 def user_2():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -45,23 +32,6 @@ def user_2():
     })
     return r.json()
 
-
-@pytest.fixture
-def user_no_access():
-    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "error@unsw.com",
-        "password": "no_access1235667",
-        "name_first": "no_access",
-        "name_last": "no_access"
-    })
-    return r.json()
-
-
-@pytest.fixture
-def user_invalid():
-    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
-
-
 @pytest.fixture
 def channel_public(user_1):
     r = requests.post(f"{BASE_URL}/channels/create/v2", json={
@@ -71,83 +41,88 @@ def channel_public(user_1):
     })
     return r.json()
 
-
-@pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
-def test_login_invalid_email(email_1):
-
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": email_1,
-        "password": "password123",
-    })
-    assert r.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-# test when login email is incorrect
-
-
-def test_login_incorrect_email(user_1):
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "notbryan.le@gmail.com",
-        "password": "test123456",
-    })
-    assert r.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-# test when login password is incorrect
-
-
-def test_login_incorrect_password(user_1):
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "mikey@unsw.com",
-        "password": "password456",
-    })
-    assert r.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-# test registered account is logged in correctly
-
-
-def test_login_correct(user_1):
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "mikey@unsw.com",
-        "password": "test123456"
-    })
-    body = jwt.decode(r.json()['token'], SECRET, algorithms="HS256")
-    assert body == {
-        "auth_user_id": 1,
-        "session_id": 2
-    }
-    assert r.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
 def test_auth_register_user_created_sucessfully_v2():
-    request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
+    response = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
         "password": "password123",
         "name_first": "Bryan",
         "name_last": "Le"
     })
-    request_login = requests.post(f"{BASE_URL}/auth/login/v2", json={
+    assert response.status_code == 200
+    payload = response.json()
+    payload["auth_user_id"] == 1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_auth_register_user_multiple_v2():
+    response1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
-        "password": "password123"
+        "password": "password123",
+        "name_first": "Bryan",
+        "name_last": "Le"
     })
-    assert request_register.status_code == 200
-    assert request_register.json()['auth_user_id'] == request_login.json()[
-        'auth_user_id']
+    response2 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "alice@gmail.com",
+        "password": "wiefoiewjfwoe",
+        "name_first": "Alice",
+        "name_last": "Wan"
+    })
+    payload1 = response1.json()
+    payload2 = response2.json()
+    assert response2.status_code == 200
+    payload1["auth_user_id"] == 1
+    payload2["auth_user_id"] == 2
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_password_length_less_than_6_v2():
+    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryanle@gmail.com",
+        "password": "pass",
+        "name_first": "Bryan",
+        "name_last": "Le"
+    })
+    assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_first_name_length_less_than_1_v2():
+    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryanle@gmail.com",
+        "password": "password123",
+        "name_first": "",
+        "name_last": "Le"
+    })
+    assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_first_name_length_more_than_50_v2():
+    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryanle@gmail.com",
+        "password": "password123",
+        "name_first": "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn",
+        "name_last": "Le"
+    })
+    assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_last_name_length_less_than_1_v2():
+    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryanle@gmail.com",
+        "password": "password123",
+        "name_first": "Bryan",
+        "name_last": ""
+    })
+    assert request_register1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
-
+def test_last_name_length_more_than_50_v2():
+    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryanle@gmail.com",
+        "password": "password123",
+        "name_first": "Bryan",
+        "name_last": "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn"
+    })
+    assert request_register1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 @pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
 def test_register_invalid_email_v2(email_1):
@@ -159,10 +134,7 @@ def test_register_invalid_email_v2(email_1):
         "name_last": "Le"
     })
     assert request_register.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_register_email_already_used_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -179,94 +151,100 @@ def test_register_email_already_used_v2():
     })
     assert request_register1.status_code == 200
     assert request_register2.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_login_incorrect_email(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "notbryan.le@gmail.com",
+        "password": "test123456",
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_login_incorrect_password(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "password456",
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_login_after_logout(user_1):
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_1['token']
+    })
+
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "test123456"
+    })
+
+    assert r.status_code == 200
+    body = jwt.decode(r.json()['token'], SECRET, algorithms="HS256")
+    assert body == {
+        "auth_user_id": 1,
+        "session_id": 2
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_login_correct(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "test123456"
+    })
+    assert r.status_code == 200
+    body1 = jwt.decode(user_1['token'], SECRET, algorithms="HS256")
+    assert body1 == {
+        "auth_user_id": 1,
+        "session_id": 1
+    }
+    body = jwt.decode(r.json()['token'], SECRET, algorithms="HS256")
+    assert body == {
+        "auth_user_id": 1,
+        "session_id": 2
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_auth_logout(user_1, channel_public):
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_1['token']
+    })
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+    assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
 
 
-def test_register_returns_unique_ID_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "password123",
-        "name_first": "Bryan",
-        "name_last": "Le"
+def test_auth_logout_user_2(user_1, channel_public, user_2):
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_2['token']
     })
-    request_register2 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "jamesnguyen@gmail.com",
-        "password": "password789",
-        "name_first": "James",
-        "name_last": "Nguyen"
+    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
     })
-    assert request_register1.json() != request_register2.json()
+    assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
 
 
-def test_password_length_less_than_6_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "pass",
-        "name_first": "Bryan",
-        "name_last": "Le"
+def test_auth_logout_after_login(user_1):
+    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
+        "email": "mikey@unsw.com",
+        "password": "test123456"
     })
-    assert request_register1.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
+    body = r.json()
+    response = requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": body['token']
     })
-
-
-def test_first_name_length_less_than_1_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "password123",
-        "name_first": "",
-        "name_last": "Le"
-    })
-    assert request_register1.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-def test_first_name_length_more_than_50_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "password123",
-        "name_first": "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn",
-        "name_last": "Le"
-    })
-    assert request_register1.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-def test_last_name_length_less_than_1_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "password123",
-        "name_first": "Bryan",
-        "name_last": ""
-    })
-    assert request_register1.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-def test_last_name_length_more_than_50_v2():
-    request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "bryanle@gmail.com",
-        "password": "password123",
-        "name_first": "Bryan",
-        "name_last": "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbn"
-    })
-    assert request_register1.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
+    assert response.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 @pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
     ("Bryan", "Le", "bryanle", "Bryan", "Le", "bryanle0"),
@@ -343,45 +321,3 @@ def test_handles_appends_correctly(user_1, channel_public):
 
     })
 
-
-def test_auth_logout(user_1, channel_public):
-    requests.post(f"{BASE_URL}/auth/logout/v1", json={
-        "token": user_1['token']
-    })
-    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-    })
-    assert r.status_code == AccessError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-def test_auth_logout_user_2(user_1, channel_public, user_2):
-    requests.post(f"{BASE_URL}/auth/logout/v1", json={
-        "token": user_2['token']
-    })
-    r = requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_2['token'],
-        "channel_id": channel_public['channel_id'],
-    })
-    assert r.status_code == AccessError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
-
-
-def test_auth_logout_after_login(user_1):
-    r = requests.post(f"{BASE_URL}/auth/login/v2", json={
-        "email": "mikey@unsw.com",
-        "password": "test123456"
-    })
-    body = r.json()
-    response = requests.post(f"{BASE_URL}/auth/logout/v1", json={
-        "token": body['token']
-    })
-    assert response.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })

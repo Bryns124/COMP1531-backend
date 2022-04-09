@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp
 from src.error import AccessError, InputError
+from src.classes import Message
 from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner
@@ -22,38 +23,20 @@ def messages_send_v1(token, channel_id, message):
         int: Id of the message which was sent.
     """
     store = data_store.get()
-    decode_token(token)
+    u_id = decode_token(token)['auth_user_id']
     if not channel_validity(channel_id, store):
         raise InputError(description="The channel you have entered is invalid")
-    u_id = decode_token(token)['auth_user_id']
-
     if not already_member(u_id, channel_id, store):
         raise AccessError(description="User is not a member of the channel")
-
     validate_message(message)
-
-    message_id = store['messages']
-
-    if store['messages'] == []:
-        message_id = 1
-    else:
-        message_id = len(store['messages']) + 1
-
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel['messages_list'].append(message_id)
-
-    message_body = {
-        "message_id": message_id,
-        "u_id": u_id,
-        "message": message,
-        "time_sent": generate_timestamp(),
-        "is_ch_message": True,
-    }
-    store['messages'].append(message_body)
-
+    parent = store['channels'][channel_id]
+    new_message = Message(u_id, message, generate_timestamp(),
+                          parent)
+    store['users'][u_id].add_msg(new_message.id, new_message)
+    store['channels'][channel_id].message_list.append(new_message.id)
+    store['messages'][new_message.id] = new_message
     data_store.set(store)
-    return {"message_id": message_id}
+    return {"message_id": new_message.id}
 
 
 def validate_message(message):
@@ -74,52 +57,36 @@ def message_senddm_v1(token, dm_id, message):
     if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
         raise AccessError(description="user is not part of dm")
 
-    if store['messages'] == []:
-        message_id = 1
-    else:
-        message_id = len(store['messages']) + 1
-
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            dm['messages_list'].insert(0, message_id)
-
-    message_body = {
-        "message_id": message_id,
-        "u_id": u_id,
-        "message": message,
-        "time_sent": generate_timestamp(),
-        "is_ch_message": False,
-    }
-    store['messages'].append(message_body)
+    new_dm_message = Message(
+        u_id, message, generate_timestamp(), store['dms'][dm_id])
+    store['dms'][dm_id].message_list.append(new_dm_message.id)
+    store['messages'][new_dm_message.id] = new_dm_message
+    store["users"][u_id].add_msg(new_dm_message.id, new_dm_message)
 
     data_store.set(store)
-    return {"message_id": message_id}
+    return {"message_id": new_dm_message.id}
 
 
 def validate_mid(messages, message_id):
     if messages == []:
         raise InputError(description="incorrect message id")
-    for message in messages:
-        if message_id == message["message_id"]:
+    for message in messages.values():
+        if message_id == message.id:
             return
     raise InputError(description="incorrect message id")
 
 
 def message_access(store, message_id, u_id):
-    for message in store["messages"]:
-        if message_id == message["message_id"]:
-            break
-    if u_id == message["u_id"]:
+    message = store['messages'][message_id]
+    if u_id == message.get_owner():
         return
-    if message["is_ch_message"] == True:
-        for ch in store["channels"]:
-            if message_id in ch['messages_list'] and u_id in ch["owner_members"]:
-                return
+    if message.get_parent_type() == "channel":
+        if message.parent.id == u_id:
+            return
 
-    if message["is_ch_message"] == False:
-        for dm in store["dms"]:
-            if message_id in dm['messages_list'] and u_id in dm["owner_members"]:
-                return
+    if message.get_parent_type() == "dm":
+        if message.parent.id == u_id:
+            return
 
     raise AccessError(description="no access to message")
 
@@ -147,9 +114,7 @@ def message_edit_v1(token, message_id, message):
     validate_mid(store["messages"], message_id)
     message_access(store, message_id, u_id)
 
-    for msg in store["messages"]:
-        if msg["message_id"] == message_id:
-            msg["message"] = message
+    store['messages'][message_id].message = message
 
     data_store.set(store)
     return {}
@@ -177,24 +142,24 @@ def message_remove_v1(token, message_id):
     validate_mid(store["messages"], message_id)
     message_access(store, message_id, u_id)
 
-    for message in store["messages"]:
-        if message["message_id"] == message_id:
-            if message["is_ch_message"]:
-                remove_ch_message(store, message_id)
-            elif not message["is_ch_message"]:
-                remove_dm_message(store, message_id)
+    message = store['messages'][message_id]
+
+    if message.parent.get_type() == "channel":
+        message.parent.message_list.remove(message_id)
+    elif message.parent.get_type() == "dm":
+        message.parent.message_list.remove(message_id)
 
     data_store.set(store)
     return {}
 
 
-def remove_ch_message(store, message_id):
-    for channel in store['channels']:
-        if message_id in channel['messages_list']:
-            channel['messages_list'].remove(message_id)
+# def remove_ch_message(store, message_id):
+#     for channel in store['channels']:
+#         if message_id in channel['messages_list']:
+#             channel['messages_list'].remove(message_id)
 
 
-def remove_dm_message(store, message_id):
-    for dm in store['dms']:
-        if message_id in dm['messages_list']:
-            dm['messages_list'].remove(message_id)
+# def remove_dm_message(store, message_id):
+#     for dm in store['dms']:
+#         if message_id in dm['messages_list']:
+#             dm['messages_list'].remove(message_id)

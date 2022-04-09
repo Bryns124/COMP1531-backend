@@ -23,73 +23,33 @@ Example usage:
     print(store) # Prints { 'names': ['Emily', 'Hayden', 'Jake', 'Nick'] }
     data_store.set(store)
 '''
-
+import re
+import hashlib
 # YOU SHOULD MODIFY THIS OBJECT BELOW
+
 initial_object = {
-    'users': [
-        # {
-        # 'u_id' : , check if is ok
-        # 'session_id':[],
-        # 'permission_id' : #owners(first user created) = 1 members(all following users) = 2
-        # 'email': "", check if using empty string is ok
-        # 'name_first': "",
-        # 'name_last': "",
-        # 'handle_str': "" ,
-        # 'password': "",
-        # 'channels_owned' : [],
-        # 'channels_joined' : [],
-        # }
-    ],
-    'channels': [
-        # {
-        #     'channel_id' : ,
-        #     'channel_name' : "",
-        #     'is_public' : None, #check if we can use None
-        #     'owner_members' : ['u_id'], #check again if this is leagal
-        #     'all_members' : ['u_id'],
-        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
-        #     'start': 25,
-        #     'end': 75,
-        # }
-    ],
-    'dms': [
-        # {
-        #     'dm_id' : ,
-        #     'name' : "",
-        #     'owner_members' : ['u_id'], #check again if this is leagal
-        #     'all_members' : ['u_id'],
-        #     'messages_list': [1,2,3,6,7,8] #list of message IDs
-        #     'start': 25,
-        #     'end': 75,
-        # }
-    ],
-    'messages':[
-        #        {
-        #            'message_id': 1,
-        #            'u_id': 1,
-        #            'message': 'Hello world',
-        #            'time_sent': 1582426789,
-        #            'is_ch_message': True, #this is a channel message
-        #        },
-        #        {
-        #            'message_id': 1,
-        #            'u_id': 1,
-        #            'message': 'Hello world',
-        #            'time_sent': 1582426789,
-        #            'is_ch_message': False, #this is a dm message
-        #        }
-        #       ],
-        # }
-    ],
-    "removed_users": [
-        # {
-        # 'u_id' : , check if is ok
-        # 'email': "", check if using empty string is ok
-        # 'name_first': "",
-        # 'name_last': "",
-        # 'handle_str': "" ,
-        # }
-    ]
+    "users": {
+        # 'auth_user_id' : class object,
+        # 'auth_user_id' : class object
+    },
+    "channels": {
+        # channel_id : class object,
+        # channel_id : class object
+    },
+    "dms": {
+        # dm_id : clas object,
+        # dm_id : class object
+    },
+    "messages": {
+        # message_id : clas object,
+        # message_id : class object
+    },
+    "removed_users": {
+        # channel_id : class object,
+        # channel_id : class object
+    },
+
+    "global_owners_count": 0
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
@@ -114,3 +74,119 @@ print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
+
+
+# class User:
+
+#     def __init__(self, email, name_first, name_last, handle_str, password):
+#         self.u_id = self.set_u_id()
+#         self.permission_id = 0
+#         self.session_id = []  # double check if correct
+#         self.name_first = name_first
+#         self.name_last = name_last
+#         self.email = email
+#         self.handle_str = handle_str
+#         self.password = password
+#         self.channels_owned = []
+#         self.channels_joined = []
+#         self.messages_sent = []
+#         self.dms_own = []
+#         self.set_session_id()
+
+#     def set_u_id(self):
+#         try:
+#             store = data_store.get()
+#             return len(store['users']) + 1
+#         except:
+#             return 1
+
+#     def set_session_id(self):
+#         self.session_id.append(True)
+
+#     def set_permission_id(self):
+#         try:
+#             len(data_store.get()['users'])
+#             return 2
+#         except:
+#             return 1
+
+#     def check_session(self, session_id):
+#         return self.session_id[session_id]
+
+#     def add_ch_owned(self, ch_id, ch_object):
+#         self.channels_owned[ch_id] = ch_object
+
+#     def add_ch_joined(self, ch_id, ch_object):
+#         self.channels_joined[ch_id] = ch_object
+
+
+# class Base_channel:
+#     def __init__(self, auth_user_id, name):
+#         self.id = self.set_ch_id()
+#         self.name = name
+#         self.owner_members = []
+#         self.all_members = []
+#         self.message_list = []
+#         self.start = self.set_start()
+#         self.end = self.set_end()
+#         self.add_owner(auth_user_id)
+#         self.add_member(auth_user_id)
+
+#     def set_ch_id(self):
+#         try:
+#             store = data_store.get()
+#             return len(store['channels']) + 1
+#         except:
+#             return 1
+
+#     def add_owner(self, auth_user_id):
+#         store = data_store.get()
+#         self.owner_members[auth_user_id] = store["users"][auth_user_id]
+
+#     def add_member(self, auth_user_id):
+#         store = data_store.get()
+#         self.all_members[auth_user_id] = store["users"][auth_user_id]
+
+#     def set_start(self):
+#         return 0
+
+#     def set_end(self):
+#         return 50
+
+#     def get_type(self):
+#         store = data_store.get()
+#         if self.id in store['channels']:
+#             return "channel"
+#         elif self.id in store['dms']:
+#             return "dm"
+
+#     def check_msg_list(self, message_id):
+#         if message_id in self.message_list:
+#             return True
+#         else:
+#             return False
+# class Channel(Base_channel):
+#     def __init__(self, is_public):
+#         self.is_public = is_public
+
+
+# class Message:
+#     def __init__(self, u_id, message, time_sent, parent):
+#         self.id = self.set_message_id()
+#         self.u_id = u_id
+#         self.message = message
+#         self.time_sent = time_sent
+#         self.parent = parent
+
+#     def set_message_id(self):
+#         store = data_store.get()
+#         if store['messages'] == {}:
+#             return 1
+#         else:
+#             return len(store['messages']) + 1
+
+#     def get_owner(self):
+#         return self.u_id
+
+#     def get_parent_type(self):
+#         return self.parent.get_type
