@@ -49,7 +49,7 @@ initial_object = {
         # channel_id : class object
     },
 
-    "global_owners_count" : 0
+    "global_owners_count": 0
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE

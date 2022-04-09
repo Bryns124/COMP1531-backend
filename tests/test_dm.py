@@ -74,7 +74,7 @@ def invalid_message_text():
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
 
 
-requests.delete(f"{BASE_URL}/clear/v1", json={})
+# requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_dm_create_invalid_ids(user_1):
@@ -315,9 +315,12 @@ def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
     payload = response.json()
     assert payload["name"] == "adiyatrahman, alicewan, michaelchai"
     assert payload["members"] == [
-        user_1['auth_user_id'],
-        user_2['auth_user_id'],
-        user_3['auth_user_id']
+        {'u_id': 1, 'email': 'alice@gmail.com', 'name_first': 'Alice',
+         'name_last': 'Wan', 'handle_str': 'alicewan'},
+        {'u_id': 2, 'email': 'adi@gmail.com', 'name_first': 'Adiyat',
+            'name_last': 'Rahman', 'handle_str': 'adiyatrahman'},
+        {'u_id': 3, 'email': 'michael@gmail.com', 'name_first': 'Michael',
+            'name_last': 'Chai', 'handle_str': 'michaelchai'}
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 

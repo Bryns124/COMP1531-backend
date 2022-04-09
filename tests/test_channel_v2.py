@@ -250,7 +250,6 @@ def test_channel_invite(user_1, channel_public, user_2):
         'channels'][-1]['channel_id'] == channel_public['channel_id']
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-<<<<<<< HEAD
     # channel_invite_v1(user_1['token'], channel_public['channel_id'], user_2['auth_user_id'])
     # assert channels_list_v1(user_2['token'])['channels'][-1]['channel_id'] == channel_public['channel_id']
     # clear_v1()
@@ -333,87 +332,6 @@ def test_channel_messages_v1(user_1, channel_public):
 
 
 # Tests for channel/addowner
-=======
-# def test_channel_messages_v1_channel_id_error(user_1, invalid_channel_id):
-#     """
-#     This function tests that a id_error is raised when the user is trying to access the messages for
-#     a invalid channel_id
-#     Args:
-#         user_1 (u_id): Id of the user who is attempting to read a channel's messages
-#         invalid_channel_id (channel_id): The invalid channel id
-#         start (start): Where the user wants to start indexing the messages from
-#     """
-#     request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_1['token'],
-#         "channel_id": invalid_channel_id,
-#         "start": 0
-#     })
-#     assert request_channel_messages.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# def test_channel_messages_v1_access_error(user_no_access, channel_public):
-#     """
-#     This function tests that a exception is raised when a user tries to read the messages
-#     of a channel they do not have access to.
-#     Args:
-#         user_no_access (u_id): Id of the user who has no access to read the channel messages
-#         channel_public (channel_id): Id of the channel the user is trying to access
-#         start start): Starting index
-#     """
-#     request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_no_access['token'],
-#         "channel_id": int(channel_public['channel_id']),
-#         "start": 0
-#     })
-#     assert request_channel_messages.status_code == AccessError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# def test_channel_messages_v1_multiple_channels(user_1, channel_private, channel_public):
-#     """
-#     This test checks to see that no messages are present when after creating a channel
-#     Args:
-#         user_1 (u_id): The id of the user trying to read the messages in a channel
-#         channel_public (channel_id): The channel_id the user is trying to access
-#         first_message (start_): Starting index of the messages
-#     """
-#     request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "start": 0
-#     })
-#     assert request_channel_messages.json() == {
-#         'messages': [],
-#         'start': 0,
-#         'end': -1}
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# def test_channel_messages_v1(user_1, channel_public):
-#     """
-#     This test checks to see that no messages are present when after creating a channel
-#     Args:
-#         user_1 (u_id): The id of the user trying to read the messages in a channel
-#         channel_public (channel_id): The channel_id the user is trying to access
-#         first_message (start_): Starting index of the messages
-#     """
-#     request_channel_messages = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "start": 0
-#     })
-#     assert request_channel_messages.json() == {
-#         'messages': [],
-#         'start': 0,
-#         'end': -1}
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# # Tests for channel/addowner
-
-
->>>>>>> 25679ba3bb1614e6783e330e50ff298b11a1ad2c
 def test_channel_addowner(user_1, user_2, channel_public):
     """
     This test makes a user an owner of the channel.
@@ -565,11 +483,8 @@ def test_channel_addowner_invalid_token(user_1, user_2, channel_public):
     })
     assert request_channel_add_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-<<<<<<< HEAD
 
 # Tests for channel/removeowner
-=======
->>>>>>> 25679ba3bb1614e6783e330e50ff298b11a1ad2c
 
 
 def test_channel_removeowner(user_1, user_2, channel_public):
@@ -792,7 +707,6 @@ def test_channel_removeowner_only_one_owner(user_1, channel_public):
     assert request_channel_remove_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-<<<<<<< HEAD
 
 def test_channel_removeowner_invalid_token(user_1, user_2, channel_public):
     requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -818,8 +732,6 @@ def test_channel_removeowner_invalid_token(user_1, user_2, channel_public):
     assert request_channel_remove_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 #
-=======
->>>>>>> 25679ba3bb1614e6783e330e50ff298b11a1ad2c
 
 
 def test_channel_details_input_error(user_1, invalid_channel_id):

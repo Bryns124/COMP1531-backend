@@ -13,7 +13,7 @@ from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, 
 from src.helper import save_data_store, load_data_store
 from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
-from src.admin import admin_user_remove_v1, admin_userpermission_change_v1, remove_id_from_group
+from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 
 
