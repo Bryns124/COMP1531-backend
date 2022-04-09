@@ -61,6 +61,7 @@ def message_senddm_v1(token, dm_id, message):
         u_id, message, generate_timestamp(), store['dms'][dm_id])
     store['dms'][dm_id].message_list.append(new_dm_message.id)
     store['messages'][new_dm_message.id] = new_dm_message
+    store["users"][u_id].add_msg(new_dm_message.id, new_dm_message)
 
     data_store.set(store)
     return {"message_id": new_dm_message.id}

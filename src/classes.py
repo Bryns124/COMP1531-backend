@@ -23,7 +23,7 @@ class User:
     def set_u_id(self):
         try:
             store = data_store.get()
-            return len(store['users']) + 1
+            return len(store['users']) + len(store['removed_users']) + 1
         except:
             store = data_store.get()
             return 1
