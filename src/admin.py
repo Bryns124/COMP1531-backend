@@ -18,11 +18,14 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     Input: {token, u_id, permission_id}
     Output: {}
     """
-
+    store = data_store.get()
     auth_user_id = decode_token(token)["auth_user_id"]
 
     if u_id not in store["users"]:
         raise InputError("The user specified does not exist")
+
+    if store["users"][u_id].permission_id == permission_id:
+        raise InputError("User already has specified permissions")
 
     if (store["global_owners_count"] == 1) and store["users"][u_id].permission_id == 1:
         raise InputError("You cannot remove the only global owner.")
@@ -30,17 +33,12 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     if not permission_id in [1, 2]:
         raise InputError("Invalid permission id.")
 
-    if store["users"][u_id].permission_id == permission_id:
-        raise InputError("User already has specified permissions")
-
     if store["users"][auth_user_id].permission_id != 1:
         raise AccessError("The authorised user is not a global user.")
 
-
-    #if changing to 1, then += global owner
-    #if changing to 2 then -= global owner
-    #chane user.permission_id
+    store["users"][u_id].permission_id = permission_id
     data_store.set(store)
+    return {}
 
 
 def admin_user_remove_v1(token, u_id):
@@ -76,7 +74,7 @@ def admin_user_remove_v1(token, u_id):
     messages_dict = store["users"][u_id].messages_sent
 
     for message in messages_dict:
-        messsages_dict[message].message = "Removed user"
+        messages_dict[message].message = "Removed user"
 
     store["removed_users"][u_id] = store["users"][u_id]
     data_store.set(store)
