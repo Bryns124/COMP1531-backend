@@ -12,6 +12,7 @@ Functions:
     user_profile_sethandle: Update the authorised user's hand (handle name)
 """
 
+
 def users_all_v1(token):
     """returns a list of all users and their associated details
 
@@ -46,6 +47,7 @@ def extract_user_details(user):
     }
     return users
 
+
 def user_profile_v1(token, u_id):
     """returns a the details of one particular user with the associated user_id
 
@@ -70,7 +72,6 @@ def user_profile_v1(token, u_id):
     if u_id in store["users"]:
         user_details = extract_user_details(store["users"][u_id])
 
-
     return {
         'user': user_details
     }
@@ -90,7 +91,8 @@ def valid_user_id(user_id):
     if user_id in store["users"] or user_id in store["removed_users"]:
         return True
 
-    raise InputError(description="This auth_user_id does not exist in the datastore.")
+    raise InputError(
+        description="This auth_user_id does not exist in the datastore.")
 
 
 def user_profile_setname_v1(token, name_first, name_last):
@@ -109,11 +111,11 @@ def user_profile_setname_v1(token, name_first, name_last):
     auth_user_id = decode_token(token)['auth_user_id']
 
     if not name_length_check(name_first):
-        raise InputError(description=
-            "The length of the new first name has to be within 1 and 50 characters inclusive")
+        raise InputError(
+            description="The length of the new first name has to be within 1 and 50 characters inclusive")
     if not name_length_check(name_last):
-        raise InputError(description=
-            "The length of the new last name has to be within 1 and 50 characters inclusive")
+        raise InputError(
+            description="The length of the new last name has to be within 1 and 50 characters inclusive")
 
     store["users"][auth_user_id].name_first = name_first
     store["users"][auth_user_id].name_last = name_last
@@ -137,8 +139,8 @@ def user_profile_setemail_v1(token, email):
     auth_user_id = decode_token(token)['auth_user_id']
 
     if not valid_email(email):
-        raise InputError(description=
-            "Email entered is not of valid format or is already in use by another user")
+        raise InputError(
+            description="Email entered is not of valid format or is already in use by another user")
 
     store["users"][auth_user_id].email = email
     data_store.set(store)

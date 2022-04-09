@@ -21,6 +21,8 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     store = data_store.get()
     auth_user_id = decode_token(token)["auth_user_id"]
 
+    store = data_store.get()
+
     if u_id not in store["users"]:
         raise InputError("The user specified does not exist")
 
@@ -37,6 +39,13 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         raise AccessError("The authorised user is not a global user.")
 
     store["users"][u_id].permission_id = permission_id
+
+    if permission_id == 1:
+        store["global_users_count"] += 1
+
+    if permission_id == 2:
+        store["global_users_count"] -= 1
+
     data_store.set(store)
     return {}
 
@@ -75,7 +84,8 @@ def admin_user_remove_v1(token, u_id):
     for message in messages_dict:
         messages_dict[message].message = "Removed user"
 
-    store["removed_users"][u_id] = store["users"][u_id]
+    store["removed_users"][u_id] = store["users"].pop(u_id)
+
     data_store.set(store)
 
     return{}
