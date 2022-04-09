@@ -59,15 +59,14 @@ def admin_user_remove_v1(token, u_id):
     auth_user_id = decode_token(token)["auth_user_id"]
 
     store = data_store.get()
+    if store["users"][auth_user_id].permission_id != 1:
+        raise AccessError("The authorised user is not a global user.")
 
     if u_id not in store["users"]:
         raise InputError("The user specified does not exist")
 
     if (store["global_owners_count"] == 1) and store["users"][u_id].permission_id == 1:
         raise InputError("You cannot remove the only global owner.")
-
-    if store["users"][auth_user_id].permission_id != 1:
-        raise AccessError("The authorised user is not a global user.")
 
     store["users"][u_id].name_first = "Removed"
     store["users"][u_id].name_last = "user"

@@ -6,7 +6,7 @@ class User:
         self, email, password, name_first, name_last, handle
     ):
         self.auth_user_id = self.set_u_id()
-        self.permission_id = 0
+        self.permission_id = self.set_permission_id()
         self.session_id = []  # double check if correct
         self.name_first = name_first
         self.name_last = name_last
@@ -19,7 +19,6 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
-        self.set_permission_id()
 
     def set_u_id(self):
         try:
@@ -27,7 +26,6 @@ class User:
             return len(store['users']) + 1
         except:
             store = data_store.get()
-            store['global_owners_count'] += 1
             return 1
 
     def set_session_id(self):
@@ -71,12 +69,12 @@ class User:
         self.dms_own.pop(dm_id, None)
 
     def set_permission_id(self):
-        try:
-            len(data_store.get()['users'])
-            return 2
-        except:
+        if len(data_store.get()['users']) == 0:
+            store = data_store.get()
+            store['global_owners_count'] += 1
             return 1
-
+        else:
+            return 2
     # def set_session_id(self):
     #     self.session_id.append(True)
 
