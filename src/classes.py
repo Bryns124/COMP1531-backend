@@ -19,6 +19,7 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
+        self.set_permission_id()
 
     def set_u_id(self):
         try:
@@ -26,7 +27,7 @@ class User:
             return len(store['users']) + 1
         except:
             store = data_store.get()
-            store["global_owners_count"] += 1
+            store['global_owners_count'] += 1
             return 1
 
     def set_session_id(self):
@@ -65,6 +66,10 @@ class User:
         self.all_channels.pop(ch_id, None)
         self.channels_owned.pop(ch_id, None)
 
+    def dm_leave(self, dm_id):
+        self.all_dms.pop(dm_id, None)
+        self.dms_own.pop(dm_id, None)
+
     def set_permission_id(self):
         try:
             len(data_store.get()['users'])
@@ -76,7 +81,7 @@ class User:
     #     self.session_id.append(True)
 
 
-class Base:
+class BaseChannel:
     def __init__(self, auth_user_id, name):
         self.id = self.set_ch_id()
         self.name = name
@@ -126,9 +131,9 @@ class Base:
             return False
 
 
-class Dm(Base):
+class Dm(BaseChannel):
     def __init__(self, auth_user_id, name,  u_ids):
-        Base.__init__(self, auth_user_id, name)
+        BaseChannel.__init__(self, auth_user_id, name)
         self.id = self.set_dm_id()
 
     def set_dm_id(self):
@@ -138,10 +143,25 @@ class Dm(Base):
         except:
             return 1
 
+    def remove_all(self):
+        # try:
+        for member in self.owner_members:
+            self.owner_members[member].dm_leave(self.id)
+            # self.owner_members.pop(member, None)
+            # self.all_members.pop(member, None)
+        # except:
+        #     pass
+        for member in self.all_members:
+            # try:
+            self.all_members[member].dm_leave(self.id)
+            # self.all_members.pop(member, None)
+            # except:
+            #     pass
 
-class Channel(Base):
+
+class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
-        Base.__init__(self, auth_user_id, name)
+        BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
 
 
@@ -164,4 +184,4 @@ class Message:
         return self.u_id
 
     def get_parent_type(self):
-        return self.parent.get_type
+        return self.parent.get_type()

@@ -58,8 +58,8 @@ def message_senddm_v1(token, dm_id, message):
         raise AccessError(description="user is not part of dm")
 
     new_dm_message = Message(
-        u_id, message, generate_timestamp(), store['dms'][dm_id].values())
-    store['dms'][dm_id].messages_list.insert(0, new_dm_message.id)
+        u_id, message, generate_timestamp(), store['dms'][dm_id])
+    store['dms'][dm_id].message_list.append(new_dm_message.id)
     store['messages'][new_dm_message.id] = new_dm_message
 
     data_store.set(store)
@@ -69,22 +69,22 @@ def message_senddm_v1(token, dm_id, message):
 def validate_mid(messages, message_id):
     if messages == []:
         raise InputError(description="incorrect message id")
-    for message in messages:
-        if message_id == message["message_id"]:
+    for message in messages.values():
+        if message_id == message.id:
             return
     raise InputError(description="incorrect message id")
 
 
 def message_access(store, message_id, u_id):
     message = store['messages'][message_id]
-    if u_id == message.get_owner:
+    if u_id == message.get_owner():
         return
-    if message.get_parent_type == "channel":
-        if message.parent.check_msg_list:
+    if message.get_parent_type() == "channel":
+        if message.parent.id == u_id:
             return
 
-    if message.get_parent_type == "dm":
-        if message.parent.check_msg_list:
+    if message.get_parent_type() == "dm":
+        if message.parent.id == u_id:
             return
 
     raise AccessError(description="no access to message")
@@ -143,10 +143,10 @@ def message_remove_v1(token, message_id):
 
     message = store['messages'][message_id]
 
-    if message.parent.get_type == "channel":
-        message.parent.message_list.remove[message_id]
-    elif message.parent.get_type == "dm":
-        message.parent.message_list.remove[message_id]
+    if message.parent.get_type() == "channel":
+        message.parent.message_list.remove(message_id)
+    elif message.parent.get_type() == "dm":
+        message.parent.message_list.remove(message_id)
 
     data_store.set(store)
     return {}

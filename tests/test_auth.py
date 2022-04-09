@@ -3,6 +3,8 @@ from src.data_store import data_store
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
+from src.channel import channel_join_v1, channel_details_v1
+from src.channels import channels_create_v1
 
 # Fixture for testing incorrect login
 
@@ -10,6 +12,11 @@ from src.other import clear_v1
 @pytest.fixture
 def user_1():
     return auth_register_v1("bryanle@gmail.com", "password123", "Bryan", "Le")
+
+
+@pytest.fixture
+def channel_public(user_1):
+    return channels_create_v1(user_1["token"], "Test Channel", True)
 
 
 @pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
@@ -132,129 +139,45 @@ def test_last_name_length_more_than_50():
 # Testing that the handle is generated correctly
 
 
-def test_handle_generated_correctly():
-    store = data_store.get()
-    auth_register_v1("bryanle1@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle2@gmail.com", "password123", "Bryan", "Le")
-    auth_register_v1("bryanle3@gmail.com", "password123",
-                     "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
-    auth_register_v1("bryanle4@gmail.com", "password123",
-                     "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee")
-    handle_str1 = store['users'][0]['handle_str']
-    handle_str2 = store['users'][1]['handle_str']
-    handle_str3 = store['users'][2]['handle_str']
-    handle_str4 = store['users'][3]['handle_str']
-    # Tests that the handle cuts off at more than 20 characters
-    assert len(handle_str1) <= 20
-    assert len(handle_str3) <= 20
-    # Tests that a unique handle is created for a new user with the same first name and last name
-    assert handle_str1 != handle_str2
-    assert handle_str3 != handle_str4
+@pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
+    ("Bryan", "Le", "bryanle0", "Bryan", "Le", "bryanle1"),
+    ("Bryan", "Le", "bryanle0", "Bryan",
+     "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee"),
+    ("Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee",
+     "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee0"),
+    ("Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn", "Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn0")])
+def test_handle_generated_correctly(user_1, channel_public, name_first, name_last, handle_1, name_first_2, name_last_2, handle_2):
+    user1 = auth_register_v1("bryanle1@gmail.com",
+                             "password123", name_first, name_last)
+    user2 = auth_register_v1("bryanle2@gmail.com",
+                             "password123", name_first_2, name_last_2)
+
+    channel_join_v1(user1['token'], channel_public['channel_id'])
+    channel_join_v1(user2['token'], channel_public['channel_id'])
+
+    details = channel_details_v1(user_1['token'], channel_public['channel_id'])
+
+    for users in details['all_members']:
+        if users['u_id'] == user1['auth_user_id']:
+            assert users['name_first'] == name_first
+            assert users['name_last'] == name_last
+            assert users['handle_str'] == handle_1
+        if users['u_id'] == user2['auth_user_id']:
+            assert users['name_first'] == name_first_2
+            assert users['name_last'] == name_last_2
+            assert users['handle_str'] == handle_2
     clear_v1()
-# Testing that the handle appends the number correctly for more than once instance of the handle
 
 
-def test_handles_appends_correctly():
-    store = data_store.get()
-    first = 'abc'
-    last = 'def'
-    handle1 = 'abcdef'
-    handle2 = 'abcdef0'
-    handle3 = 'abcdef1'
-    handle4 = 'abcdef2'
-    handle5 = 'abcdef3'
-    handle6 = 'abcdef4'
-    handle7 = 'abcdef5'
-    handle8 = 'abcdef6'
-    handle9 = 'abcdef7'
-    handle10 = 'abcdef8'
-    handle11 = 'abcdef9'
-    handle12 = 'abcdef10'
+def test_handles_appends_correctly(user_1, channel_public):
+    handles = ["bryanle", "abcdef", 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
+               'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10', 'abcdef11', 'abcdef12', 'abcdef13', 'abcdef14', 'abcdef15', 'abcdef16', 'abcdef17', 'abcdef18', 'abcdef19', 'abcdef20']
+    for _ in range(22):
+        users = auth_register_v1(
+            f"bryanle{_}@gmail.com", "password123", "abc", "def")
+        channel_join_v1(users['token'], channel_public['channel_id'])
 
-    u_id1 = auth_register_v1(
-        'abcdef1@email.com', 'password123', first, last)['auth_user_id']
-    u_id2 = auth_register_v1(
-        'abcdef2@email.com', 'password456', first, last)['auth_user_id']
-    u_id3 = auth_register_v1(
-        'abcdef3@email.com', 'password789', first, last)['auth_user_id']
-    u_id4 = auth_register_v1(
-        'abcdef4@email.com', 'password123', first, last)['auth_user_id']
-    u_id5 = auth_register_v1(
-        'abcdef5@email.com', 'password456', first, last)['auth_user_id']
-    u_id6 = auth_register_v1(
-        'abcdef6@email.com', 'password789', first, last)['auth_user_id']
-    u_id7 = auth_register_v1(
-        'abcdef7@email.com', 'password123', first, last)['auth_user_id']
-    u_id8 = auth_register_v1(
-        'abcdef8@email.com', 'password456', first, last)['auth_user_id']
-    u_id9 = auth_register_v1(
-        'abcdef9@email.com', 'password789', first, last)['auth_user_id']
-    u_id10 = auth_register_v1('abcdef10@email.com',
-                              'password789', first, last)['auth_user_id']
-    u_id11 = auth_register_v1('abcdef11@email.com',
-                              'password789', first, last)['auth_user_id']
-    u_id12 = auth_register_v1('abcdef12@email.com',
-                              'password789', first, last)['auth_user_id']
-
-    for k in store['users']:
-        if k['u_id'] == u_id1:
-            assert k['email'] == 'abcdef1@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle1
-        if k['u_id'] == u_id2:
-            assert k['email'] == 'abcdef2@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle2
-        if k['u_id'] == u_id3:
-            assert k['email'] == 'abcdef3@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle3
-        if k['u_id'] == u_id4:
-            assert k['email'] == 'abcdef4@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle4
-        if k['u_id'] == u_id5:
-            assert k['email'] == 'abcdef5@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle5
-        if k['u_id'] == u_id6:
-            assert k['email'] == 'abcdef6@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle6
-        if k['u_id'] == u_id7:
-            assert k['email'] == 'abcdef7@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle7
-        if k['u_id'] == u_id8:
-            assert k['email'] == 'abcdef8@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle8
-        if k['u_id'] == u_id9:
-            assert k['email'] == 'abcdef9@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle9
-        if k['u_id'] == u_id10:
-            assert k['email'] == 'abcdef10@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle10
-        if k['u_id'] == u_id11:
-            assert k['email'] == 'abcdef11@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle11
-        if k['u_id'] == u_id12:
-            assert k['email'] == 'abcdef12@email.com'
-            assert k['name_first'] == first
-            assert k['name_last'] == last
-            assert k['handle_str'] == handle12
+    details = channel_details_v1(user_1['token'], channel_public['channel_id'])
+    for users in details['all_members']:
+        assert users['handle_str'] in handles
     clear_v1()
