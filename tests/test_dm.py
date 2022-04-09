@@ -11,7 +11,7 @@ import jwt
 import pytest
 
 BASE_URL = url
-
+requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 @pytest.fixture
 def user_1():
@@ -593,55 +593,56 @@ def test_message_edit_no_access(user_1, user_2, create_dm_2_user):
     assert r.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# def test_message_edit1(user_1,create_dm_2_user):
-#     requests.post(f"{BASE_URL}/message/senddm/v1", json={
-#         "token": user_1['token'],
-#         "dm_id": 1,
-#         "message": "hello world"
-#     })
+def test_message_edit1(user_1,create_dm_2_user):
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "hello world"
+    })
 
-#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-#         "token": user_1["token"],
-#         "message_id": 1,
-#         "message": "new message"
-#     })
-#     payload = r.json()
-#     assert payload == {}
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "new message"
+    })
+    payload = r.json()
+    assert payload == {}
 
-#     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-#         "token": user_1['token'],
-#         "dm_id": 1,
-#         "start": 0
-#     })
-#     assert r2.status_code == 200
-#     payload = r2.json()
-#     assert payload["messages"][-1]["message"] == "new message"
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "new message"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# def test_message_edit2(user_1,create_dm_3_user):
-#     requests.post(f"{BASE_URL}/message/senddm/v1", json={
-#         "token": user_3['token'],
-#         "dm_id": 1,
-#         "message": "hello world"
-#     })
+def test_message_edit2(user_1, user_3, create_dm_3_user):
+    re = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_3['token'],
+        "dm_id": 1,
+        "message": "hello world"
+    })
+    assert re.status_code == 200
+    r = requests.put(f"{BASE_URL}/message/edit/v1", json={
+        "token": user_1["token"],
+        "message_id": 1,
+        "message": "new message"
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload == {}
 
-#     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
-#         "token": user_1["token"],
-#         "message_id": 1,
-#         "message": "new message"
-#     })
-#     payload = r.json()
-#     assert payload == {}
-
-#     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-#         "token": user_1['token'],
-#         "dm_id": 1,
-#         "start": 0
-#     })
-#     assert r2.status_code == 200
-#     payload = r2.json()
-#     assert payload["messages"][-1]["message"] == "new message"
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    assert r2.status_code == 200
+    payload = r2.json()
+    assert payload["messages"][-1]["message"] == "new message"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_message_remove_invalid_mid(user_1, create_dm_2_user):
