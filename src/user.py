@@ -115,12 +115,8 @@ def user_profile_setname_v1(token, name_first, name_last):
         raise InputError(description=
             "The length of the new last name has to be within 1 and 50 characters inclusive")
 
-
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['name_first'] = name_first
-            user['name_last'] = name_last
-
+    store["users"][auth_user_id].name_first = name_first
+    store["users"][auth_user_id].name_last = name_last
     data_store.set(store)
     return {}
 
@@ -144,10 +140,7 @@ def user_profile_setemail_v1(token, email):
         raise InputError(description=
             "Email entered is not of valid format or is already in use by another user")
 
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['email'] = email
-
+    store["users"][auth_user_id].email = email
     data_store.set(store)
     return {}
 
@@ -174,11 +167,7 @@ def user_profile_sethandle_v1(token, handle_str):
                          or it contains non-alphanumeric characters,
                          or it is already in-use""")
 
-
-    for user in store['users']:
-        if user['u_id'] == auth_user_id:
-            user['handle_str'] = handle_str
-
+    store["users"][auth_user_id].handle = handle_str
     data_store.set(store)
     return {}
 
