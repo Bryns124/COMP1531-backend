@@ -15,7 +15,7 @@ import pytest
 
 ##MAY CHANGE PORT LATER##
 BASE_URL = url
-
+requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # Users
 
@@ -56,6 +56,13 @@ def user_no_access():
 def user_invalid():
     return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
 
+@pytest.fixture
+def c(user_1, user_2):
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
+        "token": user_1['token'],
+        "u_ids": [user_2['auth_user_id']]
+    })
+    return r.json()
 
 @pytest.fixture
 def channel_public(user_1):
@@ -391,3 +398,215 @@ def test_messages_send_51(user_1, channel_public, message_text, starting_value):
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+def test_search_too_short(user_1, invalid_message_text_short):
+    r = requests.get(f"{BASE_URL}/search/v1", params={
+        "token": user_1['token'],
+        "query_str": invalid_message_text_short
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_search_too_long(user_1, invalid_message_text):
+    r = requests.get(f"{BASE_URL}/search/v1", params={
+        "token": user_1['token'],
+        "query_str": invalid_message_text
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_search_specific(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "find this"
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "not this"
+    })
+    r = requests.get(f"{BASE_URL}/search/v1", params={
+        "token": user_2['token'],
+        "query_str": "find this"
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload["messages"][-1]["u_id"] == 1
+    assert payload["messages"][-1]["message"] == "find this"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_search_multiple(user_1, user_2, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "we are looking for birdsarereal"
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "I believe birdsarereal blah blah"
+    })
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2['token'],
+        "dm_id": 1,
+        "message": "birdsarentreal dont find me"
+    })
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2['token'],
+        "dm_id": 1,
+        "message": "imhidingbirdsarerealoverhere"
+    })
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "Like i said,birdsarereal"
+    })
+    r = requests.get(f"{BASE_URL}/search/v1", params={
+        "token": user_2['token'],
+        "query_str": "birdsarereal"
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload["messages"][0]["message"] == "we are looking for birdsarereal"
+    assert payload["messages"][1]["message"] == "I believe birdsarereal blah blah"
+    assert payload["messages"][2]["message"] == "imhidingbirdsarerealoverhere"
+    assert payload["messages"][3]["message"] == "Like i said,birdsarereal"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_invalid_channeldm(user_1, user_2):
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": -20,
+        "dm_id": 500
+    })
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_user):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "Hello world"
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": create_dm_2_user['dm_id']
+    })
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_invalid_message(user_1, user_2, channel_public, create_dm_2_user):
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
+    })
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_toolong(user_1, user_2, channel_public, create_dm_2_user, invalid_message_text):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": invalid_message_text
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
+    })
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_not_ch_member(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": invalid_message_text
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": -1,
+        "dm_id": 1
+    })
+    assert request.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_not_dm_member(user_1, user_2, create_dm_2_user):
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2['token'],
+        "dm_id": 1,
+        "message": "Hello World"
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": 1,
+        "dm_id": -1,
+    })
+    assert request.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2['token'],
+        "dm_id": 1,
+        "message": "Hello World",
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "sharing this to a channel",
+        "channel_id": 1,
+        "dm_id": -1,
+    })
+    assert request.status_code == 200
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": 0
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    payload["messages"][-1]["message"] = "sharing this to a channel Hello World"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "Hello world"
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_invalid,
+        "og_message_id": 1,
+        "message": "sharing this to a dm",
+        "channel_id": -1,
+        "dm_id": 1,
+    })
+    assert request.status_code == 200
+    r = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "channel_id": create_dm_2_user['dm_id'],
+        "start": 0
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    payload["messages"][-1]["message"] = "sharing this to a dm Hello World"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+
