@@ -116,6 +116,14 @@ def invalid_message_text():
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
 
 
+@pytest.fixture
+def invalid_message_id():
+    return -1
+
+
+@pytest.fixture
+def invalid_react_id():
+    return -1
 # def test_message_edit(user_1):
 #     # craete channel, send message
 #     r = requests.put(f"{BASE_URL}/message/edit/v1", json={
@@ -608,5 +616,205 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     payload["messages"][-1]["message"] = "sharing this to a dm Hello World"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+# React tests
+# def test_messages_react_successful(user_1, channel_public, message_text):
+#     send = requests.post(f"{BASE_URL}/message/send/v1", json={
+#         "token": user_1['token'],
+#         "channel_id": channel_public['channel_id'],
+#         "message": message_text
+#     })
+#     payload = send.json()
+
+#     request = requests.post(f"{url}/message/react", json={
+#         'token': user_1['token'],
+#         'message_id': payload['message_id'],
+#         'react_id': invalid_react_id
+#     })
 
 
+def test_messages_react_invalid_token(user_1, channel_public, message_text, user_invalid):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_invalid,
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+
+def test_messages_react_invalid_message_id(user_1, channel_public, message_text, invalid_message_id):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    request = requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': invalid_message_id,
+        'react_id': 1
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_messages_react_invalid_react_id(user_1, channel_public, message_text, invalid_react_id):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    request = requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': invalid_react_id
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_messages_react_already_reacted(user_1, channel_public, message_text):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+    request = requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+# Unreact tests
+# def test_messages_unreact_successful(user_1, channel_public, message_text):
+#     send = requests.post(f"{BASE_URL}/message/send/v1", json={
+#         "token": user_1['token'],
+#         "channel_id": channel_public['channel_id'],
+#         "message": message_text
+#     })
+#     payload = send.json()
+
+#     request = requests.post(f"{url}/message/react", json={
+#         'token': user_1['token'],
+#         'message_id': payload['message_id'],
+#         'react_id': invalid_react_id
+#     })
+
+def test_messages_unreact_invalid_token(user_1, channel_public, message_text, user_invalid):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    request = requests.post(f"{url}/message/unreact", json={
+        'token': user_invalid,
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_messages_unreact_invalid_message_id(user_1, channel_public, message_text, invalid_message_id):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    request = requests.post(f"{url}/message/unreact", json={
+        'token': user_1['token'],
+        'message_id': invalid_message_id,
+        'react_id': 1
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_messages_unreact_invalid_react_id(user_1, channel_public, message_text, invalid_react_id):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    request = requests.post(f"{url}/message/unreact", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': invalid_react_id
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_messages_react_already_unreacted(user_1, channel_public, message_text):
+    send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    requests.post(f"{url}/message/react", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    requests.post(f"{url}/message/unreact", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    request = requests.post(f"{url}/message/unreact", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
