@@ -1,6 +1,5 @@
 from src.data_store import data_store
 
-
 class User:
     def __init__(
         self, email, password, name_first, name_last, handle
