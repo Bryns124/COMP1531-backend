@@ -222,6 +222,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     u_id = decode_token(token)["auth_user_id"]
     if time_sent < generate_timestamp():
         raise InputError("Time is in the past")
+
     if not channel_validity(channel_id, store):
         raise InputError(description="The channel you have entered is invalid")
     if not already_member(u_id, channel_id, store):
