@@ -1,11 +1,11 @@
 from src.data_store import data_store
-from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp
+from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp, Queue
 from src.error import AccessError, InputError
 from src.classes import Message
 from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner
-
+import threading
 
 def messages_send_v1(token, channel_id, message):
     """_summary_
@@ -188,7 +188,7 @@ def search_v1(token, query_str):
 
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     store = data_store.get()
-    auth_user_id = decode_token(token)['auth_user_id']
+    #auth_user_id = decode_token(token)['auth_user_id']
 
     if channel_id not in store["channels"] and dm_id not in store["dms"]:
         raise InputError("both channel and dm id are invalid")
@@ -217,14 +217,39 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     }
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
-    return {
-        "message_id": 1
-    }
+    store = data_store.get()
+    validate_message(message)
+    u_id = decode_token(token)["auth_user_id"]
+    if time_sent < generate_timestamp():
+        raise InputError("Time is in the past")
+    if not channel_validity(channel_id, store):
+        raise InputError(description="The channel you have entered is invalid")
+    if not already_member(u_id, channel_id, store):
+        raise AccessError(description="User is not a member of the channel")
+
+    delay = (time_sent - generate_timestamp())
+    t = threading.Timer(
+        delay, messages_send_v1, (token, channel_id, message)
+    ).start()
+
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
-    return {
-        "message_id": 1
-    }
+    store = data_store.get()
+    validate_message(message)
+    u_id = decode_token(token)["auth_user_id"]
+    if time_sent < generate_timestamp():
+        raise InputError("Time is in the past")
+
+    if not valid_dm_id(store, dm_id):
+        raise InputError(description="dm id does not exist")
+
+    if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
+        raise AccessError(description="user is not part of dm")
+    delay = (time_sent - generate_timestamp())
+
+    t = threading.Timer(
+        delay, message_senddm_v1, (token, dm_id, message)
+    ).start()
 
 def check_message_exists(message, auth_user_id):
     store = data_store.get()

@@ -419,7 +419,7 @@ def message_sendlater():
         'message_id': data['message_id']
     })
 
-@APP.route("/message/sendlater/v1", methods=['POST'])
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
 def message_sendlaterdm():
     body = request.get_json()
     data = message_sendlaterdm_v1(body['token'], body['dm_id'], body['message'], body["time_sent"])
