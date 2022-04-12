@@ -169,6 +169,8 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
+        self.is_pinned = False
+        self.reacts = [] #list of dictionaries ? according to spec
 
     def set_message_id(self):
         store = data_store.get()

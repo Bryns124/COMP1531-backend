@@ -401,10 +401,10 @@ def admin_userpermission_change():
     return dumps({})
 
 @APP.route("/search/v1", methods=['GET'])
-def admin_userpermission_change():
+def search():
     token = request.args.get('token')
     query_str = request.args.get('query_str')
-    body = query_str(token, query_str)
+    body = search_v1(token, query_str)
 
     return dumps({
         "messages" : body["messages"]
@@ -429,9 +429,9 @@ def message_sendlaterdm():
     })
 
 @APP.route("/message/share/v1", methods=['POST'])
-def message_sendlaterdm():
+def merssage_share():
     body = request.get_json()
-    data = message_sendlaterdm_v1(body['token'], body['og_message_id'], body['dm_id'], body["channel_id"])
+    data = message_share_v1(body['token'], body['og_message_id'], body["message"], body["channel_id"], body["dm_id"])
     save_data_store()
     return dumps({
         'shared_message_id': data['shared_message_id']
