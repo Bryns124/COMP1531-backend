@@ -436,6 +436,20 @@ def merssage_share():
     return dumps({
         'shared_message_id': data['shared_message_id']
     })
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    body = request.get_json()
+    data = message_react_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    body = request.get_json()
+    data = message_react_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
 
