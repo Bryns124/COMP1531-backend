@@ -3,9 +3,17 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import generate_token, decode_token
+from src.helper import generate_token, decode_token, generate_secret_code
 import hashlib
 from src.classes import User
+import smtplib
+import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import change_pw_email.txt
+
+EMAIL_ADDRESS = "w17a.ant@gmail.com"
+EMAIL_PASSWORD = """BirdsAren'tReal"""
 
 
 def auth_login_v1(email, password):
@@ -75,6 +83,80 @@ def auth_logout_v1(token):
     data_store.set(store)
 
     return {}
+
+
+def auth_passwordreset_request_v1(email):
+    # Considering writing most of this in server??
+    # Very broken atm
+    store = data_store.get()
+
+    # return None if email not in data_store
+    if not duplicate_email_check(email):
+        return None
+
+    target_user = identify_user_from_email(email)
+
+    secret_code = generate_secret_code()  # generate_secret_code not written yet
+
+    store["users"][target_user.u_id].secret_code = secret_code
+    store["users"][target_user.u_id].session_id = []
+
+    context = ssl.create_default_context()
+
+    s = smtplib.SMTP(host="smtp.gmail.com", port=465)
+    s.starttls()
+    s.login(EMAIL_ADDRESS, EMAIL_ADDRESS)
+
+    msg = MIMEMultipart()
+    email_template = read_template('change_pw_email.txt')
+    # check names are okay
+    email_contents = email_template.substitute(
+        NAME_FIRST=target_user.name_first, NAME_LAST=target_user.name_last, SECRET_CODE=secret_code)
+
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = email
+    msg['Subject'] = 'UNSW Seams - Password Change Request'
+
+    msg.attach(MIMEText(email_contents, 'plain'))
+
+    s.send_message(msg)
+    s.quit()
+
+    # sign out of email
+
+    data_store.set(store)
+
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    store = data_store.get()
+    target_user = identify_user_from_reset_code(reset_code)
+    if target_user == None:
+        raise InputError(description="Reset code invalid")
+
+    if len(new_password) < 6:
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
+
+    store["users"][target_user.u_id].password = hash_password(new_password)
+    store["users"][target_user.u_id].secret_code = None
+
+    data_store.set(store)
+
+
+def identify_user_from_email(email):
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].email == email:
+            return store["users"][u_id]
+
+
+def identify_user_from_reset_code(code):
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].reset_code == code:
+            return store["users"][u_id]
 
 
 ########################################

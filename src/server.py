@@ -3,10 +3,11 @@ import sys
 import signal
 from json import dumps
 from flask import Flask, request
+from flask_mail import Mail, Message
 from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
-from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
@@ -40,6 +41,14 @@ CORS(APP)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = "w17a.a@gmail.com"
+APP.config['MAIL_PASSWORD'] = """Bird'sAren'tReal"""
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+mail = Mail(APP)
+
+# I modified above this point - sorry
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
@@ -398,6 +407,22 @@ def admin_userpermission_change():
     body = request.get_json()
     admin_userpermission_change_v1(
         body['token'], body['u_id'], body['permission_id'])
+    return dumps({})
+
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request():
+    body = request.get_json()
+    auth_passwordreset_request_v1(
+        body['email'])
+    return dumps({})
+
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset():
+    body = request.get_json()
+    auth_passwordreset_reset_v1(
+        body['reset_code'], body['new_password'])
     return dumps({})
 
 # wew14
