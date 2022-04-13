@@ -3,17 +3,19 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import generate_token, decode_token, generate_secret_code
+from src.helper import generate_token, decode_token
 import hashlib
 from src.classes import User
 import smtplib
 import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import change_pw_email.txt
+import string
+import secrets
 
 EMAIL_ADDRESS = "w17a.ant@gmail.com"
 EMAIL_PASSWORD = """BirdsAren'tReal"""
+SECRET_CODE_LENG = 8
 
 
 def auth_login_v1(email, password):
@@ -86,48 +88,52 @@ def auth_logout_v1(token):
 
 
 def auth_passwordreset_request_v1(email):
-    # Considering writing most of this in server??
-    # Very broken atm
-    store = data_store.get()
+    '''
+    Most of auth/passwordreset/request as outlined by the spec is done in server.py
 
+    If the email is in the datastore, generates a secret code and stores that in datastore 
+    then logs the user out of all their sessions.
+
+    Args: email (string): the email of the user trying to reset their password
+    Returns: 
+        If the email provided is not in the datastore:
+            None
+        If the email provided is valid:
+            secret_code (string): the code generated needed to reset the password
+    '''
+
+    store = data_store.get()
     # return None if email not in data_store
     if not duplicate_email_check(email):
         return None
 
     target_user = identify_user_from_email(email)
-
-    secret_code = generate_secret_code()  # generate_secret_code not written yet
+    secret_code = generate_secret_code()
 
     store["users"][target_user.u_id].secret_code = secret_code
     store["users"][target_user.u_id].session_id = []
 
-    context = ssl.create_default_context()
-
-    s = smtplib.SMTP(host="smtp.gmail.com", port=465)
-    s.starttls()
-    s.login(EMAIL_ADDRESS, EMAIL_ADDRESS)
-
-    msg = MIMEMultipart()
-    email_template = read_template('change_pw_email.txt')
-    # check names are okay
-    email_contents = email_template.substitute(
-        NAME_FIRST=target_user.name_first, NAME_LAST=target_user.name_last, SECRET_CODE=secret_code)
-
-    msg['From'] = EMAIL_ADDRESS
-    msg['To'] = email
-    msg['Subject'] = 'UNSW Seams - Password Change Request'
-
-    msg.attach(MIMEText(email_contents, 'plain'))
-
-    s.send_message(msg)
-    s.quit()
-
-    # sign out of email
-
     data_store.set(store)
+
+    return secret_code
 
 
 def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the password
+    provided. Once a reset code has been used, it is then invalidated.
+
+    InputError when: reset_code is not in the datastore, or if the new_password is
+    less than 6 characters.
+
+    Args: 
+        reset_code (string): the unique generated and saved to the datastore when
+        auth_passwordreset_request is called.
+        new_password (string): the new password chosen by the user
+
+    Returns:
+        None
+    '''
     store = data_store.get()
     target_user = identify_user_from_reset_code(reset_code)
     if target_user == None:
@@ -246,3 +252,12 @@ def create_handle(name_first, name_last):
             i += 1
 
     return handle
+
+
+def generate_secret_code():
+    code = ''
+    chars = string.digits
+
+    for i in range(SECRET_CODE_LENG):
+        code += str(secrets.choice(chars))
+    return code

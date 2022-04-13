@@ -17,6 +17,9 @@ from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, use
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 
+EMAIL_ADDRESS = "w17a.ant@gmail.com"
+EMAIL_PASSWORD = """BirdsAren'tReal"""
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -37,13 +40,15 @@ def defaultHandler(err):
 
 APP = Flask(__name__)
 CORS(APP)
+mail = Mail(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
+APP.config['MAIL_SERVER'] = 'smtp.gmail.com'
 APP.config['MAIL_PORT'] = 465
-APP.config['MAIL_USERNAME'] = "w17a.a@gmail.com"
-APP.config['MAIL_PASSWORD'] = """Bird'sAren'tReal"""
+APP.config['MAIL_USERNAME'] = EMAIL_ADDRESS
+APP.config['MAIL_PASSWORD'] = EMAIL_PASSWORD
 APP.config['MAIL_USE_TLS'] = False
 APP.config['MAIL_USE_SSL'] = True
 mail = Mail(APP)
@@ -413,8 +418,17 @@ def admin_userpermission_change():
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request():
     body = request.get_json()
-    auth_passwordreset_request_v1(
-        body['email'])
+    email = body["email"]
+    secret_code = auth_passwordreset_request_v1(email)
+    if secret_code:
+        reset_msg = Message(
+            subject='Reset Code for UNSW Seams',
+            sender=EMAIL_ADDRESS,
+            recipients=[email],
+            body=f"Your secret code to reset your password is {secret_code}\n"
+        )
+        mail.send(reset_msg)
+
     return dumps({})
 
 

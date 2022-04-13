@@ -1,4 +1,0 @@
-Hello ${NAME_FIRST} ${NAME_LAST}, 
-
-You recently requested a password change for your account on UNSW Seams.
-Your unique code to reset your password is ${SECRET_CODE}.
