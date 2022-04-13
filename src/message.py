@@ -318,7 +318,6 @@ def check_user_is_message_member(u_id, message_id):
 
     if u_id in message_members:
         return True
-
     return False
 
 
@@ -328,9 +327,8 @@ def check_user_is_message_owner(u_id, message_id):
     returns False otherwise
     '''
     store = data_store.get()
-    message_members = store["messages"][message_id].parent.owner_members
+    message_owners = store["messages"][message_id].parent.owner_members
 
-    if u_id in message_members:
+    if u_id in message_owners:
         return True
-
     return False
