@@ -735,46 +735,46 @@ def test_dm_sendlater_invalid_time(user_1, create_dm_2_user):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_sendlater_invalid_dm(user_1, create_dm_2_user):
-    five_sec_after = generate_timestamp() + 5
+    three_sec_after = generate_timestamp() + 3
     response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
         "token": user_1['token'],
         "dm_id": 2,
         "message": "hello",
-        "time_sent": five_sec_after
+        "time_sent": three_sec_after
     })
     assert response1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_sendlater_invalid_message(user_1, create_dm_2_user, invalid_message_text):
-    five_sec_after = generate_timestamp() + 5
+    three_sec_after = generate_timestamp() + 3
     response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
         "token": user_1['token'],
         "dm_id": 1,
         "message": invalid_message_text,
-        "time_sent": five_sec_after
+        "time_sent": three_sec_after
     })
     assert response1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_sendlater_no_access(create_dm_2_user, user_3):
-    five_sec_after = generate_timestamp() + 5
+    three_sec_after = generate_timestamp() + 3
     response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
         "token": user_3['token'],
         "dm_id": 1,
         "message": "hello world",
-        "time_sent": five_sec_after
+        "time_sent": three_sec_after
     })
     assert response1.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_dm_sendlater_different_times(user_1, create_dm_2_user):
-    five_sec_after = generate_timestamp() + 5
+    three_sec_after = generate_timestamp() + 3
     requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
         "token": user_1['token'],
         "dm_id": 1,
         "message": "This will be sent later",
-        "time_sent": five_sec_after
+        "time_sent": three_sec_after
     })
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
@@ -782,7 +782,7 @@ def test_dm_sendlater_different_times(user_1, create_dm_2_user):
         "message": "This will be sent first"
     })
 
-    time.sleep(5)
+    time.sleep(3)
     response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
         "token": user_1['token'],
         "dm_id": 1,
@@ -790,10 +790,10 @@ def test_dm_sendlater_different_times(user_1, create_dm_2_user):
     })
 
     payload = response.json()
-    assert payload["messages"][0]["time_sent"] >= five_sec_after
+    assert payload["messages"][0]["time_sent"] - three_sec_after <= 1
     assert payload["messages"][0]["message"] == "This will be sent later"
     assert payload["messages"][0]["message_id"] == 2
-    assert payload["messages"][1]["time_sent"] <= five_sec_after
+    assert payload["messages"][1]["time_sent"] <= three_sec_after
     assert payload["messages"][1]["message"] == "This will be sent first"
     assert payload["messages"][1]["message_id"] == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})

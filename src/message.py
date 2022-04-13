@@ -287,6 +287,8 @@ def message_pin_v1(token, message_id):
 
     store["messages"][message_id].is_pinned = True
 
+    return {}
+
 
 def message_unpin_v1(token, message_id):
 
@@ -306,6 +308,8 @@ def message_unpin_v1(token, message_id):
         raise InputError("Message is not pinned")
 
     store["messages"][message_id].is_pinned = False
+
+    return {}
 
 
 def check_user_is_message_member(u_id, message_id):
