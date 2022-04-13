@@ -4,13 +4,14 @@ import pytest
 # from src.other import clear_v1
 from src.error import AccessError, InputError
 import src.server
-from src.helper import SECRET
+from src.helper import SECRET, generate_timestamp
 from src.config import port, url
 import json
 from flask import request, Flask
 import jwt
 import pytest
 import requests
+import time
 
 BASE_URL = url
 
@@ -522,4 +523,79 @@ def test_message_edit2(user_1, user_2, public_channel_user1):
     assert r2.status_code == 200
     payload = r2.json()
     assert payload["messages"][-1]["message"] == "new message"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_sendlater_invalid_time(user_1, public_channel_user1):
+    ten_sec_before = generate_timestamp() - 10
+    response1 = requests.post(f"{BASE_URL}/message/sendlater/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello",
+        "time_sent": ten_sec_before
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_sendlater_invalid_ch(user_1):
+    five_sec_after = generate_timestamp() + 5
+    response1 = requests.post(f"{BASE_URL}/message/sendlater/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "hello",
+        "time_sent": five_sec_after
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_sendlater_invalid_message(user_1, public_channel_user1, invalid_message_text):
+    five_sec_after = generate_timestamp() + 5
+    response1 = requests.post(f"{BASE_URL}/message/sendlater/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": invalid_message_text,
+        "time_sent": five_sec_after
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_sendlater_no_access(public_channel_user1, user_2):
+    five_sec_after = generate_timestamp() + 5
+    response1 = requests.post(f"{BASE_URL}/message/sendlater/v1", json={
+        "token": user_2['token'],
+        "channel_id": 1,
+        "message": "hello world",
+        "time_sent": five_sec_after
+    })
+    assert response1.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_sendlater_different_times(user_1, public_channel_user1):
+    five_sec_after = generate_timestamp() + 5
+    requests.post(f"{BASE_URL}/message/sendlater/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "This will be sent later",
+        "time_sent": five_sec_after
+    })
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "message": "This will be sent first"
+    })
+
+    time.sleep(5)
+    response = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+
+    payload = response.json()
+    assert payload["messages"][0]["time_sent"] >= five_sec_after
+    assert payload["messages"][0]["message"] == "This will be sent later"
+    assert payload["messages"][0]["message_id"] == 2
+    assert payload["messages"][1]["time_sent"] <= five_sec_after
+    assert payload["messages"][1]["message"] == "This will be sent first"
+    assert payload["messages"][1]["message_id"] == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})

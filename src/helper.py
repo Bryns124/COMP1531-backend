@@ -8,6 +8,21 @@ from src.classes import User, Channel
 
 SECRET = "ANT"
 
+class Queue():
+    def __init__(self):
+        self.data = []
+
+    def enqueue(self, item):
+        self.data.insert(0, item)
+
+    def dequeue(self):
+        if self.size() == 0:
+            return None
+        else:
+            return self.data.pop()
+
+    def size(self):
+        return len(self.data)
 
 def generate_token(u_id):
     """

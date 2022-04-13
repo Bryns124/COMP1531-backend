@@ -43,6 +43,17 @@ def user_2():
 
 
 @pytest.fixture
+def user_3():
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "ali@unsw.com",
+        "password": "123456789",
+        "name_first": "Alice",
+        "name_last": "Wan"
+    })
+    return r.json()
+
+
+@pytest.fixture
 def user_no_access():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "error@unsw.com",
@@ -59,7 +70,7 @@ def user_invalid():
 
 
 @pytest.fixture
-def c(user_1, user_2):
+def create_dm_2_user(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [user_2['auth_user_id']]
@@ -415,9 +426,7 @@ def test_messages_send_51(user_1, channel_public, message_text, starting_value):
         assert payload['messages'][i]['time_sent'] >= time_sent
         assert payload['start'] == 0
         assert payload['end'] == 50
-    requests.delete(f"{BASE_URL}/clear/v1", json={
-
-    })
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_search_too_short(user_1, invalid_message_text_short):
@@ -499,9 +508,9 @@ def test_search_multiple(user_1, user_2, create_dm_2_user, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_messages_share_invalid_channeldm(user_1, user_2):
+def test_messages_share_invalid_channeldm(user_1):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
         "message": "new message",
         "channel_id": -20,
@@ -518,7 +527,7 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
         "message": "Hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
         "message": "new message",
         "channel_id": channel_public['channel_id'],
@@ -544,12 +553,12 @@ def test_messages_share_toolong(user_1, user_2, channel_public, create_dm_2_user
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
-        "message": invalid_message_text
+        "message": "hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
-        "message": "new message",
+        "message": invalid_message_text,
         "channel_id": channel_public['channel_id'],
         "dm_id": -1
     })
@@ -557,52 +566,58 @@ def test_messages_share_toolong(user_1, user_2, channel_public, create_dm_2_user
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_messages_share_not_ch_member(user_1, user_2, channel_public):
-    requests.post(f"{BASE_URL}/message/send/v1", json={
+def test_messages_share_not_ch_member(user_1, user_2, channel_public, create_dm_2_user):
+    r = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-        "message": invalid_message_text
+        "dm_id": 1,
+        "message": "Hello World"
     })
+    assert r.status_code == 200
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_2["token"],
         "og_message_id": 1,
         "message": "new message",
-        "channel_id": -1,
-        "dm_id": 1
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
     })
     assert request.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_messages_share_not_dm_member(user_1, user_2, create_dm_2_user):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_2['token'],
-        "dm_id": 1,
-        "message": "Hello World"
+def test_messages_share_not_dm_member(user_1, user_3, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "hello"
+    })
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_3['token'],
+        "channel_id": channel_public["channel_id"],
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_3["token"],
         "og_message_id": 1,
         "message": "new message",
-        "channel_id": 1,
-        "dm_id": -1,
+        "channel_id": -1,
+        "dm_id": create_dm_2_user["dm_id"],
     })
     assert request.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_public):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+    r = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_2['token'],
         "dm_id": 1,
         "message": "Hello World",
     })
+    assert r.status_code == 200
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
-        "message": "sharing this to a channel",
-        "channel_id": 1,
-        "dm_id": -1,
+        "message": "new message",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
     })
     assert request.status_code == 200
     r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
@@ -623,7 +638,7 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
         "message": "Hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1['token'],
         "og_message_id": 1,
         "message": "sharing this to a dm",
         "channel_id": -1,
@@ -631,8 +646,8 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     })
     assert request.status_code == 200
     r = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-        "token": user_1['token'],
-        "channel_id": create_dm_2_user['dm_id'],
+        "token": user_1["token"],
+        "dm_id": 1,
         "start": 0
     })
     assert r.status_code == 200
