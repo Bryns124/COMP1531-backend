@@ -7,6 +7,7 @@ import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner
 import threading
 
+
 def messages_send_v1(token, channel_id, message):
     """_summary_
     Sends a message in specified channel.
@@ -25,6 +26,7 @@ def messages_send_v1(token, channel_id, message):
     validate_message(message)
     new_message = do_messages_send_v1(token, channel_id, message)
     return {"message_id": new_message.id}
+
 
 def do_messages_send_v1(token, channel_id, message):
     store = data_store.get()
@@ -58,6 +60,7 @@ def message_senddm_v1(token, dm_id, message):
     validate_message(message)
     new_dm_message = do_message_senddm_v1(token, dm_id, message)
     return {"message_id": new_dm_message.id}
+
 
 def do_message_senddm_v1(token, dm_id, message):
     store = data_store.get()
@@ -164,6 +167,7 @@ def message_remove_v1(token, message_id):
     data_store.set(store)
     return {}
 
+
 def search_v1(token, query_str):
     decode_token(token)
     validate_message(query_str)
@@ -174,17 +178,18 @@ def search_v1(token, query_str):
         if query_str in messages[m].message:
             new = {
                 "message_id": messages[m].id,
-                "u_id" : messages[m].u_id,
-                "message" : messages[m].message,
+                "u_id": messages[m].u_id,
+                "message": messages[m].message,
                 "time_sent": messages[m].time_sent,
-                "reacts" : messages[m].reacts,
-                "is_pinned" : messages[m].is_pinned
+                "reacts": messages[m].reacts,
+                "is_pinned": messages[m].is_pinned
             }
             message_list.append(new)
 
     return {
-        "messages" : message_list
+        "messages": message_list
     }
+
 
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     store = data_store.get()
@@ -215,6 +220,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     return {
         "shared_message_id": new.id
     }
+
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
     store = data_store.get()
@@ -252,9 +258,79 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         delay, message_senddm_v1, (token, dm_id, message)
     ).start()
 
+
+# maybe change check_message_exists to message_id instead of message?
 def check_message_exists(message, auth_user_id):
     store = data_store.get()
     for m in store["messages"]:
         if store["messages"][m].message == message and auth_user_id in store["messages"][m].parent.all_members:
             return True
     raise InputError("message is not a valid message you are a part of")
+
+
+def message_pin_v1(token, message_id):
+
+    auth_user_id = decode_token(token)["auth_user_id"]
+
+    store = data_store.get()
+    # maybe change check_message_exists to message_id instead of message?
+    check_message_exists(message_id, auth_user_id)
+
+    if not check_user_is_message_member(auth_user_id, message_id):
+        raise InputError("You are not part of the specified channel/dm")
+
+    if not check_user_is_message_owner(auth_user_id, message_id):
+        raise AccessError("You do not have permission to pin this message")
+
+    if store["messages"][message_id].is_pinned:
+        raise InputError("Message is already pinned")
+
+    store["messages"][message_id].is_pinned = True
+
+
+def message_unpin_v1(token, message_id):
+
+    auth_user_id = decode_token(token)["auth_user_id"]
+
+    store = data_store.get()
+    # maybe change check_message_exists to message_id instead of message?
+    check_message_exists(message_id, auth_user_id)
+
+    if not check_user_is_message_member(auth_user_id, message_id):
+        raise InputError("You are not part of the specified channel/dm")
+
+    if not check_user_is_message_owner(auth_user_id, message_id):
+        raise AccessError("You do not have permission to pin this message")
+
+    if not store["messages"][message_id].is_pinned:
+        raise InputError("Message is not pinned")
+
+    store["messages"][message_id].is_pinned = False
+
+
+def check_user_is_message_member(u_id, message_id):
+    '''
+    Returns True if the u_id provided is a member of the message specified by message id
+    returns False otherwise
+    '''
+    store = data_store.get()
+    message_members = store["messages"][message_id].parent.all_members
+
+    if u_id in message_members:
+        return True
+
+    return False
+
+
+def check_user_is_message_owner(u_id, message_id):
+    '''
+    Returns True if the u_id provided is a member of the message specified by message id
+    returns False otherwise
+    '''
+    store = data_store.get()
+    message_members = store["messages"][message_id].parent.owner_members
+
+    if u_id in message_members:
+        return True
+
+    return False
