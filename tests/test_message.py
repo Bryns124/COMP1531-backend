@@ -2,7 +2,7 @@ from distutils.command.config import config
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
-from src.message import messages_send_v1
+from src.message import messages_send_v1, message_pin_v1, message_unpin_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 from src.helper import SECRET, generate_timestamp

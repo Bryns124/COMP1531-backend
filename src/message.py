@@ -259,7 +259,6 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     ).start()
 
 
-# maybe change check_message_exists to message_id instead of message?
 def check_message_exists(message, auth_user_id):
     store = data_store.get()
     for m in store["messages"]:
@@ -273,8 +272,9 @@ def message_pin_v1(token, message_id):
     auth_user_id = decode_token(token)["auth_user_id"]
 
     store = data_store.get()
-    # maybe change check_message_exists to message_id instead of message?
-    check_message_exists(message_id, auth_user_id)
+
+    if not (message_id in store["messages"]):
+        raise InputError("The provided message_id does not exist")
 
     if not check_user_is_message_member(auth_user_id, message_id):
         raise InputError("You are not part of the specified channel/dm")
@@ -287,14 +287,16 @@ def message_pin_v1(token, message_id):
 
     store["messages"][message_id].is_pinned = True
 
+    data_store.set(store)
+
 
 def message_unpin_v1(token, message_id):
 
     auth_user_id = decode_token(token)["auth_user_id"]
-
     store = data_store.get()
-    # maybe change check_message_exists to message_id instead of message?
-    check_message_exists(message_id, auth_user_id)
+
+    if not (message_id in store["messages"]):
+        raise InputError("The provided message_id does not exist")
 
     if not check_user_is_message_member(auth_user_id, message_id):
         raise InputError("You are not part of the specified channel/dm")
@@ -306,6 +308,8 @@ def message_unpin_v1(token, message_id):
         raise InputError("Message is not pinned")
 
     store["messages"][message_id].is_pinned = False
+
+    data_store.set(store)
 
 
 def check_user_is_message_member(u_id, message_id):
