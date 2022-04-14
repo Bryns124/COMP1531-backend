@@ -2,7 +2,7 @@ from distutils.command.config import config
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
-from src.message import messages_send_v1
+from src.message import messages_send_v1, message_pin_v1, message_unpin_v1
 from src.other import clear_v1
 from src.error import InputError, AccessError
 from src.helper import SECRET, generate_timestamp
@@ -18,6 +18,7 @@ BASE_URL = url
 requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # Users
+
 
 @pytest.fixture()
 def user_1():
@@ -42,6 +43,17 @@ def user_2():
 
 
 @pytest.fixture
+def user_3():
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "ali@unsw.com",
+        "password": "123456789",
+        "name_first": "Alice",
+        "name_last": "Wan"
+    })
+    return r.json()
+
+
+@pytest.fixture
 def user_no_access():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "error@unsw.com",
@@ -56,13 +68,15 @@ def user_no_access():
 def user_invalid():
     return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
 
+
 @pytest.fixture
-def c(user_1, user_2):
+def create_dm_2_user(user_1, user_2):
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [user_2['auth_user_id']]
     })
     return r.json()
+
 
 @pytest.fixture
 def channel_public(user_1):
@@ -80,6 +94,15 @@ def channel_private(user_1):
         "token": user_1['token'],
         "name": "Private Channel",
         "is_public": False
+    })
+    return r.json()
+
+
+@pytest.fixture
+def create_dm_2_user(user_1, user_2):
+    r = requests.post(f"{BASE_URL}/dm/create/v1", json={
+        "token": user_1['token'],
+        "u_ids": [user_2['auth_user_id']]
     })
     return r.json()
 
@@ -403,9 +426,8 @@ def test_messages_send_51(user_1, channel_public, message_text, starting_value):
         assert payload['messages'][i]['time_sent'] >= time_sent
         assert payload['start'] == 0
         assert payload['end'] == 50
-    requests.delete(f"{BASE_URL}/clear/v1", json={
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-    })
 
 def test_search_too_short(user_1, invalid_message_text_short):
     r = requests.get(f"{BASE_URL}/search/v1", params={
@@ -415,6 +437,7 @@ def test_search_too_short(user_1, invalid_message_text_short):
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_search_too_long(user_1, invalid_message_text):
     r = requests.get(f"{BASE_URL}/search/v1", params={
         "token": user_1['token'],
@@ -422,6 +445,7 @@ def test_search_too_long(user_1, invalid_message_text):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_search_specific(user_1, user_2, channel_public):
     requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -443,6 +467,7 @@ def test_search_specific(user_1, user_2, channel_public):
     assert payload["messages"][-1]["u_id"] == 1
     assert payload["messages"][-1]["message"] == "find this"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_search_multiple(user_1, user_2, create_dm_2_user, channel_public):
     requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -482,9 +507,10 @@ def test_search_multiple(user_1, user_2, create_dm_2_user, channel_public):
     assert payload["messages"][3]["message"] == "Like i said,birdsarereal"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_messages_share_invalid_channeldm(user_1, user_2):
+
+def test_messages_share_invalid_channeldm(user_1):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
         "message": "new message",
         "channel_id": -20,
@@ -493,6 +519,7 @@ def test_messages_share_invalid_channeldm(user_1, user_2):
     assert request.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_user):
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -500,7 +527,7 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
         "message": "Hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
         "message": "new message",
         "channel_id": channel_public['channel_id'],
@@ -508,6 +535,7 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
     })
     assert request.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_messages_share_invalid_message(user_1, user_2, channel_public, create_dm_2_user):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
@@ -520,66 +548,76 @@ def test_messages_share_invalid_message(user_1, user_2, channel_public, create_d
     assert request.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_messages_share_toolong(user_1, user_2, channel_public, create_dm_2_user, invalid_message_text):
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
-        "message": invalid_message_text
+        "message": "hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
-        "message": "new message",
+        "message": invalid_message_text,
         "channel_id": channel_public['channel_id'],
         "dm_id": -1
     })
     assert request.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_messages_share_not_ch_member(user_1, user_2, channel_public):
-    requests.post(f"{BASE_URL}/message/send/v1", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-        "message": invalid_message_text
-    })
-    request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
-        "og_message_id": 1,
-        "message": "new message",
-        "channel_id": -1,
-        "dm_id": 1
-    })
-    assert request.status_code == AccessError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_messages_share_not_dm_member(user_1, user_2, create_dm_2_user):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_2['token'],
+def test_messages_share_not_ch_member(user_1, user_2, channel_public, create_dm_2_user):
+    r = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
         "dm_id": 1,
         "message": "Hello World"
     })
+    assert r.status_code == 200
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_2["token"],
         "og_message_id": 1,
         "message": "new message",
-        "channel_id": 1,
-        "dm_id": -1,
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
     })
     assert request.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
+def test_messages_share_not_dm_member(user_1, user_3, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "hello"
+    })
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_3['token'],
+        "channel_id": channel_public["channel_id"],
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_3["token"],
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": -1,
+        "dm_id": create_dm_2_user["dm_id"],
+    })
+    assert request.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_public):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+    r = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_2['token'],
         "dm_id": 1,
         "message": "Hello World",
     })
+    assert r.status_code == 200
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1["token"],
         "og_message_id": 1,
-        "message": "sharing this to a channel",
-        "channel_id": 1,
-        "dm_id": -1,
+        "message": "new message",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
     })
     assert request.status_code == 200
     r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
@@ -592,6 +630,7 @@ def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_pub
     payload["messages"][-1]["message"] = "sharing this to a channel Hello World"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -599,7 +638,7 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
         "message": "Hello world"
     })
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1['token'],
         "og_message_id": 1,
         "message": "sharing this to a dm",
         "channel_id": -1,
@@ -607,8 +646,8 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     })
     assert request.status_code == 200
     r = requests.get(f"{BASE_URL}/dm/messages/v1", params={
-        "token": user_1['token'],
-        "channel_id": create_dm_2_user['dm_id'],
+        "token": user_1["token"],
+        "dm_id": 1,
         "start": 0
     })
     assert r.status_code == 200
@@ -617,6 +656,8 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # React tests
+
+
 def test_messages_react_successful(user_1, channel_public, message_text):
     send = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -625,7 +666,7 @@ def test_messages_react_successful(user_1, channel_public, message_text):
     })
     payload = send.json()
 
-    assert request.status_code == 200
+    assert send.status_code == 200
     assert requests.post(f"{url}/message/react", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
@@ -643,7 +684,7 @@ def test_messages_react_successful_dm(user_1, c, message_text):
     })
     payload = send.json()
 
-    assert request.status_code == 200
+    assert send.status_code == 200
     assert requests.post(f"{url}/message/react", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
@@ -744,6 +785,8 @@ def test_messages_react_already_reacted(user_1, channel_public, message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # Unreact tests
+
+
 def test_messages_unreact_successful(user_1, channel_public, message_text):
     send = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -913,4 +956,226 @@ def test_messages_react_already_unreacted(user_1, channel_public, message_text):
     })
 
     assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_pin_already_pinned(user_1, channel_public, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = request_send.json()
+
+    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"],
+    })
+    assert request_pin_1.status_code == 200
+    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin_2.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_unpin_not_pinned(user_1, channel_public, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    payload = request_send.json()
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_unpin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_nonowner_pin(user_1, user_2, channel_public, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    request_channel_invite = requests.post(f"{BASE_URL}/channel/invite/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert request_channel_invite.status_code == 200
+
+    request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_2['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == AccessError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_nonowner_unpin(user_1, user_2, channel_public, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    request_channel_invite = requests.post(f"{BASE_URL}/channel/invite/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert request_channel_invite.status_code == 200
+
+    request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == 200
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+        "token": user_2['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_unpin.status_code == AccessError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_dm_pin_already_pinned(user_1, create_dm_2_user, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"],
+    })
+    assert request_pin_1.status_code == 200
+    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin_2.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_dm_unpin_not_pinned(user_1, create_dm_2_user, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_unpin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_dm_nonowner_pin(user_1, user_2, create_dm_2_user, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_2['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == AccessError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == 200
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+        "token": user_2['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_unpin.status_code == AccessError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_pin_invalid_message(user_1, invalid_message_id):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_1['token'],
+        "message_id": invalid_message_id
+    })
+    assert request_pin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_message_pin_invalid_token(user_1, user_invalid, channel_public):
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+        "token": user_invalid['token'],
+        "message_id": payload["message_id"],
+    })
+
+    assert request_pin.status_code == AccessError.code
+
     requests.delete(f"{BASE_URL}/clear/v1", json={})
