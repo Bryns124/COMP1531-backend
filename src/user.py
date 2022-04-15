@@ -3,6 +3,9 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
 from src.auth import email_check, duplicate_email_check
+import urllib.request
+import sys
+from PIL import Image
 """User has the 5 functions: users_all, user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
 Functions:
     users_all: Returns a list of all users and their associated details
@@ -208,3 +211,162 @@ def duplicate_handle(store, handle_str):
         if handle_str == store["users"][users].handle:
             return True
     return False
+
+
+def user_stats_v1(token):
+    auth_user_id = decode_token(token)['auth_user_id']
+
+    channels_joined = generate_channels_joined_timed(auth_user_id)
+    dms_joined = generate_dms_joined_timed(auth_user_id)
+    messages_sent = generate_messages_sent_timed(auth_user_id)
+
+    involvement_rate = calculate_ir(auth_user_id)
+
+    user_stats = {
+        "channels_joined": channels_joined,
+        "dms_joined": dms_joined,
+        "messages_sent": messages_sent,
+        "involvement_rate": involvement_rate
+    }
+    return {
+        "user_stats": user_stats
+    }
+
+
+def calculate_ir(auth_user_id):
+    store = data_store.get()
+
+    user_channels = len(store["users"][auth_user_id].all_channels)
+    user_dms = len(store["users"][auth_user_id].all_dms)
+    user_messages = len(store["users"][auth_user_id].messages_sent)
+
+    numerator = float(sum(user_channels, user_dms, user_messages))
+    denominator = float(sum(len(store["channels"], len(store["dms"]), len(store["messages"]))))
+
+    involvement_rate = numerator / denominator
+    return involvement_rate
+
+
+def generate_channels_joined_timed(auth_user_id):
+    store = data_store.get()
+    counter = 0
+    channels_joined_list = []
+    for channel in store["users"][auth_user_id].all_channels:
+        counter += 1
+        new_entry = {
+            "num_channels_joined": counter,
+            "time_stamp": store["users"][auth_user_id][channel].time_created
+        }
+        channels_joined_list.append(new_entry)
+    return channels_joined_list
+
+
+def generate_dms_joined_timed(auth_user_id):
+    store = data_store.get()
+    counter = 0
+    dms_joined_list = []
+    for dm in store["users"][auth_user_id].all_dms:
+        counter += 1
+        new_entry = {
+            "num_dms_joined": counter,
+            "time_stamp": store["users"][auth_user_id][dm].time_created
+        }
+        dms_joined_list.append(new_entry)
+    return dms_joined_list
+
+
+def generate_messages_sent_timed(auth_user_id):
+    store = data_store.get()
+    counter = 0
+    messages_sent_list = []
+    for message in store["users"][auth_user_id].messages_sent:
+        counter += 1
+        new_entry = {
+            "num_messages_sent": counter,
+            "time_stamp": store["users"][auth_user_id][message].time_created
+        }
+        messages_sent_list.append(new_entry)
+    return messages_sent_list
+
+
+
+
+def users_stats_v1():
+    channels_exist = generate_channels_exist_timed()
+    dms_exist = generate_dms_exist_timed()
+    messages_exist = generate_messages_exist_timed()
+
+    utilization_rate = calculate_utilization_rate()
+
+    workspace_stats = {
+        "channels_exist": channels_exist,
+        "dms_exist": dms_exist,
+        "messages_exist": messages_exist,
+        "utilization_rate": utilization_rate
+    }
+    return {
+        "workspace_stats": workspace_stats
+    }
+
+def calculate_utilization_rate():
+    store = data_store.get()
+    count = 0
+    for user in store["users"]:
+        if len(store["users"][user].all_channels) != 0 or len(store["users"][user].all_dms) != 0:
+            count += 1
+
+    utilization_rate = count / len(store["users"])
+    return utilization_rate
+
+def generate_channels_exist_timed():
+    store = data_store.get()
+
+    channel_exist = []
+    counter = 0
+    for channel in store["channels"]:
+        couter += 1
+        new_entry = {
+            "num_channels_exist": counter,
+            "time_stamp": store["channels"][channel].time_created
+        }
+        channel_exist.append(new_entry)
+    return channel_exist
+
+def generate_dms_exist_timed():
+    store = data_store.get()
+
+    dm_exist = []
+    counter = 0
+    for dm in store["dms"]:
+        couter += 1
+        new_entry = {
+            "num_dms_exist": counter,
+            "time_stamp": store["dms"][dm].time_created
+        }
+        dm_exist.append(new_entry)
+    return dm_exist
+
+def generate_messages_exist_timed():
+    store = data_store.get()
+
+    messages_exist = []
+    counter = 0
+    for message in store["messages"]:
+        couter += 1
+        new_entry = {
+            "num_messages_exist": counter,
+            "time_stamp": store["messages"][message].time_created
+        }
+        messages_exist.append(new_entry)
+    return messages_exist
+
+
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    auth_user_id = decode_token(token)['auth_user_id']
+
+    filename = f"images/{auth_user_id}.jpg"
+    urllib.request.urlretrieve(img_url, filename)
+    img = Image.open(filename)
+
+    if (img.format != 'JPEG'):
+        raise InputError("The image uploaded needs to be of JPEG format")

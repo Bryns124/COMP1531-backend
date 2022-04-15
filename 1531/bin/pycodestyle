@@ -1,4 +1,4 @@
-#!/import/cage/5/z5346887/Assignment/project-backend/1531/bin/python
+#!/tmp_amd/cage/export/cage/5/z5346887/Assignment/project-backend/1531/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -239,14 +239,6 @@ def test_messages_send_2(user_1, channel_public, message_text, starting_value):
         "message": message_text
     })
 
-    payload = request.json()
-    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-        "start": starting_value
-    })
-    body = r.json()
-    assert body['messages'][-1]['message_id'] == payload["message_id"]
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })

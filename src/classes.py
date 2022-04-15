@@ -1,4 +1,5 @@
 from src.data_store import data_store
+from src.helper import generate_timestamp
 
 
 class User:
@@ -133,6 +134,7 @@ class Dm(BaseChannel):
     def __init__(self, auth_user_id, name,  u_ids):
         BaseChannel.__init__(self, auth_user_id, name)
         self.id = self.set_dm_id()
+        self.time_created = generate_timestamp() #for the user and users stats
 
     def set_dm_id(self):
         try:
@@ -161,6 +163,7 @@ class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
         BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
+        self.time_created = generate_timestamp() #for the user and users stats
 
 
 class Message:
