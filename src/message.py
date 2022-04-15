@@ -181,7 +181,7 @@ def search_v1(token, query_str):
                 "u_id": messages[m].u_id,
                 "message": messages[m].message,
                 "time_sent": messages[m].time_sent,
-                "reacts":get_reacts(m, auth_user_id),
+                "reacts": get_reacts(m, auth_user_id),
                 "is_pinned": messages[m].is_pinned
             }
             message_list.append(new)
@@ -277,7 +277,8 @@ def message_react_v1(token, message_id, react_id):
         raise InputError(description='React ID is invalid')
 
     if store["messages"][message_id].is_user_reacted(u_id):
-        raise InputError(description='You have already reacted to this message')
+        raise InputError(
+            description='You have already reacted to this message')
 
     store["messages"][message_id].react(u_id)
     data_store.set(store)
@@ -294,7 +295,8 @@ def message_unreact_v1(token, message_id, react_id):
         raise InputError(description='React ID is invalid')
 
     if not store["messages"][message_id].is_user_reacted(u_id):
-        raise InputError(description='You are already unreacted')
+        raise InputError(
+            description='You have already unreacted to this message')
 
     store["messages"][message_id].unreact(u_id)
 
