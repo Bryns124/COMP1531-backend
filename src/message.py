@@ -235,7 +235,8 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         raise AccessError(description="User is not a member of the channel")
 
     delay = (time_sent - generate_timestamp())
-    t = threading.Timer(
+
+    threading.Timer(
         delay, messages_send_v1, (token, channel_id, message)
     ).start()
 
@@ -254,7 +255,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         raise AccessError(description="user is not part of dm")
     delay = (time_sent - generate_timestamp())
 
-    t = threading.Timer(
+    threading.Timer(
         delay, message_senddm_v1, (token, dm_id, message)
     ).start()
 
