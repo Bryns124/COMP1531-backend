@@ -960,21 +960,21 @@ def test_messages_react_already_unreacted(user_1, channel_public, message_text):
 
 
 def test_channel_pin_already_pinned(user_1, channel_public, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
     request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
+    assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"],
     })
     assert request_pin_1.status_code == 200
-    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+
+    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
@@ -984,14 +984,15 @@ def test_channel_pin_already_pinned(user_1, channel_public, message_text):
 
 
 def test_channel_unpin_not_pinned(user_1, channel_public, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
     request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
+    assert request_send.status_code == 200
     payload = request_send.json()
-    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
@@ -1001,7 +1002,6 @@ def test_channel_unpin_not_pinned(user_1, channel_public, message_text):
 
 
 def test_channel_nonowner_pin(user_1, user_2, channel_public, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
     request_channel_invite = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": channel_public['channel_id'],
@@ -1017,7 +1017,7 @@ def test_channel_nonowner_pin(user_1, user_2, channel_public, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_2['token'],
         "message_id": payload["message_id"]
     })
@@ -1027,7 +1027,6 @@ def test_channel_nonowner_pin(user_1, user_2, channel_public, message_text):
 
 
 def test_channel_nonowner_unpin(user_1, user_2, channel_public, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
     request_channel_invite = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": channel_public['channel_id'],
@@ -1043,13 +1042,13 @@ def test_channel_nonowner_unpin(user_1, user_2, channel_public, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
     assert request_pin.status_code == 200
 
-    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
         "token": user_2['token'],
         "message_id": payload["message_id"]
     })
@@ -1059,8 +1058,6 @@ def test_channel_nonowner_unpin(user_1, user_2, channel_public, message_text):
 
 
 def test_dm_pin_already_pinned(user_1, create_dm_2_user, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": create_dm_2_user['dm_id'],
@@ -1069,12 +1066,12 @@ def test_dm_pin_already_pinned(user_1, create_dm_2_user, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin_1 = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"],
     })
     assert request_pin_1.status_code == 200
-    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
@@ -1083,8 +1080,7 @@ def test_dm_pin_already_pinned(user_1, create_dm_2_user, message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_dm_unpin_not_pinned(user_1, create_dm_2_user, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_dm_unpin_not_pinned(user_1, user_2, create_dm_2_user, message_text):
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": create_dm_2_user['dm_id'],
@@ -1093,7 +1089,7 @@ def test_dm_unpin_not_pinned(user_1, create_dm_2_user, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
@@ -1103,8 +1099,6 @@ def test_dm_unpin_not_pinned(user_1, create_dm_2_user, message_text):
 
 
 def test_dm_nonowner_pin(user_1, user_2, create_dm_2_user, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": create_dm_2_user['dm_id'],
@@ -1113,7 +1107,7 @@ def test_dm_nonowner_pin(user_1, user_2, create_dm_2_user, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_2['token'],
         "message_id": payload["message_id"]
     })
@@ -1123,8 +1117,6 @@ def test_dm_nonowner_pin(user_1, user_2, create_dm_2_user, message_text):
 
 
 def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": create_dm_2_user['dm_id'],
@@ -1133,13 +1125,13 @@ def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
     assert request_pin.status_code == 200
 
-    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", params={
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
         "token": user_2['token'],
         "message_id": payload["message_id"]
     })
@@ -1149,9 +1141,8 @@ def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
 
 
 def test_message_pin_invalid_message(user_1, invalid_message_id):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": invalid_message_id
     })
@@ -1160,19 +1151,19 @@ def test_message_pin_invalid_message(user_1, invalid_message_id):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_message_pin_invalid_token(user_1, user_invalid, channel_public):
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_message_pin_invalid_token(user_1, user_invalid, channel_public, message_text):
 
     request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
+        "token": user_1["token"],
+        "channel_id": channel_public["channel_id"],
         "message": message_text
     })
+
     assert request_send.status_code == 200
     payload = request_send.json()
 
-    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", params={
-        "token": user_invalid['token'],
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
+        "token": user_invalid,
         "message_id": payload["message_id"],
     })
 
