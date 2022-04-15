@@ -12,6 +12,7 @@ import pytest
 
 BASE_URL = url
 
+
 @pytest.fixture()
 def user_1():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -21,6 +22,7 @@ def user_1():
         "name_last": "Test"
     })
     return r.json()
+
 
 @pytest.fixture
 def user_2():
@@ -32,6 +34,7 @@ def user_2():
     })
     return r.json()
 
+
 @pytest.fixture
 def channel_public(user_1):
     r = requests.post(f"{BASE_URL}/channels/create/v2", json={
@@ -40,6 +43,7 @@ def channel_public(user_1):
         "is_public": True
     })
     return r.json()
+
 
 def test_auth_register_user_created_sucessfully_v2():
     response = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -52,6 +56,7 @@ def test_auth_register_user_created_sucessfully_v2():
     payload = response.json()
     payload["auth_user_id"] == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_auth_register_user_multiple_v2():
     response1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -73,6 +78,7 @@ def test_auth_register_user_multiple_v2():
     payload2["auth_user_id"] == 2
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_password_length_less_than_6_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
@@ -82,6 +88,7 @@ def test_password_length_less_than_6_v2():
     })
     assert request_register1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_first_name_length_less_than_1_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -93,6 +100,7 @@ def test_first_name_length_less_than_1_v2():
     assert request_register1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_first_name_length_more_than_50_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
@@ -102,6 +110,7 @@ def test_first_name_length_more_than_50_v2():
     })
     assert request_register1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_last_name_length_less_than_1_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -114,6 +123,8 @@ def test_last_name_length_less_than_1_v2():
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
+
+
 def test_last_name_length_more_than_50_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryanle@gmail.com",
@@ -123,6 +134,7 @@ def test_last_name_length_more_than_50_v2():
     })
     assert request_register1.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 @pytest.mark.parametrize('email_1', [("bryanle@gmailcom"), ("bryan..le@gmail.com"), ("bryanle@gmail"), ("bryanle-@gmail.com"), ("@gmail"), ("")])
 def test_register_invalid_email_v2(email_1):
@@ -135,6 +147,7 @@ def test_register_invalid_email_v2(email_1):
     })
     assert request_register.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_register_email_already_used_v2():
     request_register1 = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -153,6 +166,7 @@ def test_register_email_already_used_v2():
     assert request_register2.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_login_incorrect_email(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
         "email": "notbryan.le@gmail.com",
@@ -169,6 +183,7 @@ def test_login_incorrect_password(user_1):
     })
     assert r.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_login_after_logout(user_1):
     requests.post(f"{BASE_URL}/auth/logout/v1", json={
@@ -188,6 +203,7 @@ def test_login_after_logout(user_1):
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+
 def test_login_correct(user_1):
     r = requests.post(f"{BASE_URL}/auth/login/v2", json={
         "email": "mikey@unsw.com",
@@ -205,6 +221,7 @@ def test_login_correct(user_1):
         "session_id": 2
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 def test_auth_logout(user_1, channel_public):
     requests.post(f"{BASE_URL}/auth/logout/v1", json={
@@ -245,6 +262,7 @@ def test_auth_logout_after_login(user_1):
     })
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 
 @pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
     ("Bryan", "Le", "bryanle", "Bryan", "Le", "bryanle0"),
@@ -321,3 +339,19 @@ def test_handles_appends_correctly(user_1, channel_public):
 
     })
 
+
+def test_auth_passwordreset_email_sends():
+    request_register = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "danielyung144@outlook.com",
+        "password": "test123456",
+        "name_first": "Daniel",
+        "name_last": "Test"
+    })
+    assert request_register.status_code == 200
+
+    request_email = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json={
+        "email": "danielyung144@outlook.com"
+    })
+    assert request_email.status_code == 200
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})

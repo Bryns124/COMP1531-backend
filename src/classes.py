@@ -19,6 +19,7 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
+        self.reset_code = None
 
     def set_u_id(self):
         try:

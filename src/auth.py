@@ -11,7 +11,7 @@ import secrets
 
 EMAIL_ADDRESS = "w17a.ant@gmail.com"
 EMAIL_PASSWORD = """BirdsAren'tReal"""
-SECRET_CODE_LENG = 8
+SECRET_CODE_LENG = 6
 
 
 def auth_login_v1(email, password):
@@ -106,8 +106,9 @@ def auth_passwordreset_request_v1(email):
     target_user = identify_user_from_email(email)
     secret_code = generate_secret_code()
 
-    store["users"][target_user.u_id].secret_code = secret_code
-    store["users"][target_user.u_id].session_id = []
+    store["users"][target_user].reset_code = secret_code
+    for session in store["users"][target_user].session_id:
+        store["users"][target_user].session_id[session] = False
 
     data_store.set(store)
 
@@ -139,26 +140,34 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
         raise InputError(
             description="Password entered must be longer than 6 characters")
 
-    store["users"][target_user.u_id].password = hash_password(new_password)
-    store["users"][target_user.u_id].secret_code = None
+    store["users"][target_user].password = hash_password(new_password)
+    store["users"][target_user].reset_code = None
 
     data_store.set(store)
 
 
 def identify_user_from_email(email):
+    '''
+    Given a valid email, returns the u_id of the user with that email.
+    Args: email (string), the email of the user to be identified
+    Returns: u_id (int), the u_id of the user with the specified email
+    '''
     store = data_store.get()
 
     for u_id in store["users"]:
         if store["users"][u_id].email == email:
-            return store["users"][u_id]
+            return u_id
 
 
 def identify_user_from_reset_code(code):
+    '''
+    Given a code 
+    '''
     store = data_store.get()
 
     for u_id in store["users"]:
         if store["users"][u_id].reset_code == code:
-            return store["users"][u_id]
+            return u_id
 
 
 ########################################
@@ -251,8 +260,13 @@ def create_handle(name_first, name_last):
 
 
 def generate_secret_code():
+    '''
+    Generates a random secret code that is cryptographically secure.
+    Args: None
+    Output: code (string), a randomly generated code of length SECRET_CODE_LENG
+    '''
     code = ''
-    chars = string.digits
+    chars = string.digits + string.ascii_uppercase
 
     for i in range(SECRET_CODE_LENG):
         code += str(secrets.choice(chars))

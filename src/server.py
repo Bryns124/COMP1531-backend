@@ -425,7 +425,7 @@ def auth_passwordreset_request():
             subject='Reset Code for UNSW Seams',
             sender=EMAIL_ADDRESS,
             recipients=[email],
-            body=f"Your secret code to reset your password is {secret_code}\n"
+            body=f"Your secret code to reset your password is {secret_code}.\n"
         )
         mail.send(reset_msg)
 
