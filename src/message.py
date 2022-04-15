@@ -269,7 +269,6 @@ def check_message_exists(message, auth_user_id):
 
 def message_react_v1(token, message_id, react_id):
     u_id = decode_token(token)['auth_user_id']
-    validate_message(message)
     store = data_store.get()
 
     validate_mid(store["messages"], message_id)
@@ -280,9 +279,17 @@ def message_react_v1(token, message_id, react_id):
     # for react in store['message'][message_id].react = {'1', '2', '3'}
     # for react in store['message'][message_id].react.values() = {react_object1, react_object2, react_object3}
     already_reacted = True
-    if u_id not in store['message'][message_id].react.values().u_ids:
-        store['message'][message_id].react.u_ids.append(u_id)
-        already_reacted = False
+    # if u_id not in store['message'][message_id].react.values():
+    #     store['message'][message_id].react.u_ids.append(u_id)
+    #     already_reacted = False
+    for message in store["messages"]:
+        if store["messages"][message].id == message_id:
+            for react in store["reacts"]:
+                if react_id == 1:
+                    if u_id not in react['u_ids']:
+                        react['u_ids'].append(u_id)
+                        already_reacted = False
+                        break
 
     if already_reacted:
         raise InputError(
@@ -293,7 +300,6 @@ def message_react_v1(token, message_id, react_id):
 
 def message_unreact_v1(token, message_id, react_id):
     u_id = decode_token(token)['auth_user_id']
-    validate_message(message)
     store = data_store.get()
 
     validate_mid(store["messages"], message_id)

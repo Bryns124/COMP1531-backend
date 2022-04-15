@@ -537,11 +537,11 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_messages_share_invalid_message(user_1, user_2, channel_public, create_dm_2_user):
+def test_messages_share_invalid_message(user_1, invalid_message_text, channel_public):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
-        "token": user_invalid,
+        "token": user_1['token'],
         "og_message_id": 1,
-        "message": "new message",
+        "message": invalid_message_text,
         "channel_id": channel_public['channel_id'],
         "dm_id": -1
     })
@@ -667,7 +667,7 @@ def test_messages_react_successful(user_1, channel_public, message_text):
     payload = send.json()
 
     assert send.status_code == 200
-    assert requests.post(f"{url}/message/react", json={
+    assert requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
@@ -685,7 +685,7 @@ def test_messages_react_successful_dm(user_1, c, message_text):
     payload = send.json()
 
     assert send.status_code == 200
-    assert requests.post(f"{url}/message/react", json={
+    assert requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
@@ -702,7 +702,7 @@ def test_messages_react_invalid_token(user_1, channel_public, message_text, user
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_invalid,
         'message_id': payload['message_id'],
         'react_id': 1
@@ -718,7 +718,7 @@ def test_messages_react_invalid_message_id(user_1, channel_public, message_text,
         "channel_id": channel_public['channel_id'],
         "message": message_text
     })
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': invalid_message_id,
         'react_id': 1
@@ -734,7 +734,7 @@ def test_messages_react_invalid_dm_id(user_1, c, message_text, invalid_message_i
         "dm_id": c['dm_id'],
         "message": message_text
     })
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': invalid_message_id,
         'react_id': 1
@@ -752,7 +752,7 @@ def test_messages_react_invalid_react_id(user_1, channel_public, message_text, i
     })
     payload = send.json()
 
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': invalid_react_id
@@ -770,12 +770,12 @@ def test_messages_react_already_reacted(user_1, channel_public, message_text):
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
@@ -795,13 +795,13 @@ def test_messages_unreact_successful(user_1, channel_public, message_text):
     })
     payload = send.json()
 
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
     assert request.status_code == 200
-    assert requests.post(f"{url}/message/unreact", json={
+    assert requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
@@ -818,13 +818,13 @@ def test_messages_unreact_successful_dm(user_1, c, message_text):
     })
     payload = send.json()
 
-    request = requests.post(f"{url}/message/react", json={
+    request = requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
     assert request.status_code == 200
-    assert requests.post(f"{url}/message/unreact", json={
+    assert requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
@@ -841,13 +841,13 @@ def test_messages_unreact_invalid_token(user_1, channel_public, message_text, us
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    request = requests.post(f"{url}/message/unreact", json={
+    request = requests.post(f"{url}/message/unreact/v1", json={
         'token': user_invalid,
         'message_id': payload['message_id'],
         'react_id': 1
@@ -865,13 +865,13 @@ def test_messages_unreact_invalid_message_id(user_1, channel_public, message_tex
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    request = requests.post(f"{url}/message/unreact", json={
+    request = requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': invalid_message_id,
         'react_id': 1
@@ -889,13 +889,13 @@ def test_messages_unreact_invalid_dm_id(user_1, c, message_text, invalid_message
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    request = requests.post(f"{url}/message/unreact", json={
+    request = requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': invalid_message_id,
         'react_id': 1
@@ -913,13 +913,13 @@ def test_messages_unreact_invalid_react_id(user_1, channel_public, message_text,
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    request = requests.post(f"{url}/message/unreact", json={
+    request = requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': invalid_react_id
@@ -937,19 +937,19 @@ def test_messages_react_already_unreacted(user_1, channel_public, message_text):
     })
     payload = send.json()
 
-    requests.post(f"{url}/message/react", json={
+    requests.post(f"{url}/message/react/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    requests.post(f"{url}/message/unreact", json={
+    requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
 
-    request = requests.post(f"{url}/message/unreact", json={
+    request = requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
