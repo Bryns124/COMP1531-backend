@@ -6,10 +6,6 @@ import jwt
 from src.helper import generate_token, decode_token
 import hashlib
 from src.classes import User
-import smtplib
-import ssl
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 import string
 import secrets
 
