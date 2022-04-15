@@ -2,7 +2,7 @@ from operator import methodcaller
 import sys
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
@@ -34,7 +34,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -399,6 +399,10 @@ def admin_userpermission_change():
     admin_userpermission_change_v1(
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
+
+@APP.route('static/images/<path:path>')
+def send_js(path):
+    return send_from_directory('', path)
 
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT

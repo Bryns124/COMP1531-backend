@@ -3,9 +3,11 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.helper import decode_token, validate_token
 from src.auth import email_check, duplicate_email_check
+from urllib import request
+import requests
 import urllib.request
 import sys
-from PIL import Image
+from PIL import Image, ImageFile
 """User has the 5 functions: users_all, user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
 Functions:
     users_all: Returns a list of all users and their associated details
@@ -364,9 +366,52 @@ def generate_messages_exist_timed():
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     auth_user_id = decode_token(token)['auth_user_id']
 
+    if (x_start > x_end or y_start > y_end):
+        raise InputError("Invalid dimensions.")
+
+    size = get_dimension(img_url)
+    width = size[0]
+    height = size[1]
+
+    if (x_end > width or y_end > height):
+        raise InputError("Invalid dimensions")
+
+    if (not correct_format(img_url)):
+        raise InputError("Only urls with jpg format are allowed")
+
+
     filename = f"images/{auth_user_id}.jpg"
     urllib.request.urlretrieve(img_url, filename)
-    img = Image.open(filename)
+    crop_photo(filename, x_start, y_start, x_end, y_end)
+
+    return {}
+
+
+
+def correct_format(img_url):
+    img = Image.open(requests.get(img_url, stream=True).raw)
 
     if (img.format != 'JPEG'):
-        raise InputError("The image uploaded needs to be of JPEG format")
+        return False
+    return True
+
+
+def crop_photo(filename, x1, x2, y1, y2):
+    image = Image.open(filename)
+    cropped_image = image.crop(x1, y1, x2, y2)
+    cropped_image.save(filename)
+
+
+def get_dimension(img_url):
+    file = request.urlopen(img_url)
+    p = ImageFile.Parser()
+    while True:
+        data = file.read(1024)
+        if not data:
+            break
+        p.feed(data)
+        if p.image:
+            return p.image.size
+
+    file.close()
+    return(None)
