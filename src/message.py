@@ -259,7 +259,6 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     ).start()
 
 
-# maybe change check_message_exists to message_id instead of message?
 def check_message_exists(message, auth_user_id):
     store = data_store.get()
     for m in store["messages"]:
@@ -268,13 +267,66 @@ def check_message_exists(message, auth_user_id):
     raise InputError("message is not a valid message you are a part of")
 
 
+def message_react_v1(token, message_id, react_id):
+    u_id = decode_token(token)['auth_user_id']
+    store = data_store.get()
+
+    validate_mid(store["messages"], message_id)
+
+    if react_id <= 0:
+        raise InputError(description='React ID is invalid')
+
+    # for react in store['message'][message_id].react = {'1', '2', '3'}
+    # for react in store['message'][message_id].react.values() = {react_object1, react_object2, react_object3}
+    already_reacted = True
+    # if u_id not in store['message'][message_id].react.values():
+    #     store['message'][message_id].react.u_ids.append(u_id)
+    #     already_reacted = False
+    for message in store["messages"]:
+        if store["messages"][message].id == message_id:
+            for react in store["reacts"]:
+                if react_id == 1:
+                    if u_id not in react['u_ids']:
+                        react['u_ids'].append(u_id)
+                        already_reacted = False
+                        break
+
+    if already_reacted:
+        raise InputError(
+            description='You have already reacted to this message')
+
+    return {}
+
+
+def message_unreact_v1(token, message_id, react_id):
+    u_id = decode_token(token)['auth_user_id']
+    store = data_store.get()
+
+    validate_mid(store["messages"], message_id)
+
+    if react_id <= 0:
+        raise InputError(description='React ID is invalid')
+
+    already_reacted = True
+    if u_id not in store['message'][message_id].react.values().u_ids:
+        store['message'][message_id].react.u_ids.remove(u_id)
+        already_reacted = False
+
+    if already_reacted:
+        raise InputError(
+            description='You have already reacted to this message')
+
+    return {}
+
+
 def message_pin_v1(token, message_id):
 
     auth_user_id = decode_token(token)["auth_user_id"]
 
     store = data_store.get()
-    # maybe change check_message_exists to message_id instead of message?
-    check_message_exists(message_id, auth_user_id)
+
+    if not (message_id in store["messages"]):
+        raise InputError("The provided message_id does not exist")
 
     if not check_user_is_message_member(auth_user_id, message_id):
         raise InputError("You are not part of the specified channel/dm")
@@ -287,16 +339,17 @@ def message_pin_v1(token, message_id):
 
     store["messages"][message_id].is_pinned = True
 
+    data_store.set(store)
     return {}
 
 
 def message_unpin_v1(token, message_id):
 
     auth_user_id = decode_token(token)["auth_user_id"]
-
     store = data_store.get()
-    # maybe change check_message_exists to message_id instead of message?
-    check_message_exists(message_id, auth_user_id)
+
+    if not (message_id in store["messages"]):
+        raise InputError("The provided message_id does not exist")
 
     if not check_user_is_message_member(auth_user_id, message_id):
         raise InputError("You are not part of the specified channel/dm")
@@ -308,6 +361,8 @@ def message_unpin_v1(token, message_id):
         raise InputError("Message is not pinned")
 
     store["messages"][message_id].is_pinned = False
+
+    data_store.set(store)
 
     return {}
 
