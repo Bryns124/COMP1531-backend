@@ -456,7 +456,7 @@ def message_react():
 @APP.route("/message/unreact/v1", methods=['POST'])
 def message_unreact():
     body = request.get_json()
-    message_react_v1(body['token'], body['message_id'], body["react_id"])
+    message_unreact_v1(body['token'], body['message_id'], body["react_id"])
     save_data_store()
     return dumps({})
 
