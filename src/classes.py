@@ -1,4 +1,6 @@
 from src.data_store import data_store
+import time
+import threading
 
 
 class User:
@@ -157,10 +159,57 @@ class Dm(BaseChannel):
             #     pass
 
 
+class Standup:
+    def __init__(self, auth_user_id, parent_channel, length):
+        self.owner = auth_user_id
+        self.start_time = int(time.time())
+        self.end_time = int(time.time() + length)
+        self.session = self.start_session(length)
+        self.parent_channel = parent_channel
+        self.message = ""
+
+    def start_session(self, length):
+        t = threading.Timer(length, self.end_session)
+        t.start()
+        return True
+        # while time.time() < self.end_time:
+        #     return True
+        # return False
+
+    def end_session(self):
+        self.session = False
+        self.parent_channel.end_standup()
+
+    def message_compile(self, auth_user_id, message):
+        user_str = self.parent_channel.all_members[auth_user_id].handle
+        if self.message == "":
+            self.message = f"{user_str}: {message}"
+        else:
+            self.message = self.message + '\n' + f"{user_str}: {message}"
+
+    def message_send(self):
+        if self.message == "":
+            return
+        store = data_store.get()
+        new_message = Message(self.owner, self.message,
+                              self.end_time, self.parent_channel)
+        store['messages'][new_message.id] = new_message
+        store['users'][self.owner].add_msg(new_message.id, new_message)
+        self.parent_channel.message_list.append(new_message.id)
+
+
 class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
         BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
+        self.active_standup = None
+
+    def start_standup(self, auth_user_id, duration):
+        self.active_standup = Standup(auth_user_id, self, duration)
+
+    def end_standup(self):
+        self.active_standup.message_send()
+        self.active_standup = None
 
 
 class Message:
