@@ -268,6 +268,6 @@ def generate_secret_code():
     code = ''
     chars = string.digits + string.ascii_uppercase
 
-    for i in range(SECRET_CODE_LENG):
+    for dummy in range(SECRET_CODE_LENG):
         code += str(secrets.choice(chars))
     return code
