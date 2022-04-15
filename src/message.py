@@ -1,5 +1,5 @@
 from src.data_store import data_store
-from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp, Queue
+from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp, get_reacts
 from src.error import AccessError, InputError
 from src.classes import Message
 from datetime import timezone
@@ -169,7 +169,7 @@ def message_remove_v1(token, message_id):
 
 
 def search_v1(token, query_str):
-    decode_token(token)
+    auth_user_id = decode_token(token)['auth_user_id']
     validate_message(query_str)
 
     message_list = []
@@ -181,7 +181,7 @@ def search_v1(token, query_str):
                 "u_id": messages[m].u_id,
                 "message": messages[m].message,
                 "time_sent": messages[m].time_sent,
-                "reacts": messages[m].reacts,
+                "reacts":get_reacts(m, auth_user_id),
                 "is_pinned": messages[m].is_pinned
             }
             message_list.append(new)
@@ -276,25 +276,11 @@ def message_react_v1(token, message_id, react_id):
     if react_id <= 0:
         raise InputError(description='React ID is invalid')
 
-    # for react in store['message'][message_id].react = {'1', '2', '3'}
-    # for react in store['message'][message_id].react.values() = {react_object1, react_object2, react_object3}
-    already_reacted = True
-    # if u_id not in store['message'][message_id].react.values():
-    #     store['message'][message_id].react.u_ids.append(u_id)
-    #     already_reacted = False
-    for message in store["messages"]:
-        if store["messages"][message].id == message_id:
-            for react in store["reacts"]:
-                if react_id == 1:
-                    if u_id not in react['u_ids']:
-                        react['u_ids'].append(u_id)
-                        already_reacted = False
-                        break
+    if store["messages"][message_id].is_user_reacted(u_id):
+        raise InputError(description='You have already reacted to this message')
 
-    if already_reacted:
-        raise InputError(
-            description='You have already reacted to this message')
-
+    store["messages"][message_id].react(u_id)
+    data_store.set(store)
     return {}
 
 
@@ -307,14 +293,10 @@ def message_unreact_v1(token, message_id, react_id):
     if react_id <= 0:
         raise InputError(description='React ID is invalid')
 
-    already_reacted = True
-    if u_id not in store['message'][message_id].react.values().u_ids:
-        store['message'][message_id].react.u_ids.remove(u_id)
-        already_reacted = False
+    if not store["messages"][message_id].is_user_reacted(u_id):
+        raise InputError(description='You are already unreacted')
 
-    if already_reacted:
-        raise InputError(
-            description='You have already reacted to this message')
+    store["messages"][message_id].unreact(u_id)
 
     return {}
 

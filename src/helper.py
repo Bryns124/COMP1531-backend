@@ -229,3 +229,12 @@ def load_dm(dm_id):
         if dm['dm_id'] == dm_id:
             return dm
     raise InputError(description="Could not locate dm")
+
+def get_reacts(message_id, u_id):
+    store = data_store.get()
+    m = store["messages"][message_id]
+    return {
+        "react_id": m.react_id,
+        "u_ids": m.react_ud_ids,
+        "is_this_user_reacted": m.is_user_reacted(u_id)
+    }

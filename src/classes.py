@@ -170,7 +170,8 @@ class Message:
         self.time_sent = time_sent
         self.parent = parent
         self.is_pinned = False
-        self.reacts = {}
+        self.react_id = 0
+        self.react_ud_ids = []
         # self.react = react_type(object)
 
     def set_message_id(self):
@@ -186,16 +187,26 @@ class Message:
     def get_parent_type(self):
         return self.parent.get_type()
 
-    def react(self, u_id, react_id):
-        new_react = Reacts(u_id, self)
-        self.reacts[new_react.id] = new_react
+    def react(self, u_id):
+        self.react_id = 1
+        self.react_ud_ids.append(u_id)
+
+    def unreact(self, u_id):
+        self.react_ud_ids.remove(u_id)
+        if len(self.react_ud_ids) == 0:
+            self.react_id = 0
+
+    def is_user_reacted(self, u_id):
+        if u_id in self.react_ud_ids:
+            return True
+        return False
 
 class Reacts:
     def __init__(self, u_id, message_object):
         self.id = self.set_react_id()
         self.u_ids = [] #list of people who have reacted
         self.parent_message = message_object # allows access to the message object
-        # self.parent_message_id = self.parent_message.id 
+        # self.parent_message_id = self.parent_message.id
 
     def set_react_id(self):
         store = data_store.get()
