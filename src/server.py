@@ -463,18 +463,19 @@ def message_unreact():
 
 @APP.route("/message/pin/v1", methods=['POST'])
 def message_pin():
-    body = request.get_json()
-    message_pin_v1(body['token'], body['message_id'])
+    body = request.get_json('token')
+    message_pin_v1(body["token"], body["message_id"])
     save_data_store()
     return dumps({})
 
 
-@APP.route("/message/pin/v1", methods=['POST'])
+@APP.route("/message/unpin/v1", methods=['POST'])
 def message_unpin():
-    body = request.get_json()
-    message_unpin_v1(body['token'], body['message_id'])
+    body = request.get_json('token')
+    message_unpin_v1(body["token"], body["message_id"])
     save_data_store()
     return dumps({})
+
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
 
