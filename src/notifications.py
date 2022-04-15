@@ -3,11 +3,16 @@ from src.helper import decode_token, validate_token
 from src.error import AccessError
 
 
-def notification_get_v1(token):
+def notifications_get_v1(token):
+
+    store = data_store.get()
 
     if not validate_token(token):
-        raise AccessError(description= "The token is invalid.")
-    
+        raise AccessError(description="The token is invalid.")
+
     u_id = decode_token(token)['auth_user_id']
 
+    notifications_list = store["users"][u_id]["notifications"]
+    notifications = notifications_list[0:20]
     # notifications inside user data I THINK
+    return {"notifications": notifications}

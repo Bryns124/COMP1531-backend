@@ -15,6 +15,7 @@ from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
+from src.notifications import notifications_get_v1
 
 
 def quit_gracefully(*args):
@@ -399,6 +400,15 @@ def admin_userpermission_change():
     admin_userpermission_change_v1(
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
+
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get():
+    token = request.args.get('token')
+    body = notifications_get_v1(token)
+    return dumps({
+        "notifications": body["notifications"]
+    })
 
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT

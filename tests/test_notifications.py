@@ -118,7 +118,7 @@ def invalid_message_text():
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
 
 
-def test_notifications_invite_to_channel(user_1, user_2, channel_public, c, message_text):
+def test_notifications_invite_to_channel(user_1, user_2, channel_public, message_text):
     # user_1 invites user_2 into channel
     requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
@@ -128,7 +128,7 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public, c, mess
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
         "token": user_2['token']
     })
-    notifications = request_notifications.json()
+    notifications = request_notifications["notifications"]
 
     assert notifications[0]["channel_id"] == channel_public['channel_id']
     assert notifications[0]["dm_id"] == -1
@@ -136,7 +136,8 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public, c, mess
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_notifications_invite_to_dm(user_1, user_2, channel_public, c, message_text):
+
+def test_notifications_invite_to_dm(user_1, user_2, c, message_text):
     # user_1 invites user_2 into dm
     # might need a dm_create not sure
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
@@ -174,7 +175,7 @@ def test_notifications_tag_in_channel(user_1, user_2, channel_public, c, message
     assert notifications[0]["notification_message"] == "mikey tagged you in a message: @miguel hey miguel!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-    
+
 
 def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text):
     # user_1 tags user_2
@@ -195,5 +196,5 @@ def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# make notification tests for reacts 
-# 
+# make notification tests for reacts
+#

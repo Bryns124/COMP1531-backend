@@ -172,7 +172,7 @@ def channel_messages_v1(token, channel_id, start):
 
     if channel_id not in store["channels"]:
         raise InputError(
-            description="The input channel_id does not exist in the datastore.") from InputError
+            description="The input channel_id does not exist in the datastore.")
 
     active_channel = store["channels"][channel_id]
     if len(active_channel.message_list) < start:
@@ -183,7 +183,7 @@ def channel_messages_v1(token, channel_id, start):
         active_channel.all_members[decode_token(token)['auth_user_id']]
     except:
         raise AccessError(
-            description="You are not part of that channel.") from AccessError
+            description="You are not part of that channel.")
 
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False

@@ -184,14 +184,26 @@ class Message:
     def get_parent_type(self):
         return self.parent.get_type()
 
+
 class Notifications:
-    def __init__(self, channel_id, dm_id, notification_message, user_object):
-        self.channel_id = channel_id
-        self.dm_id = dm_id
-        self.notification_message = notification_message
+    def __init__(self, channel_object, dm_object, notification_message, user_object):
+        self.channel = channel_object
+        self.dm = dm_object
         self.user = user_object
+        self.notification_message = notification_message
 
-    def is_in_channel():
-        
+    def is_in_channel(self, channel_id):
+        store = data_store.get()
+        for channel in store["channels"][channel_id]:
+            if channel[channel_id] == channel_id:
+                pass
+            else:
+                return -1
 
-    def is_in_dm():
+    def is_in_dm(self, dm_id):
+        store = data_store.get()
+        for dm in store["dms"][dm_id]:
+            if dm[dm_id] == dm_id:
+                pass
+            else:
+                return -1
