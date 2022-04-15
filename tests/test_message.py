@@ -19,7 +19,6 @@ requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # Users
 
-
 @pytest.fixture()
 def user_1():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
@@ -537,8 +536,6 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-<<<<<<< HEAD
-=======
 def test_messages_share_invalid_message(user_1, invalid_message_text, channel_public):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
         "token": user_1['token'],
@@ -551,7 +548,6 @@ def test_messages_share_invalid_message(user_1, invalid_message_text, channel_pu
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 def test_messages_share_toolong(user_1, user_2, channel_public, create_dm_2_user, invalid_message_text):
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
@@ -669,21 +665,12 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
 #     })
 #     payload = send.json()
 
-<<<<<<< HEAD
 #     assert send.status_code == 200
 #     assert requests.post(f"{url}/message/react", json={
 #         'token': user_1['token'],
 #         'message_id': payload['message_id'],
 #         'react_id': 1
 #     })
-=======
-    assert send.status_code == 200
-    assert requests.post(f"{url}/message/react/v1", json={
-        'token': user_1['token'],
-        'message_id': payload['message_id'],
-        'react_id': 1
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -696,21 +683,12 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
 #     })
 #     payload = send.json()
 
-<<<<<<< HEAD
 #     assert send.status_code == 200
 #     assert requests.post(f"{url}/message/react", json={
 #         'token': user_1['token'],
 #         'message_id': payload['message_id'],
 #         'react_id': 1
 #     })
-=======
-    assert send.status_code == 200
-    assert requests.post(f"{url}/message/react/v1", json={
-        'token': user_1['token'],
-        'message_id': payload['message_id'],
-        'react_id': 1
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -723,25 +701,16 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
 #     })
 #     payload = send.json()
 
-<<<<<<< HEAD
 #     requests.post(f"{url}/message/react", json={
 #         'token': user_invalid,
 #         'message_id': payload['message_id'],
 #         'react_id': 1
 #     })
-=======
-    request = requests.post(f"{url}/message/react/v1", json={
-        'token': user_invalid,
-        'message_id': payload['message_id'],
-        'react_id': 1
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     assert request.status_code == InputError.code
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-<<<<<<< HEAD
 # def test_messages_react_invalid_message_id(user_1, channel_public, message_text, invalid_message_id):
 #     requests.post(f"{BASE_URL}/message/send/v1", json={
 #         "token": user_1['token'],
@@ -753,25 +722,11 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
 #         'message_id': invalid_message_id,
 #         'react_id': 1
 #     })
-=======
-def test_messages_react_invalid_message_id(user_1, channel_public, message_text, invalid_message_id):
-    requests.post(f"{BASE_URL}/message/send/v1", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-        "message": message_text
-    })
-    request = requests.post(f"{url}/message/react/v1", json={
-        'token': user_1['token'],
-        'message_id': invalid_message_id,
-        'react_id': 1
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     assert request.status_code == InputError.code
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-<<<<<<< HEAD
 # def test_messages_react_invalid_dm_id(user_1, c, message_text, invalid_message_id):
 #     requests.post(f"{BASE_URL}/message/senddm/v1", json={
 #         "token": user_1['token'],
@@ -783,19 +738,6 @@ def test_messages_react_invalid_message_id(user_1, channel_public, message_text,
 #         'message_id': invalid_message_id,
 #         'react_id': 1
 #     })
-=======
-def test_messages_react_invalid_dm_id(user_1, c, message_text, invalid_message_id):
-    requests.post(f"{BASE_URL}/message/senddm/v1", json={
-        "token": user_1['token'],
-        "dm_id": c['dm_id'],
-        "message": message_text
-    })
-    request = requests.post(f"{url}/message/react/v1", json={
-        'token': user_1['token'],
-        'message_id': invalid_message_id,
-        'react_id': 1
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     assert request.status_code == InputError.code
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -809,19 +751,11 @@ def test_messages_react_invalid_dm_id(user_1, c, message_text, invalid_message_i
 #     })
 #     payload = send.json()
 
-<<<<<<< HEAD
 #     request = requests.post(f"{url}/message/react", json={
 #         'token': user_1['token'],
 #         'message_id': payload['message_id'],
 #         'react_id': invalid_react_id
 #     })
-=======
-    request = requests.post(f"{url}/message/react/v1", json={
-        'token': user_1['token'],
-        'message_id': payload['message_id'],
-        'react_id': invalid_react_id
-    })
->>>>>>> 20a154533b01af2f9458aa1319c84765da499c96
 
 #     assert request.status_code == InputError.code
 #     requests.delete(f"{BASE_URL}/clear/v1", json={})
