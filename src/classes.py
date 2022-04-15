@@ -183,3 +183,15 @@ class Message:
 
     def get_parent_type(self):
         return self.parent.get_type()
+
+class Notifications:
+    def __init__(self, channel_id, dm_id, notification_message, user_object):
+        self.channel_id = channel_id
+        self.dm_id = dm_id
+        self.notification_message = notification_message
+        self.user = user_object
+
+    def is_in_channel():
+        
+
+    def is_in_dm():
