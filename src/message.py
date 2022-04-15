@@ -209,6 +209,8 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     #     raise InputError("This message does not exist in the users channels / dms")
 
     new_message = message + " " + store["messages"][og_message_id].message
+    if message == "":
+        new_message = store["messages"][og_message_id].message
 
     if dm_id == -1:
         new = do_messages_send_v1(token, channel_id, new_message)
