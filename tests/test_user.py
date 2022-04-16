@@ -1,5 +1,6 @@
 from re import I
 import pytest
+from pytest import approx
 from src.channels import channels_listall_v1, channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1
 from src.other import clear_v1
@@ -381,7 +382,7 @@ def user_stats_none(user_1):
     })
     payload = response.json()
     assert response.status_code == 200
-    assert payload['user_stats']['involvement_rate'] == 0
+    assert payload['user_stats']['involvement_rate'] == approx(0)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -391,7 +392,7 @@ def user_stats_one_channel(user_1, public_channel_user1):
     })
     payload = response.json()
     assert response.status_code == 200
-    assert payload['user_stats']['involvement_rate'] == 1
+    assert payload['user_stats']['involvement_rate'] == approx(1)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -401,7 +402,7 @@ def user_stats_two_channels(user_1, user2, public_channel_user1, private_channel
     })
     payload = response.json()
     assert response.status_code == 200
-    assert payload['user_stats']['involvement_rate'] == 0.5
+    assert payload['user_stats']['involvement_rate'] == approx(0.5)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -411,7 +412,7 @@ def user_stats_one_dm(user_1, user2, create_dm_2_user):
     })
     payload = response.json()
     assert response.status_code == 200
-    assert payload['user_stats']['involvement_rate'] == 1
+    assert payload['user_stats']['involvement_rate'] == approx(1)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -421,7 +422,7 @@ def user_stats_two_dms(user_1, user_2, user_3, create_dm_2_user, create_dm_3_use
     })
     payload = response.json()
     assert response.status_code == 200
-    assert payload['user_stats']['involvement_rate'] == 0.5
+    assert payload['user_stats']['involvement_rate'] == approx(0.5)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -437,10 +438,10 @@ def user_stats_channel_dm(user_1, user_2, public_channel_user1, create_dm_2_user
     payload_2 = response_2.json()
 
     assert response_1.status_code == 200
-    assert payload_1['user_stats']['involvement_rate'] == 1
+    assert payload_1['user_stats']['involvement_rate'] == approx(1)
 
     assert response_2.status_code == 200
-    assert payload_2['user_stats']['involvement_rate'] == 0.5
+    assert payload_2['user_stats']['involvement_rate'] == approx(0.5)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -449,7 +450,7 @@ def user_stats_dm_messages(user_1, send_multiple_dms):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['user_stats']['involvement_rate'] == 1
+    assert payload['user_stats']['involvement_rate'] == approx(1)
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -459,7 +460,7 @@ def user_stats_channel_messages(user_1, messages_send_2_channel):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['user_stats']['involvement_rate'] == 1
+    assert payload['user_stats']['involvement_rate'] == approx(1)
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -481,13 +482,13 @@ def user_stats_channel_dm_messages(user_1, user_2, user_3, send_multiple_dms, me
     payload_3 = response_2.json()
 
     assert response_1.status_code == 200
-    assert payload_1['user_stats']['involvement_rate'] == 1
+    assert payload_1['user_stats']['involvement_rate'] == approx(1)
 
     assert response_2.status_code == 200
-    assert payload_2['user_stats']['involvement_rate'] == 0.3
+    assert payload_2['user_stats']['involvement_rate'] == approx(0.3)
 
     assert response_3.status_code == 200
-    assert payload_3['user_stats']['involvement_rate'] == 0.1
+    assert payload_3['user_stats']['involvement_rate'] == approx(0.1)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -497,10 +498,10 @@ def users_stats_none(user_1):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 0
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 0
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 0
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 0
+    assert payload['workspace_stats']['utilization_rate'] == approx(0)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -510,10 +511,10 @@ def users_stats_one_channel(user_1, public_channel_user1):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 0
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 0
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -523,10 +524,10 @@ def users_stats_two_channels(user_1, user2, public_channel_user1, private_channe
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 2
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 0
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 0
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 2
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -536,10 +537,10 @@ def users_stats_one_dm(user_1, user2, user3, create_dm_2_user):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 0.7
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 0
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 1
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 0
+    assert payload['workspace_stats']['utilization_rate'] == approx(0.7)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 1
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -549,10 +550,10 @@ def users_stats_two_dms(user_1, user_2, user_3, create_dm_2_user, create_dm_3_us
         "token": user_3["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 0
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 2
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 0
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -562,10 +563,10 @@ def users_stats_dm_messages(user_1, send_multiple_dms):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 0
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 2
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 2
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -575,10 +576,10 @@ def users_stats_channel_messages(user_1, messages_send_2_channel):
         "token": user_1["token"]
     })
     payload = response.json()
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 0
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 2
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -589,76 +590,76 @@ def users_stats_channel_dm_messages(user_1, user_2, user_3, send_multiple_dms, m
     })
     payload = response.json()
 
-    assert payload['workspace_stats']['utilization_rate'] == 1
-    assert payload['workspace_stats']['channels_exist'][0]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'][0]['num_dms_exist'] == 2
-    assert payload['workspace_stats']['messages_exist'][0]['num_messages_exist'] == 4
+    assert payload['workspace_stats']['utilization_rate'] == approx(1)
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 4
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 
-def test_valid_img(user_1):
-    response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
-        "token": user_1["token"],
-        "img_url": "valid_url",
-        "x_start": 0,
-        "y_start": 0,
-        "x_end": 100,
-        "y_end": 100
-    })
+# def test_valid_img(user_1):
+#     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
+#         "token": user_1["token"],
+#         "img_url": "valid_url",
+#         "x_start": 0,
+#         "y_start": 0,
+#         "x_end": 100,
+#         "y_end": 100
+#     })
 
-    assert response.status_code == 200
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     assert response.status_code == 200
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_invalid_img_url(user_1):
-    response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
-        "token": user_1["token"],
-        "img_url": "invalid_url",
-        "x_start": 0,
-        "y_start": 0,
-        "x_end": 100,
-        "y_end": 100
-    })
+# def test_invalid_img_url(user_1):
+#     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
+#         "token": user_1["token"],
+#         "img_url": "invalid_url",
+#         "x_start": 0,
+#         "y_start": 0,
+#         "x_end": 100,
+#         "y_end": 100
+#     })
 
-    assert response.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     assert response.status_code == InputError.code
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_invalid_dimensions(user_1):
-    response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
-        "token": user_1["token"],
-        "img_url": "valid_url",
-        "x_start": 0,
-        "y_start": 0,
-        "x_end": 100000,
-        "y_end": 100000
-    })
+# def test_invalid_dimensions(user_1):
+#     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
+#         "token": user_1["token"],
+#         "img_url": "valid_url",
+#         "x_start": 0,
+#         "y_start": 0,
+#         "x_end": 100000,
+#         "y_end": 100000
+#     })
 
-    assert response.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     assert response.status_code == InputError.code
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_invalid_crop(user_1):
-    response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
-        "token": user_1["token"],
-        "img_url": "valid_url",
-        "x_start": 100,
-        "y_start": 100,
-        "x_end": 50,
-        "y_end": 50
-    })
+# def test_invalid_crop(user_1):
+#     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
+#         "token": user_1["token"],
+#         "img_url": "valid_url",
+#         "x_start": 100,
+#         "y_start": 100,
+#         "x_end": 50,
+#         "y_end": 50
+#     })
 
-    assert response.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     assert response.status_code == InputError.code
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_invalid_format(user_1):
-    response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
-        "token": user_1["token"],
-        "img_url": "url_png_image",
-        "x_start": 0,
-        "y_start": 0,
-        "x_end": 100,
-        "y_end": 100
-    })
+# def test_invalid_image_format(user_1):
+#     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
+#         "token": user_1["token"],
+#         "img_url": "url_png_image",
+#         "x_start": 0,
+#         "y_start": 0,
+#         "x_end": 100,
+#         "y_end": 100
+#     })
 
-    assert response.status_code == InputError.code
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
+#     assert response.status_code == InputError.code
+#     requests.delete(f"{BASE_URL}/clear/v1", json={})
