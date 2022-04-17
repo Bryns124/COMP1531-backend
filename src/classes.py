@@ -1,5 +1,21 @@
 from src.data_store import data_store
+import datetime
+from datetime import timezone
+# from src.helper import generate_timestamp
+from src.config import port, url
 
+BASE_URL = url
+
+def generate_timestamp():
+    """
+    Generates the times_sent for messages.
+    Returns:
+        int: Type cast int of the current utc timestamp.
+    """
+    time = datetime.datetime.now(timezone.utc)
+    utc = time.replace(tzinfo=timezone.utc)
+    timestamp = utc.timestamp()
+    return int(timestamp)
 
 class User:
     def __init__(
@@ -18,6 +34,7 @@ class User:
         self.messages_sent = {}
         self.dms_own = {}
         self.all_dms = {}  # ask
+        self.profile_img_url = "{BASE_URL}/static/images/default.jpg"
         self.set_session_id()  # fix later
 
     def set_u_id(self):
@@ -133,6 +150,7 @@ class Dm(BaseChannel):
     def __init__(self, auth_user_id, name,  u_ids):
         BaseChannel.__init__(self, auth_user_id, name)
         self.id = self.set_dm_id()
+        self.time_created = generate_timestamp() #for the user and users stats
 
     def set_dm_id(self):
         try:
@@ -161,6 +179,7 @@ class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
         BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
+        self.time_created = int(generate_timestamp()) #for the user and users stats
 
 
 class Message:
