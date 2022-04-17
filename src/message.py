@@ -1,5 +1,5 @@
 from src.data_store import data_store
-from src.helper import decode_token, detect_tagged_user, notify_react, validate_token, channel_validity, already_member, generate_timestamp
+from src.helper import decode_token, detect_tagged_user, notify_react, validate_token, channel_validity, already_member, generate_timestamp, get_reacts
 from src.error import AccessError, InputError
 from src.classes import Message
 from datetime import timezone
@@ -440,7 +440,6 @@ def notify_tagged_user(user_tagged, sender_handle, message_text, parent_id, pare
     Returns:
         None
     """
-
     store = data_store.get()
     trunc_msg = message_text[0:20]
 

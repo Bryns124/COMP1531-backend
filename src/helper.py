@@ -282,3 +282,16 @@ def notify_react(message_reacted, sender_handle, parent_id, parent_name, is_chan
     }
     store["messages"][message_reacted.id].notifications.append(notification)
     data_store.set(store)
+
+
+def get_reacts(message_id, u_id):
+    react_list = []
+    store = data_store.get()
+    m = store["messages"][message_id]
+    new_react = {
+        "react_id": m.react_id,
+        "u_ids": m.react_ud_ids,
+        "is_this_user_reacted": m.is_user_reacted(u_id)
+    }
+    react_list.append(new_react)
+    return react_list
