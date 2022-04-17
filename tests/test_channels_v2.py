@@ -584,7 +584,7 @@ def test_sendlater_different_times(user_1, public_channel_user1):
         "message": "This will be sent first"
     })
 
-    time.sleep(5)
+    time.sleep(3)
     response = requests.get(f"{BASE_URL}/channel/messages/v2", params={
         "token": user_1['token'],
         "channel_id": 1,
@@ -592,7 +592,7 @@ def test_sendlater_different_times(user_1, public_channel_user1):
     })
 
     payload = response.json()
-    assert payload["messages"][0]["time_sent"]- three_sec_after <= 1
+    assert payload["messages"][0]["time_sent"] - three_sec_after <= 1
     assert payload["messages"][0]["message"] == "This will be sent later"
     assert payload["messages"][0]["message_id"] == 2
     assert payload["messages"][1]["time_sent"] <= three_sec_after
