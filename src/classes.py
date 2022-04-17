@@ -3,7 +3,7 @@ from src.data_store import data_store
 
 class User:
     def __init__(
-        self, email, password, name_first, name_last, handle
+        self, email, password, name_first, name_last, handle, notification_message
     ):
         self.auth_user_id = self.set_u_id()
         self.permission_id = self.set_permission_id()
@@ -19,6 +19,8 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
+        self.notifications = {}
+        self.notification_message = notification_message
 
     def set_u_id(self):
         try:
@@ -77,6 +79,18 @@ class User:
             return 2
     # def set_session_id(self):
     #     self.session_id.append(True)
+
+    def event_in_channel(self, ch_id):
+        if ch_id in self.all_channels:
+            return ch_id
+        else: 
+            return -1
+
+    def event_in_dm(self, dm_id):
+        if dm_id in self.all_dms:
+            return dm_id
+        else: 
+            return -1
 
 
 class BaseChannel:
@@ -185,25 +199,25 @@ class Message:
         return self.parent.get_type()
 
 
-class Notifications:
-    def __init__(self, channel_object, dm_object, notification_message, user_object):
-        self.channel = channel_object
-        self.dm = dm_object
-        self.user = user_object
-        self.notification_message = notification_message
+# class Notifications:
+#     def __init__(self, channel_object, dm_object, notification_message, user_object):
+#         self.channel = channel_object
+#         self.dm = dm_object
+#         self.user = user_object
+#         self.notification_message = notification_message
 
-    def is_in_channel(self, channel_id):
-        store = data_store.get()
-        for channel in store["channels"][channel_id]:
-            if channel[channel_id] == channel_id:
-                pass
-            else:
-                return -1
+#     def is_in_channel(self, channel_id):
+#         store = data_store.get()
+#         for channel in store["channels"][channel_id]:
+#             if channel[channel_id] == channel_id:
+#                 pass
+#             else:
+#                 return -1
 
-    def is_in_dm(self, dm_id):
-        store = data_store.get()
-        for dm in store["dms"][dm_id]:
-            if dm[dm_id] == dm_id:
-                pass
-            else:
-                return -1
+#     def is_in_dm(self, dm_id):
+#         store = data_store.get()
+#         for dm in store["dms"][dm_id]:
+#             if dm[dm_id] == dm_id:
+#                 pass
+#             else:
+#                 return -1
