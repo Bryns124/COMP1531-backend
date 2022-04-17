@@ -38,7 +38,7 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    try :
+    try:
         token_data = jwt.decode(token, SECRET, algorithms="HS256")
     except:
         # raise Error
@@ -214,3 +214,33 @@ def load_dm(dm_id):
         if dm['dm_id'] == dm_id:
             return dm
     raise InputError(description="Could not locate dm")
+
+
+def detect_tagged_user(message_text, users):
+    """
+    Searchs a given string for a tagged user of the form "@handle" where handle is a handle of 
+    a user listed in users.
+
+    Args:
+        message_text (string): The contents of a message being sent to a channel/dm
+        users (dictionary): The members of the channel/dm where the message is being sent 
+                            of the form {u_id: User object}
+
+    Returns:
+        dictionary: The users tagged in the message of the form {u_id: User object}, an empty dict
+                    if no users are tagged
+    """
+    tagged_users = {}
+    if "@" not in message_text:
+        return tagged_users
+
+    handles_list = []
+
+    for u_id in users:
+        handles_list.append(u_id, '@' + users[u_id].handle)
+
+    for u_id, handle in handles_list:
+        if handle in message_text:
+            tagged_users[u_id] = users[u_id]
+
+    return tagged_users
