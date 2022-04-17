@@ -19,7 +19,7 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
-        self.notifications = {}
+        self.notifications = []
         self.notification_message = notification_message
 
     def set_u_id(self):
@@ -184,7 +184,7 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
-
+    
     def set_message_id(self):
         store = data_store.get()
         if store['messages'] == {}:

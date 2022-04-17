@@ -12,6 +12,8 @@ def notifications_get_v1(token):
 
     u_id = decode_token(token)['auth_user_id']
 
+    
+
     notifications_list = store["users"][u_id].notification_message
     notifications = notifications_list[0:20]
     return {"notifications": notifications}
