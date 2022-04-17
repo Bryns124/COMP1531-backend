@@ -19,7 +19,7 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
-        self.notifications = {}
+        self.notifications = []  # maybe change to a list
         self.notification_message = notification_message
 
     def set_u_id(self):
@@ -83,13 +83,13 @@ class User:
     def event_in_channel(self, ch_id):
         if ch_id in self.all_channels:
             return ch_id
-        else: 
+        else:
             return -1
 
     def event_in_dm(self, dm_id):
         if dm_id in self.all_dms:
             return dm_id
-        else: 
+        else:
             return -1
 
 
