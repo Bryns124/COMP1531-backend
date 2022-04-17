@@ -410,6 +410,28 @@ def check_user_is_message_owner(u_id, message_id):
 
 
 def notify_tagged_user(user_tagged, sender_handle, message_text, parent_id, parent_name, is_channel):
+    """
+    Updates the notifications list with a tag notification of the form: 
+    {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": 
+            "{User's handle} tagged you in {channel/DM name}: {first 20 characters of the message}"
+    }
+    where channel_id is the id of the channel that the event happened in, and is -1 if it is being sent to a DM. 
+    dm_id is the DM that the event happened in, and is -1 if it is being sent to a channel.
+
+    Args:
+        user_tagged (User): The user tagged in the massage
+        sender_handle (string): The handle of the user who sent the message
+        message_text (string): The message sent containing the tag
+        parent_id (int): The channel/dm id the message is sent to
+        parent_name (string): The name of the channel/dm the message is sent to
+        is_channel (bool): True if the parent is a channel, False if it is a dm
+
+    Returns:
+        None
+    """
     store = data_store.get()
     trunc_msg = message_text[0:20]
 
