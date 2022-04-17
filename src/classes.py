@@ -3,7 +3,7 @@ from src.data_store import data_store
 
 class User:
     def __init__(
-        self, email, password, name_first, name_last, handle, notification_message
+        self, email, password, name_first, name_last, handle
     ):
         self.auth_user_id = self.set_u_id()
         self.permission_id = self.set_permission_id()
@@ -20,7 +20,6 @@ class User:
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
         self.notifications = []  # maybe change to a list
-        self.notification_message = notification_message
 
     def set_u_id(self):
         try:
@@ -184,7 +183,7 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
-    
+
     def set_message_id(self):
         store = data_store.get()
         if store['messages'] == {}:
