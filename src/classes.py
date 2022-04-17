@@ -79,17 +79,17 @@ class User:
     # def set_session_id(self):
     #     self.session_id.append(True)
 
-    def event_in_channel(self, ch_id):
-        if ch_id in self.all_channels:
-            return ch_id
-        else:
-            return -1
+    # def event_in_channel(self, ch_id):
+    #     if ch_id in self.all_channels:
+    #         return ch_id
+    #     else:
+    #         return -1
 
-    def event_in_dm(self, dm_id):
-        if dm_id in self.all_dms:
-            return dm_id
-        else:
-            return -1
+    # def event_in_dm(self, dm_id):
+    #     if dm_id in self.all_dms:
+    #         return dm_id
+    #     else:
+    #         return -1
 
 
 class BaseChannel:

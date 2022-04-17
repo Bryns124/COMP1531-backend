@@ -237,9 +237,11 @@ def detect_tagged_user(message_text, users):
     handles_list = []
 
     for u_id in users:
-        handles_list.append(u_id, '@' + users[u_id].handle)
+        # handles_list.append(u_id, '@' + users[u_id].handle)
+        handles_list.append('@' + users[u_id].handle)
 
-    for u_id, handle in handles_list:
+    # for u_id, handle in handles_list:
+    for handle in handles_list:
         if handle in message_text:
             tagged_users[u_id] = users[u_id]
 
@@ -261,11 +263,11 @@ def notify_add(user_invited, sender_handle, parent_id, parent_name, is_channel):
         "dm_id": dm_id,
         "notification_message": f"{sender_handle} added you to {parent_name}: "
     }
-    store["users"][user_invited.auth_user_id].notifications.append(notification)
+    store["users"][user_invited].notifications.append(notification)
     data_store.set(store)
 
 
-def notify_react(message_reacted, sender_handle, parent_id, parent_name, is_channel):
+def notify_react(user_reacted, sender_handle, parent_id, parent_name, is_channel):
     store = data_store.get()
 
     if is_channel:
@@ -280,7 +282,7 @@ def notify_react(message_reacted, sender_handle, parent_id, parent_name, is_chan
         "dm_id": dm_id,
         "notification_message": f"{sender_handle} reacted to your message in {parent_name}: "
     }
-    store["messages"][message_reacted.id].notifications.append(notification)
+    store["users"][user_reacted].notifications.append(notification)
     data_store.set(store)
 
 

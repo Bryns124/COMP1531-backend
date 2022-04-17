@@ -128,11 +128,15 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public, message
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
         "token": user_2['token']
     })
-    notifications = request_notifications["notifications"]
-
-    assert notifications[0]["channel_id"] == channel_public['channel_id']
-    assert notifications[0]["dm_id"] == -1
-    assert notifications[0]["notification_message"] == "mikey invited you to the channel"
+    notifications = request_notifications.json()
+    assert notifications == {
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "mikey invited you to the channel"
+    }
+    # assert notifications[0]["channel_id"] == channel_public['channel_id']
+    # assert notifications[0]["dm_id"] == -1
+    # assert notifications[0]["notification_message"] == "mikey invited you to the channel"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -162,17 +166,21 @@ def test_notifications_tag_in_channel(user_1, user_2, channel_public, c, message
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
-        "message": "@miguel hey miguel!"
+        "message": "@mikeytest hey mikey!"
     })
     # user_2 gets notification
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
         "token": user_2['token']
     })
     notifications = request_notifications.json()
-
-    assert notifications[0]["channel_id"] == channel_public['channel_id']
-    assert notifications[0]["dm_id"] == -1
-    assert notifications[0]["notification_message"] == "mikey tagged you in a message: @miguel hey miguel!"
+    assert notifications == {
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "miguel tagged you in a message: @mikeytest hey mikey!"
+    }
+    # assert notifications[0]["channel_id"] == channel_public['channel_id']
+    # assert notifications[0]["dm_id"] == -1
+    # assert notifications[0]["notification_message"] == "mikey tagged you in a message: @miguel hey miguel!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -182,7 +190,7 @@ def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "dm_id": c['dm_id'],
-        "message": "@miguel hey miguel!"
+        "message": "@mikeytest hey mikey!"
     })
     # user_2 gets notification
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
@@ -192,7 +200,7 @@ def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text
 
     assert notifications[0]["channel_id"] == -1
     assert notifications[0]["dm_id"] == c['dm_id']
-    assert notifications[0]["notification_message"] == "mikey tagged you in a message: @miguel hey miguel!"
+    assert notifications[0]["notification_message"] == "miguel tagged you in a message: @mikeytest hey mikey!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -219,9 +227,14 @@ def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
     })
     notifications = request_notifications.json()
 
-    assert notifications[0]["channel_id"] == channel_public['channel_id']
-    assert notifications[0]["dm_id"] == -1
-    assert notifications[0]["notification_message"] == "mikey reacted to your message in channel: hey miguel!"
+    assert notifications == {
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "mikey reacted to your message in channel: hey miguel!"
+    }
+    # assert notifications[0]["channel_id"] == channel_public['channel_id']
+    # assert notifications[0]["dm_id"] == -1
+    # assert notifications[0]["notification_message"] == "mikey reacted to your message in channel: hey miguel!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 

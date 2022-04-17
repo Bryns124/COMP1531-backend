@@ -317,9 +317,9 @@ def message_react_v1(token, message_id, react_id):
     message.react(u_id)
 
     if message_parent.get_type == "channel":
-        notify_react(message_id, store["users"][u_id].handle, message_parent.id, message_parent.name, True)
+        notify_react(u_id, store["users"][u_id].handle, message_parent.id, message_parent.name, True)
     elif message_parent.get_type == "dm":
-        notify_react(message_id, store["users"][u_id].handle, message_parent.id, message_parent.name, False)
+        notify_react(u_id, store["users"][u_id].handle, message_parent.id, message_parent.name, False)
 
     data_store.set(store)
     return {}
@@ -455,5 +455,5 @@ def notify_tagged_user(user_tagged, sender_handle, message_text, parent_id, pare
         "dm_id": dm_id,
         "notification_message": f"{sender_handle} tagged you in {parent_name}: {trunc_msg}"
     }
-    store["users"][user_tagged.auth_user_id].notifications.append(notification)
+    store["users"][user_tagged].notifications.append(notification)
     data_store.set(store)
