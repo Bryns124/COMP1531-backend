@@ -198,3 +198,53 @@ def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text
 
 # make notification tests for reacts
 #
+def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
+
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_public['channel_id'],
+    })
+    message = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "hey miguel!"
+    })
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_2["token"],
+        "message_id": message,
+        "react_id": 1
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()
+
+    assert notifications[0]["channel_id"] == channel_public['channel_id']
+    assert notifications[0]["dm_id"] == -1
+    assert notifications[0]["notification_message"] == "mikey reacted to your message in channel: hey miguel!"
+    assert len(notifications) == 1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_reacts_in_dm(user_1, user_2, c):
+    
+    message = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": c['dm_id'],
+        "message": "hey miguel!"
+    })
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_2["token"],
+        "message_id": message,
+        "react_id": 1
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()
+
+    assert notifications[0]["channel_id"] == -1
+    assert notifications[0]["dm_id"] == c['dm_id']
+    assert notifications[0]["notification_message"] == "mikey reacted to your message in dm: hey miguel!"
+    assert len(notifications) == 1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})

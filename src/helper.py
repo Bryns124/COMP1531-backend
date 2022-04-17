@@ -244,3 +244,41 @@ def detect_tagged_user(message_text, users):
             tagged_users[u_id] = users[u_id]
 
     return tagged_users
+
+
+def notify_add(user_invited, sender_handle, parent_id, parent_name, is_channel):
+    store = data_store.get()
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} added you to {parent_name}: "
+    }
+    store["users"][user_invited.auth_user_id].notifications.append(notification)
+    data_store.set(store)
+
+
+def notify_react(message_reacted, sender_handle, parent_id, parent_name, is_channel):
+    store = data_store.get()
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} reacted to your message in {parent_name}: "
+    }
+    store["messages"][message_reacted.id].notifications.append(notification)
+    data_store.set(store)

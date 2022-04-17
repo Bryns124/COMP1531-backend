@@ -2,7 +2,7 @@ from base64 import decode
 from json import load
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details, load_channel, load_message, load_user
+from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details, load_channel, load_message, load_user, notify_add
 from src.classes import User, Channel
 
 """
@@ -54,6 +54,7 @@ def channel_invite_v1(token, channel_id, u_id):
     ch_object = store["channels"][channel_id]
     store["users"][u_id].add_channel(channel_id, ch_object)
     ch_object.add_member(u_id, store["users"][u_id])
+    notify_add(u_id, store["users"][u_id].handle, channel_id, ch_object.name, True)
     data_store.set(store)
     return {
     }
