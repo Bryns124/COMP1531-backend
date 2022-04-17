@@ -238,7 +238,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     delay = (time_sent - generate_timestamp())
 
-    threading.Timer(
+    return threading.Timer(
         delay, messages_send_v1, (token, channel_id, message)
     ).start()
 
@@ -257,7 +257,26 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         raise AccessError(description="user is not part of dm")
     delay = (time_sent - generate_timestamp())
 
-    threading.Timer(
+    return threading.Timer(
+        delay, message_senddm_v1, (token, dm_id, message)
+    ).start()
+
+
+def message_dm_v1(token, dm_id, message, time_sent):
+    store = data_store.get()
+    validate_message(message)
+    u_id = decode_token(token)["auth_user_id"]
+    if time_sent < generate_timestamp():
+        raise InputError("Time is in the past")
+
+    if not valid_dm_id(store, dm_id):
+        raise InputError(description="dm id does not exist")
+
+    if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
+        raise AccessError(description="user is not part of dm")
+    delay = (time_sent - generate_timestamp())
+
+    return threading.Timer(
         delay, message_senddm_v1, (token, dm_id, message)
     ).start()
 

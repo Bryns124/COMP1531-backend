@@ -1,5 +1,6 @@
 from src.data_store import data_store
 
+
 class User:
     def __init__(
         self, email, password, name_first, name_last, handle
@@ -201,21 +202,21 @@ class Message:
             return True
         return False
 
-class Reacts:
-    def __init__(self, u_id, message_object):
-        self.id = self.set_react_id()
-        self.u_ids = [] #list of people who have reacted
-        self.parent_message = message_object # allows access to the message object
-        # self.parent_message_id = self.parent_message.id
+# class Reacts:
+#     def __init__(self, u_id, message_object):
+#         self.id = self.set_react_id()
+#         self.u_ids = [] #list of people who have reacted
+#         self.parent_message = message_object # allows access to the message object
+#         # self.parent_message_id = self.parent_message.id
 
-    def set_react_id(self):
-        store = data_store.get()
-        if store['reacts'] == {}:
-            return 1
-        else:
-            return len(store['reacts']) + 1
+#     def set_react_id(self):
+#         store = data_store.get()
+#         if store['reacts'] == {}:
+#             return 1
+#         else:
+#             return len(store['reacts']) + 1
 
-    def is_user_reacted(self, u_id):
-        if u_id in self.u_ids:
-            return True
-        return False
+#     def is_user_reacted(self, u_id):
+#         if u_id in self.u_ids:
+#             return True
+#         return False
