@@ -499,11 +499,8 @@ def get_dimension(img_url):
     p = ImageFile.Parser()
     while True:
         data = file.read(1024)
-        if not data:
-            break
         p.feed(data)
         if p.image:
+            file.close()
             return p.image.size
 
-    file.close()
-    return(None)

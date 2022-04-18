@@ -64,9 +64,6 @@ class User:
     def add_dm_owned(self, dm_id, dm_object):
         self.dms_own[dm_id] = dm_object
 
-    def remove_dm_owned(self, dm_id):
-        self.dms_own.pop(dm_id, None)
-
     def remove_ch_owned(self, ch_id):
         self.channels_owned.pop(ch_id, None)
 
@@ -147,7 +144,7 @@ class BaseChannel:
         store = data_store.get()
         if self.id in store['channels']:
             return "channel"
-        elif self.id in store['dms']:
+        else:
             return "dm"
 
     # def check_msg_list(self, message_id):

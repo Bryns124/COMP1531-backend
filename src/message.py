@@ -138,7 +138,7 @@ def message_remove_v1(token, message_id):
     if message.parent.get_type() == "channel":
 
         message.parent.message_list.remove(message_id)
-    elif message.parent.get_type() == "dm":
+    else:
         message.parent.message_list.remove(message_id)
 
     data_store.set(store)
@@ -330,7 +330,7 @@ def message_react_v1(token, message_id, react_id):
 
     if message.parent.get_type() == "channel":
         notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, True)
-    elif message.parent.get_type() == "dm":
+    else:
         notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, False)
 
     data_store.set(store)

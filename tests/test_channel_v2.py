@@ -385,6 +385,14 @@ def test_channel_addowner_invalid_channel(channel_public, invalid_channel_id, us
     assert request_channel_add_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_channel_addowner_invalid_member(channel_public, user_1):
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public["channel_id"],
+        "u_id": 6
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_channel_addowner_invalid_user(channel_public, invalid_user_id, user_1):
     """

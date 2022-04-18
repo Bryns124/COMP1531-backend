@@ -1186,7 +1186,6 @@ def test_messages_unreact_successful(user_1, channel_public, message_text):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-
 def test_messages_unreact_successful_dm(user_1, create_dm_2_user, message_text):
     send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
@@ -1235,6 +1234,58 @@ def test_messages_unreact_successful_dm(user_1, create_dm_2_user, message_text):
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_messages_unreact_successful_dm2(user_1, user_2, create_dm_2_user, message_text):
+    send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    payload = send.json()
+
+    request = requests.post(f"{url}/message/react/v1", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+    request = requests.post(f"{url}/message/react/v1", json={
+        'token': user_2['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [1, 2],
+            "is_this_user_reacted": True
+        }
+    ]
+
+    assert request.status_code == 200
+    assert requests.post(f"{url}/message/unreact/v1", json={
+        'token': user_1['token'],
+        'message_id': payload['message_id'],
+        'react_id': 1
+    })
+    response2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload2 = response2.json()
+    assert payload2["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [2],
+            "is_this_user_reacted": False
+        }
+    ]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_messages_unreact_invalid_token(user_1, channel_public, message_text, user_invalid):
     send = requests.post(f"{BASE_URL}/message/send/v1", json={

@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for src/dm.py: 98%</title>
+    <title>Coverage for src/dm.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,15 +18,15 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>src/dm.py</b> :
-            <span class="pc_cov">98%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            133 statements &nbsp;
+            130 statements &nbsp;
             <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">130 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">3 missing</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
-            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">1 partial</button>
+            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">0 partial</button>
         </h2>
     </div>
 </div>
@@ -166,59 +166,59 @@
     <p id="t111" class="run"><span class="n"><a href="#t111">111</a></span><span class="t">    <span class="nam">store</span> <span class="op">=</span> <span class="nam">data_store</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t112" class="run"><span class="n"><a href="#t112">112</a></span><span class="t">    <span class="nam">auth_user_id</span> <span class="op">=</span> <span class="nam">decode_token</span><span class="op">(</span><span class="nam">token</span><span class="op">)</span><span class="op">[</span><span class="str">'auth_user_id'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p id="t113" class="run"><span class="n"><a href="#t113">113</a></span><span class="t">    <span class="nam">dm_list</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t114" class="run"><span class="n"><a href="#t114">114</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t115" class="run"><span class="n"><a href="#t115">115</a></span><span class="t">        <span class="nam">dms</span> <span class="op">=</span> <span class="nam">store</span><span class="op">[</span><span class="str">"users"</span><span class="op">]</span><span class="op">[</span><span class="nam">auth_user_id</span><span class="op">]</span><span class="op">.</span><span class="nam">all_dms</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t114" class="pln"><span class="n"><a href="#t114">114</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t115" class="run"><span class="n"><a href="#t115">115</a></span><span class="t">    <span class="nam">dms</span> <span class="op">=</span> <span class="nam">store</span><span class="op">[</span><span class="str">"users"</span><span class="op">]</span><span class="op">[</span><span class="nam">auth_user_id</span><span class="op">]</span><span class="op">.</span><span class="nam">all_dms</span>&nbsp;</span><span class="r"></span></p>
     <p id="t116" class="pln"><span class="n"><a href="#t116">116</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t117" class="run"><span class="n"><a href="#t117">117</a></span><span class="t">        <span class="key">for</span> <span class="nam">dm</span> <span class="key">in</span> <span class="nam">dms</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t118" class="run"><span class="n"><a href="#t118">118</a></span><span class="t">            <span class="nam">new</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t119" class="pln"><span class="n"><a href="#t119">119</a></span><span class="t">                <span class="str">"dm_id"</span><span class="op">:</span> <span class="nam">dm</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t120" class="pln"><span class="n"><a href="#t120">120</a></span><span class="t">                <span class="str">"name"</span><span class="op">:</span> <span class="nam">dms</span><span class="op">[</span><span class="nam">dm</span><span class="op">]</span><span class="op">.</span><span class="nam">name</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t121" class="pln"><span class="n"><a href="#t121">121</a></span><span class="t">            <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t122" class="run"><span class="n"><a href="#t122">122</a></span><span class="t">            <span class="nam">dm_list</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">new</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t123" class="mis show_mis"><span class="n"><a href="#t123">123</a></span><span class="t">    <span class="key">except</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t124" class="mis show_mis"><span class="n"><a href="#t124">124</a></span><span class="t">        <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t125" class="run"><span class="n"><a href="#t125">125</a></span><span class="t">    <span class="nam">data_store</span><span class="op">.</span><span class="nam">set</span><span class="op">(</span><span class="nam">store</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t126" class="run"><span class="n"><a href="#t126">126</a></span><span class="t">    <span class="key">return</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t127" class="pln"><span class="n"><a href="#t127">127</a></span><span class="t">        <span class="str">'dms'</span><span class="op">:</span> <span class="nam">dm_list</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t128" class="pln"><span class="n"><a href="#t128">128</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t129" class="pln"><span class="n"><a href="#t129">129</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t130" class="pln"><span class="n"><a href="#t130">130</a></span><span class="t">    <span class="com"># for dm in store["dms"]:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t131" class="pln"><span class="n"><a href="#t131">131</a></span><span class="t">    <span class="com">#     if auth_user_id in dm["owner_members"] or auth_user_id in dm['all_members']:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t132" class="pln"><span class="n"><a href="#t132">132</a></span><span class="t">    <span class="com">#         new = {</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t133" class="pln"><span class="n"><a href="#t133">133</a></span><span class="t">    <span class="com">#             "dm_id": dm["dm_id"],</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t134" class="pln"><span class="n"><a href="#t134">134</a></span><span class="t">    <span class="com">#             "name": dm["name"]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t135" class="pln"><span class="n"><a href="#t135">135</a></span><span class="t">    <span class="com">#         }</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t136" class="pln"><span class="n"><a href="#t136">136</a></span><span class="t">    <span class="com">#         dm_list.append(new)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t117" class="run"><span class="n"><a href="#t117">117</a></span><span class="t">    <span class="key">for</span> <span class="nam">dm</span> <span class="key">in</span> <span class="nam">dms</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t118" class="run"><span class="n"><a href="#t118">118</a></span><span class="t">        <span class="nam">new</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t119" class="pln"><span class="n"><a href="#t119">119</a></span><span class="t">            <span class="str">"dm_id"</span><span class="op">:</span> <span class="nam">dm</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t120" class="pln"><span class="n"><a href="#t120">120</a></span><span class="t">            <span class="str">"name"</span><span class="op">:</span> <span class="nam">dms</span><span class="op">[</span><span class="nam">dm</span><span class="op">]</span><span class="op">.</span><span class="nam">name</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t121" class="pln"><span class="n"><a href="#t121">121</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t122" class="run"><span class="n"><a href="#t122">122</a></span><span class="t">        <span class="nam">dm_list</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">new</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t123" class="pln"><span class="n"><a href="#t123">123</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t124" class="run"><span class="n"><a href="#t124">124</a></span><span class="t">    <span class="nam">data_store</span><span class="op">.</span><span class="nam">set</span><span class="op">(</span><span class="nam">store</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t125" class="run"><span class="n"><a href="#t125">125</a></span><span class="t">    <span class="key">return</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t126" class="pln"><span class="n"><a href="#t126">126</a></span><span class="t">        <span class="str">'dms'</span><span class="op">:</span> <span class="nam">dm_list</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t127" class="pln"><span class="n"><a href="#t127">127</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t128" class="pln"><span class="n"><a href="#t128">128</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t129" class="pln"><span class="n"><a href="#t129">129</a></span><span class="t">    <span class="com"># for dm in store["dms"]:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t130" class="pln"><span class="n"><a href="#t130">130</a></span><span class="t">    <span class="com">#     if auth_user_id in dm["owner_members"] or auth_user_id in dm['all_members']:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t131" class="pln"><span class="n"><a href="#t131">131</a></span><span class="t">    <span class="com">#         new = {</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t132" class="pln"><span class="n"><a href="#t132">132</a></span><span class="t">    <span class="com">#             "dm_id": dm["dm_id"],</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t133" class="pln"><span class="n"><a href="#t133">133</a></span><span class="t">    <span class="com">#             "name": dm["name"]</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t134" class="pln"><span class="n"><a href="#t134">134</a></span><span class="t">    <span class="com">#         }</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t135" class="pln"><span class="n"><a href="#t135">135</a></span><span class="t">    <span class="com">#         dm_list.append(new)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t136" class="pln"><span class="n"><a href="#t136">136</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t137" class="pln"><span class="n"><a href="#t137">137</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t138" class="pln"><span class="n"><a href="#t138">138</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t139" class="run"><span class="n"><a href="#t139">139</a></span><span class="t"><span class="key">def</span> <span class="nam">dm_remove_v1</span><span class="op">(</span><span class="nam">token</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t140" class="pln"><span class="n"><a href="#t140">140</a></span><span class="t">    <span class="str">"""removes an existing dm so all members are</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t141" class="pln"><span class="n"><a href="#t141">141</a></span><span class="t"><span class="str">        no longer a part of the dm.</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t142" class="pln"><span class="n"><a href="#t142">142</a></span><span class="t"><span class="str">        this action can only be done by the owner of the dm</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t143" class="pln"><span class="n"><a href="#t143">143</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t144" class="pln"><span class="n"><a href="#t144">144</a></span><span class="t"><span class="str">    Args:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t145" class="pln"><span class="n"><a href="#t145">145</a></span><span class="t"><span class="str">        token (string): owner fo the dm</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t146" class="pln"><span class="n"><a href="#t146">146</a></span><span class="t"><span class="str">        dm_id (int): dm to be removed</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t147" class="pln"><span class="n"><a href="#t147">147</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t148" class="pln"><span class="n"><a href="#t148">148</a></span><span class="t"><span class="str">    Raises:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t149" class="pln"><span class="n"><a href="#t149">149</a></span><span class="t"><span class="str">        AccessError: the authorised user is not the original creator of the DM</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t150" class="pln"><span class="n"><a href="#t150">150</a></span><span class="t"><span class="str">        InputError: the dm_id provided is invalid</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t151" class="pln"><span class="n"><a href="#t151">151</a></span><span class="t"><span class="str">        AccessError: The authorised user is no longer a part of the DM</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t152" class="pln"><span class="n"><a href="#t152">152</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t153" class="pln"><span class="n"><a href="#t153">153</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t154" class="pln"><span class="n"><a href="#t154">154</a></span><span class="t"><span class="str">        dictionary: empty</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t155" class="pln"><span class="n"><a href="#t155">155</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t156" class="run"><span class="n"><a href="#t156">156</a></span><span class="t">    <span class="nam">store</span> <span class="op">=</span> <span class="nam">data_store</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t157" class="run"><span class="n"><a href="#t157">157</a></span><span class="t">    <span class="nam">auth_user_id</span> <span class="op">=</span> <span class="nam">decode_token</span><span class="op">(</span><span class="nam">token</span><span class="op">)</span><span class="op">[</span><span class="str">'auth_user_id'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t158" class="pln"><span class="n"><a href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t159" class="run"><span class="n"><a href="#t159">159</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">valid_dm_id</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t160" class="run"><span class="n"><a href="#t160">160</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"dm id does not exist"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t161" class="pln"><span class="n"><a href="#t161">161</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t162" class="run"><span class="n"><a href="#t162">162</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">is_dm_owner</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t163" class="run"><span class="n"><a href="#t163">163</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"user is not owner of dm"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t164" class="pln"><span class="n"><a href="#t164">164</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t165" class="par run show_par"><span class="n"><a href="#t165">165</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">is_dm_member</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">165&#x202F;&#x219B;&#x202F;166</span><span class="annotate long">line 165 didn't jump to line 166, because the condition on line 165 was never true</span></span></p>
-    <p id="t166" class="mis show_mis"><span class="n"><a href="#t166">166</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"That member is not apart of the dm"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t138" class="run"><span class="n"><a href="#t138">138</a></span><span class="t"><span class="key">def</span> <span class="nam">dm_remove_v1</span><span class="op">(</span><span class="nam">token</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t139" class="pln"><span class="n"><a href="#t139">139</a></span><span class="t">    <span class="str">"""removes an existing dm so all members are</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t140" class="pln"><span class="n"><a href="#t140">140</a></span><span class="t"><span class="str">        no longer a part of the dm.</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t141" class="pln"><span class="n"><a href="#t141">141</a></span><span class="t"><span class="str">        this action can only be done by the owner of the dm</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t142" class="pln"><span class="n"><a href="#t142">142</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t143" class="pln"><span class="n"><a href="#t143">143</a></span><span class="t"><span class="str">    Args:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t144" class="pln"><span class="n"><a href="#t144">144</a></span><span class="t"><span class="str">        token (string): owner fo the dm</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t145" class="pln"><span class="n"><a href="#t145">145</a></span><span class="t"><span class="str">        dm_id (int): dm to be removed</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t146" class="pln"><span class="n"><a href="#t146">146</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t147" class="pln"><span class="n"><a href="#t147">147</a></span><span class="t"><span class="str">    Raises:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t148" class="pln"><span class="n"><a href="#t148">148</a></span><span class="t"><span class="str">        AccessError: the authorised user is not the original creator of the DM</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t149" class="pln"><span class="n"><a href="#t149">149</a></span><span class="t"><span class="str">        InputError: the dm_id provided is invalid</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t150" class="pln"><span class="n"><a href="#t150">150</a></span><span class="t"><span class="str">        AccessError: The authorised user is no longer a part of the DM</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t151" class="pln"><span class="n"><a href="#t151">151</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t152" class="pln"><span class="n"><a href="#t152">152</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t153" class="pln"><span class="n"><a href="#t153">153</a></span><span class="t"><span class="str">        dictionary: empty</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t154" class="pln"><span class="n"><a href="#t154">154</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t155" class="run"><span class="n"><a href="#t155">155</a></span><span class="t">    <span class="nam">store</span> <span class="op">=</span> <span class="nam">data_store</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t156" class="run"><span class="n"><a href="#t156">156</a></span><span class="t">    <span class="nam">auth_user_id</span> <span class="op">=</span> <span class="nam">decode_token</span><span class="op">(</span><span class="nam">token</span><span class="op">)</span><span class="op">[</span><span class="str">'auth_user_id'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t157" class="pln"><span class="n"><a href="#t157">157</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t158" class="run"><span class="n"><a href="#t158">158</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">valid_dm_id</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t159" class="run"><span class="n"><a href="#t159">159</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"dm id does not exist"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t160" class="pln"><span class="n"><a href="#t160">160</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t161" class="run"><span class="n"><a href="#t161">161</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">is_dm_member</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t162" class="run"><span class="n"><a href="#t162">162</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"That member is not apart of the dm"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t163" class="pln"><span class="n"><a href="#t163">163</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t164" class="run"><span class="n"><a href="#t164">164</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">is_dm_owner</span><span class="op">(</span><span class="nam">store</span><span class="op">,</span> <span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">dm_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t165" class="run"><span class="n"><a href="#t165">165</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">"user is not owner of dm"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t166" class="pln"><span class="n"><a href="#t166">166</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t167" class="pln"><span class="n"><a href="#t167">167</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t168" class="pln"><span class="n"><a href="#t168">168</a></span><span class="t">    <span class="com"># i = 0</span>&nbsp;</span><span class="r"></span></p>
     <p id="t169" class="pln"><span class="n"><a href="#t169">169</a></span><span class="t">    <span class="com"># while i &lt; len(store["dms"]):</span>&nbsp;</span><span class="r"></span></p>
@@ -444,7 +444,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
-            created at 2022-04-18 23:01 +1000
+            created at 2022-04-19 02:02 +1000
         </p>
     </div>
 </div>

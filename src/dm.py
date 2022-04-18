@@ -111,17 +111,16 @@ def dm_list_v1(token):
     store = data_store.get()
     auth_user_id = decode_token(token)['auth_user_id']
     dm_list = []
-    try:
-        dms = store["users"][auth_user_id].all_dms
 
-        for dm in dms:
-            new = {
-                "dm_id": dm,
-                "name": dms[dm].name
-            }
-            dm_list.append(new)
-    except:
-        pass
+    dms = store["users"][auth_user_id].all_dms
+
+    for dm in dms:
+        new = {
+            "dm_id": dm,
+            "name": dms[dm].name
+        }
+        dm_list.append(new)
+
     data_store.set(store)
     return {
         'dms': dm_list
@@ -159,11 +158,12 @@ def dm_remove_v1(token, dm_id):
     if not valid_dm_id(store, dm_id):
         raise InputError(description="dm id does not exist")
 
+    if not is_dm_member(store, auth_user_id, dm_id):
+        raise AccessError(description="That member is not apart of the dm")
+
     if not is_dm_owner(store, auth_user_id, dm_id):
         raise AccessError(description="user is not owner of dm")
 
-    if not is_dm_member(store, auth_user_id, dm_id):
-        raise AccessError(description="That member is not apart of the dm")
 
     # i = 0
     # while i < len(store["dms"]):
