@@ -3,21 +3,15 @@ import re
 from src.data_store import data_store
 from src.error import InputError
 import jwt
-from src.helper import decode_token, generate_token
+from src.helper import generate_token, decode_token
 import hashlib
-"""
-Auth has three main functions: register, login and logout
+from src.classes import User
+import string
+import secrets
 
-Functions:
-    auth_login_v1: logs in a registered user
-    auth_register_v1: registers a new user
-    auth_logout_v1: logs a user out
-
-        create_user: initialises a new user
-            create_handle: creates handle for new user
-        email_check: checks if email is valid
-        duplicate_email_check: checks if email has already been registered.
-"""
+EMAIL_ADDRESS = "w17a.ant@gmail.com"
+EMAIL_PASSWORD = """BirdsAren'tReal"""
+SECRET_CODE_LENG = 6
 
 
 def auth_login_v1(email, password):
@@ -28,93 +22,198 @@ def auth_login_v1(email, password):
     :param password: the user's password
     :return: token, u_id
     """
-    store = data_store.get()
-    for user in store['users']:
-        if user['email'] == email:
-            if user['password'] == hash_password(password):
-                return {
-                    'token': generate_token(user['u_id']),
-                    'auth_user_id': user['u_id']
-                }
+    users = data_store.get()["users"]
+    for u_id in users:
+        if users[u_id].email == email and users[u_id].password == hash_password(password):
+            return {
+                "token": generate_token(u_id),
+                "auth_user_id": u_id
+            }
+        elif users[u_id].email == email and users[u_id].password != hash_password(password):
             raise InputError(description="Password is incorrect")
 
     raise InputError(description="Email does not exist")
 
 
 def auth_register_v1(email, password, name_first, name_last):
-    """
-    Registers in a new user given the email, password, first name and last name.
-
-    :param email: the user's email
-    :param password: the user's password
-    :name_first: the user's first name
-    :name_last: the user's last name
-    :return: token, u_id
-    :rtype: dictionary
-    """
     if not email_check(email):
         raise InputError(description="Email entered is not a valid email")
     if duplicate_email_check(email):
-        raise InputError(description="Email entered has already been registered")
+        raise InputError(
+            description="Email entered has already been registered")
     if len(password) < 6:
-        raise InputError(description="Password entered must be longer than 6 characters")
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError(description=
-            "First name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="First name entered must be between 1 and 50 characters inclusive")
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError(description=
-            "Last name entered must be between 1 and 50 characters inclusive")
+        raise InputError(
+            description="Last name entered must be between 1 and 50 characters inclusive")
 
-    user = create_user(email, password, name_first, name_last)
+    handle = create_handle(name_first, name_last)
+    new_user = User(
+        email, hash_password(password), name_first, name_last, handle
+    )
+    store = data_store.get()
+    store["users"][new_user.auth_user_id] = new_user
+    data_store.set(store)
+
+    u_id = int(new_user.auth_user_id)
     return {
-        'token': generate_token(user['u_id']),
-        'auth_user_id': user['u_id']
+        "token": generate_token(u_id),
+        "auth_user_id": u_id
     }
 
 
-def create_user(email, password, name_first, name_last):
+def auth_logout_v1(token):
+    """_summary_
+    Logs the user off, removing their current session_id from the datastore.
+    Args:
+        token (string): token of user, obtained when logging on or when registering.
     """
-    Initialises the user's details and saves it into data_store.
 
-    :param email: the user's email
-    :param password: the user's password
-    :name_first: the user's first name
-    :name_last: the user's last name
-    :return: the user's details
-    :rtype: dictionary
+    u_id = decode_token(token)['auth_user_id']
+    s_id = decode_token(token)['session_id']
+    store = data_store.get()
+
+    store["users"][u_id].session_logout(s_id)
+    data_store.set(store)
+
+    return {}
+
+
+def auth_passwordreset_request_v1(email):
+    '''
+    Most of auth/passwordreset/request as outlined by the spec is done in server.py
+
+    If the email is in the datastore, generates a secret code and stores that in datastore 
+    then logs the user out of all their sessions.
+
+    Args: email (string): the email of the user trying to reset their password
+    Returns: 
+        If the email provided is not in the datastore:
+            None
+        If the email provided is valid:
+            secret_code (string): the code generated needed to reset the password
+    '''
+
+    store = data_store.get()
+    # return None if email not in data_store
+    if not duplicate_email_check(email):
+        return None
+
+    target_user = identify_user_from_email(email)
+    secret_code = generate_secret_code()
+
+    store["users"][target_user].reset_code = secret_code
+    for session in store["users"][target_user].session_id:
+        store["users"][target_user].session_id[session] = False
+
+    data_store.set(store)
+
+    return secret_code
+
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the password
+    provided. Once a reset code has been used, it is then invalidated.
+
+    InputError when: reset_code is not in the datastore, or if the new_password is
+    less than 6 characters.
+
+    Args: 
+        reset_code (string): the unique generated and saved to the datastore when
+        auth_passwordreset_request is called.
+        new_password (string): the new password chosen by the user
+
+    Returns:
+        None
+    '''
+    store = data_store.get()
+    target_user = identify_user_from_reset_code(reset_code)
+    if target_user == None:
+        raise InputError(description="Reset code invalid")
+
+    if len(new_password) < 6:
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
+
+    store["users"][target_user].password = hash_password(new_password)
+    store["users"][target_user].reset_code = None
+
+    data_store.set(store)
+
+
+def identify_user_from_email(email):
+    '''
+    Given a valid email, returns the u_id of the user with that email.
+    Args: email (string), the email of the user to be identified
+    Returns: u_id (int), the u_id of the user with the specified email
+    '''
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].email == email:
+            return u_id
+
+
+def identify_user_from_reset_code(code):
+    '''
+    Given a code 
+    '''
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].reset_code == code:
+            return u_id
+
+
+########################################
+###### - - HELPER FUNCTIONS - - #######
+######################################
+
+def email_check(email):
+    """
+    Checks if the email entered is valid.
+
+    :email: the user's email
+    :return: whether the email is valid or not
+    :rtype: boolean
+    """
+    regex = re.compile(
+        r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+    return bool(re.fullmatch(regex, email))
+
+
+def hash_password(password):
+    """_summary_
+    Encodes the password given when registering.
+    Args:
+        password (string): Users input plantext password.
+
+    Returns:
+        string: Hashed password
+    """
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+def duplicate_email_check(email):
+    """
+    Checks if the email entered has already been registered.
+
+    :email: the user's email
+    :return: whether the email is new or already has been registered
+    :rtype: boolean
     """
     store = data_store.get()
-    if (store['users'] == []):
-        new_id = len(store['users']) + 1
-        user = {
-            'u_id': new_id,
-            'session_id': [],
-            'email': email,
-            'permission_id': 1,
-            'name_first': name_first,
-            'name_last': name_last,
-            'handle_str': create_handle(name_first, name_last),
-            'password': hash_password(password),
-            'channels_owned': [],
-            'channels_joined': [],
-        }
-    else:
-        new_id = len(store['users']) + len(store["removed_users"]) + 1
-        user = {
-            'u_id': new_id,
-            'session_id': [],
-            'email': email,
-            'permission_id': 2,
-            'name_first': name_first,
-            'name_last': name_last,
-            'handle_str': create_handle(name_first, name_last),
-            'password': hash_password(password),
-            'channels_owned': [],
-            'channels_joined': [],
-        }
-    store['users'].append(user)
-    data_store.set(store)
-    return user
+    if store["users"] == {}:
+        return False
+    for user in store['users']:
+        if store["users"][user].email == email:
+            return True
+    return False
 
 
 def create_handle(name_first, name_last):
@@ -137,7 +236,7 @@ def create_handle(name_first, name_last):
 
     i = 0
     for user in store['users']:
-        if user['handle_str'] == handle:
+        if store['users'][user].handle == handle:
             if i == 0:
                 handle += str(0)
                 i += 1
@@ -160,61 +259,15 @@ def create_handle(name_first, name_last):
     return handle
 
 
-def auth_logout_v1(token):
-    """_summary_
-    Logs the user off, removing their current session_id from the datastore.
-    Args:
-        token (string): token of user, obtained when logging on or when registering.
-    """
-    store = data_store.get()
+def generate_secret_code():
+    '''
+    Generates a random secret code that is cryptographically secure.
+    Args: None
+    Output: code (string), a randomly generated code of length SECRET_CODE_LENG
+    '''
+    code = ''
+    chars = string.digits + string.ascii_uppercase
 
-    for user in store['users']:
-        if user['u_id'] == decode_token(token)['auth_user_id']:
-            user['session_id'].remove(decode_token(token)['session_id'])
-
-    data_store.set(store)
-
-###############################################################
-##                 Checking functions                        ##
-###############################################################
-
-
-def hash_password(password):
-    """_summary_
-    Encodes the password given when registering.
-    Args:
-        password (string): Users input plantext password.
-
-    Returns:
-        string: Hashed password
-    """
-    return hashlib.sha256(password.encode()).hexdigest()
-
-
-def email_check(email):
-    """
-    Checks if the email entered is valid.
-
-    :email: the user's email
-    :return: whether the email is valid or not
-    :rtype: boolean
-    """
-    regex = re.compile(
-        r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-    return bool(re.fullmatch(regex, email))
-
-
-def duplicate_email_check(email):
-    """
-    Checks if the email entered has already been registered.
-
-    :email: the user's email
-    :return: whether the email is new or already has been registered
-    :rtype: boolean
-    """
-    store = data_store.get()
-    does_email_exist = False
-    for user in store['users']:
-        if user['email'] == email:
-            does_email_exist = True
-    return does_email_exist
+    for dummy in range(SECRET_CODE_LENG):
+        code += str(secrets.choice(chars))
+    return code

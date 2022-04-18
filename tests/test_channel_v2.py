@@ -332,8 +332,6 @@ def test_channel_messages_v1(user_1, channel_public):
 
 
 # Tests for channel/addowner
-
-
 def test_channel_addowner(user_1, user_2, channel_public):
     """
     This test makes a user an owner of the channel.
@@ -357,15 +355,15 @@ def test_channel_addowner(user_1, user_2, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest'}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest'}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -387,6 +385,14 @@ def test_channel_addowner_invalid_channel(channel_public, invalid_channel_id, us
     assert request_channel_add_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_channel_addowner_invalid_member(channel_public, user_1):
+    request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public["channel_id"],
+        "u_id": 6
+    })
+    assert request_channel_add_owner.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_channel_addowner_invalid_user(channel_public, invalid_user_id, user_1):
     """
@@ -468,14 +474,24 @@ def test_channel_addowner_user_not_owner(user_2, user_no_access, channel_public)
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_channel_addownder_user_not_in_channel(user_1, channel_public, user_2):
+def test_channel_addowner_invalid_token(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_1['token'],
+    })
+
     request_channel_add_owner = requests.post(f"{BASE_URL}/channel/addowner/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2['auth_user_id']
     })
-    assert request_channel_add_owner.status_code == InputError.code
+    assert request_channel_add_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
 # Tests for channel/removeowner
 
 
@@ -507,13 +523,13 @@ def test_channel_removeowner(user_1, user_2, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest'}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -547,13 +563,13 @@ def test_channel_removeowner_multiple_channels(user_1, user_2, channel_private, 
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest'},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest'}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -622,20 +638,25 @@ def test_channel_removeowner_user_not_owner(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_channel_removeowner_user_no_access(user_1, user_2, channel_public):
+def test_channel_removeowner_user_no_access(user_2, user_no_access, channel_public):
     """
-    This test checks to see that an InputError is raised when removing the u_id
-    of a user who is not an owner of the channel.
+    This test checks to see that an AccessError is raised when the user removing a
+    u_id is not an owner permissions
     """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
-        "token": user_1['token'],
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+    })
+
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_no_access['token'],
         "channel_id": channel_public['channel_id'],
     })
 
     request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id'],
-        "u_id": user_1['auth_user_id']
+        "u_id": user_no_access['auth_user_id']
     })
     assert request_channel_remove_owner.status_code == AccessError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -693,6 +714,31 @@ def test_channel_removeowner_only_one_owner(user_1, channel_public):
     })
     assert request_channel_remove_owner.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_channel_removeowner_invalid_token(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id']
+    })
+
+    requests.post(f"{BASE_URL}/channel/addowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+
+    requests.post(f"{BASE_URL}/auth/logout/v1", json={
+        "token": user_1['token'],
+    })
+
+    request_channel_remove_owner = requests.post(f"{BASE_URL}/channel/removeowner/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2['auth_user_id']
+    })
+    assert request_channel_remove_owner.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 #
 
 
@@ -734,11 +780,11 @@ def test_channel_details_multiple_channels(user_1, channel_private, channel_publ
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -756,11 +802,11 @@ def test_channel_details(user_1, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -768,7 +814,7 @@ def test_channel_details(user_1, channel_public):
 
 
 def test_channel_details_multiple_users(user_2, channel_public, user_1):
-    requests.post(f"{BASE_URL}/channel/join/v2", json={
+    response = requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2['token'],
         "channel_id": channel_public['channel_id']
     })
@@ -776,22 +822,23 @@ def test_channel_details_multiple_users(user_2, channel_public, user_1):
         "token": user_1['token'],
         "channel_id": channel_public['channel_id']
     })
+    assert response.status_code == 200
+    assert r.status_code == 200
     data = r.json()
     assert data == {
         'name': "Test Channel",
         'is_public': True,
         'owner_members': [
             {'u_id': 2, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 2, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 1, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
-    assert r.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
@@ -848,13 +895,13 @@ def test_channel_join_multiple_channels(channel_private, channel_public, user_2)
         'is_public':  True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -876,13 +923,13 @@ def test_channel_join(channel_public, user_2):
         'is_public':  True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -981,7 +1028,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "owner_members": [],
         "all_members": [
             {'email': 'miguel@unsw.com', 'handle_str': 'migueltest',
-                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2}
+                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2, "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -1009,7 +1056,7 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
     assert payload == {
         "name": "A New Hope",
         "is_public": True,
-        "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1}],
-        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1}]
+        "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": f"{BASE_URL}/static/default.jpg"}],
+        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": f"{BASE_URL}/static/default.jpg"}]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
