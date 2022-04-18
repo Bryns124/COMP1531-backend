@@ -414,6 +414,7 @@ def admin_userpermission_change():
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
 
+
 @APP.route('/static/<path:path>')
 def send_js(path):
     return send_from_directory('', path)
@@ -428,6 +429,7 @@ def user_stats():
         'user_stats': body['user_stats']
     })
 
+
 @APP.route("/users/stats/v1", methods=["GET"])
 def users_stats():
     token = request.args.get('token')
@@ -437,12 +439,15 @@ def users_stats():
         'workspace_stats': body['workspace_stats']
     })
 
+
 @APP.route("/user/profile/uploadphoto/v1", methods=["POST"])
 def user_profile_uploadphoto():
     data = request.get_json()
 
-    user_profile_uploadphoto_v1(data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end'])
+    user_profile_uploadphoto_v1(
+        data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end'])
     return dumps({})
+
 
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request():
