@@ -154,11 +154,17 @@ class Standup:
         self.owner = auth_user_id
         self.start_time = int(time.time())
         self.end_time = int(time.time() + length)
-        self.session = self.start_session(length)
         self.parent_channel = parent_channel
         self.message = ""
+        self.session = self.start_session(length)
 
     def start_session(self, length):
+        # not tested
+        # if length == 0:
+        #     t = threading.Timer(2, self.parent_channel.reset_standup())
+        #     t.start()
+        #     return False
+        # else:
         t = threading.Timer(length, self.end_session)
         t.start()
         return True
@@ -199,6 +205,9 @@ class Channel(BaseChannel):
 
     def end_standup(self):
         self.active_standup.message_send()
+        self.reset_standup()
+
+    def reset_standup(self):
         self.active_standup = None
 
 

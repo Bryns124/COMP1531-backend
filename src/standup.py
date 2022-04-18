@@ -1,7 +1,6 @@
 from src.classes import Standup
 from src.data_store import data_store
 from src.helper import decode_token
-from src.message import validate_message
 from src.error import is_channel_valid, is_length_valid, is_standup_active, is_user_in_channel, InputError
 
 

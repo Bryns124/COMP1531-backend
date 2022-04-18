@@ -2,7 +2,8 @@ import tests.conftest as fix
 import time
 import threading
 from src.error import AccessError, InputError
-NORMAL_LENGTH = 1  # seconds
+NORMAL_LENGTH = 2  # seconds
+ZERO_LENGTH = 0
 INVALID_LENGTH = -1
 
 
@@ -60,7 +61,12 @@ def test_standup_start(clear, user_1, channel_public):
     body1 = response1.json()
     assert body["time_finish"] == body1['time_finish']
     assert body1["is_active"] == True
-
+    time.sleep(NORMAL_LENGTH)
+    response2 = fix.standup_active_v1(
+        user_1['token'], channel_public['channel_id'])
+    body2 = response2.json()
+    assert body2["time_finish"] == None
+    assert body2["is_active"] == False
 # Standup Active
 
 
@@ -188,6 +194,21 @@ def test_standup_send(clear, user_1, user_2, channel_public, message_text):
 
 
 def test_standup_send_empty(clear, user_1, user_2, channel_public, invalid_message_text_short):
+    response = fix.standup_start_v1(
+        user_1['token'], channel_public['channel_id'], NORMAL_LENGTH)
+    body = response.json()
+
+    time.sleep(NORMAL_LENGTH)
+
+    response2 = fix.channel_messages_v2(
+        user_1['token'], channel_public['channel_id'], 0)
+
+    body2 = response2.json()
+    assert response2.status_code == 200
+    assert body2['messages'] == []
+
+
+def test_standup_send_short(clear, user_1, user_2, channel_public, invalid_message_text_short):
     response = fix.standup_start_v1(
         user_1['token'], channel_public['channel_id'], NORMAL_LENGTH)
     body = response.json()
