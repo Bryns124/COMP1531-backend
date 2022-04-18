@@ -618,7 +618,7 @@ def test_valid_img(user_1):
 def test_invalid_img_url(user_1):
     response = requests.post(f"{BASE_URL}/user/profile/uploadphoto/v1", json={
         "token": user_1["token"],
-        "img_url": "invalid_url",
+        "img_url": "http://invalid_url.com/invalid.jpg",
         "x_start": 0,
         "y_start": 0,
         "x_end": 100,

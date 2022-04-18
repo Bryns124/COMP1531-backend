@@ -7,10 +7,6 @@ from urllib import request
 import requests
 import urllib.request
 import sys
-import Image
-from Pillow import Image
-import pillow
-import PIL.Image
 from PIL import Image, ImageFile
 from src.config import port, url
 
@@ -55,7 +51,8 @@ def extract_user_details(user):
         'email': user.email,
         'name_first': user.name_first,
         'name_last': user.name_last,
-        'handle_str': user.handle
+        'handle_str': user.handle,
+        'profile_img_url': user.profile_img_url
     }
     return users
 
@@ -388,6 +385,11 @@ def generate_messages_exist_timed():
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     auth_user_id = decode_token(token)['auth_user_id']
 
+    try:
+        urllib.request.urlopen(img_url)
+    except:
+        raise InputError("Invalid image url")
+
     if (x_start > x_end or y_start > y_end):
         raise InputError("Invalid dimensions.")
 
@@ -402,12 +404,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError("Only urls with jpg format are allowed")
 
 
-    filename = f"{BASE_URL}/static/images/{auth_user_id}.jpg"
-
+    filename = f"./src/static/images/{auth_user_id}.jpg"
     store = data_store.get()
-    store["users"][auth_user_id].profile_img_url = filename
+    store["users"][auth_user_id].profile_img_url = BASE_URL + filename
 
     urllib.request.urlretrieve(img_url, filename)
+
     crop_photo(filename, x_start, y_start, x_end, y_end)
 
     return {}
@@ -422,9 +424,9 @@ def correct_format(img_url):
     return True
 
 
-def crop_photo(filename, x1, x2, y1, y2):
+def crop_photo(filename, x1, y1, x2, y2):
     image = Image.open(filename)
-    cropped_image = image.crop(x1, y1, x2, y2)
+    cropped_image = image.crop((x1, y1, x2, y2))
     cropped_image.save(filename)
 
 
