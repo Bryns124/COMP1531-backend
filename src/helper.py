@@ -8,6 +8,7 @@ from src.classes import User, Channel
 
 SECRET = "ANT"
 
+
 def generate_token(u_id):
     """
     Takes a input user_id and generates a token for the user.
@@ -37,11 +38,11 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    try :
+    try:
         token_data = jwt.decode(token, SECRET, algorithms="HS256")
     except:
         # raise Error
-        pass
+        raise AccessError(description="Token is Invalid") from AccessError
     validate_token(token_data)
     return token_data
 
@@ -97,20 +98,20 @@ def channel_validity(channel_id, store):
         return True
     return False
 
+# Depcriated
+# def user_validity(u_id, store):
+#     """_summary_
+#     Checks for a valid channel
+#     Args:
+#         channel_id (channel_id): _description_
+#         store (datastore): _description_
 
-def user_validity(u_id, store):
-    """_summary_
-    Checks for a valid channel
-    Args:
-        channel_id (channel_id): _description_
-        store (datastore): _description_
-
-    Returns:
-        _Boolean: Returns if the channel exists or not.
-    """
-    if u_id in store["users"]:
-        return True
-    return False
+#     Returns:
+#         _Boolean: Returns if the channel exists or not.
+#     """
+#     if u_id in store["users"]:
+#         return True
+#     return False
 
 
 def already_member(auth_user_id, channel_id, store):
@@ -130,28 +131,28 @@ def already_member(auth_user_id, channel_id, store):
         return True
     return False
 
+# Depcriated
+# def is_global_owner(store):
+#     for users in store['users']:
+#         if users['u_id'] == 1:
+#             return True
+#     return False
 
-def is_global_owner(store):
-    for users in store['users']:
-        if users['u_id'] == 1:
-            return True
-    return False
+# Depcriated
+# def extract_channel_details(channel_id, store):
+#     """
+#     A method which coppies the data in the input_channel and returns it.
+#     Args:
+#         channel_id (int): ID of the channel info being looked for.
+#         store (dict): The current state of datastore.
 
-
-def extract_channel_details(channel_id, store):
-    """
-    A method which coppies the data in the input_channel and returns it.
-    Args:
-        channel_id (int): ID of the channel info being looked for.
-        store (dict): The current state of datastore.
-
-    Returns:
-        dict: the corresponding channel info
-    """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            channel_details = channels
-    return channel_details
+#     Returns:
+#         dict: the corresponding channel info
+#     """
+#     for channels in store['channels']:
+#         if channels['channel_id'] == channel_id:
+#             channel_details = channels
+#     return channel_details
 
 
 def generate_timestamp():
@@ -182,13 +183,13 @@ def load_data_store():
     with open('datastore.p', 'rb') as FILE:
         data_store.set(pickle.load(FILE))
 
-
-def load_channel(channel_id):
-    store = data_store.get()
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel
-    raise InputError(description="Could not locate channel")
+# Depcriated
+# def load_channel(channel_id):
+#     store = data_store.get()
+#     for channel in store['channels']:
+#         if channel['channel_id'] == channel_id:
+#             return channel
+#     raise InputError(description="Could not locate channel")
 
 
 def load_user(u_id):
@@ -199,20 +200,21 @@ def load_user(u_id):
     raise InputError(description="Could not locate user")
 
 
-def load_message(message_id):
-    store = data_store.get()
-    for message in store['messages']:
-        if message['message_id'] == message_id:
-            return message
-    raise InputError(description="Could not locate message")
+# Depcriated
+# def load_message(message_id):
+#     store = data_store.get()
+#     for message in store['messages']:
+#         if message['message_id'] == message_id:
+#             return message
+#     raise InputError(description="Could not locate message")
 
-
-def load_dm(dm_id):
-    store = data_store.get()
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            return dm
-    raise InputError(description="Could not locate dm")
+# Depcriated
+# def load_dm(dm_id):
+#     store = data_store.get()
+#     for dm in store['dms']:
+#         if dm['dm_id'] == dm_id:
+#             return dm
+#     raise InputError(description="Could not locate dm")
 
 def get_reacts(message_id, u_id):
     react_list = []
