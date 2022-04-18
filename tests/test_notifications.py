@@ -65,6 +65,14 @@ def user_3():
 
 
 @pytest.fixture
+def user_invalid():
+    """
+    Fixture for user_invalid
+    """
+    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
+
+
+@pytest.fixture
 def channel_public(user_1):
     """
     Fixture for public channel
@@ -100,6 +108,17 @@ def c(user_1, user_2):
         "u_ids": [user_2['auth_user_id']]
     })
     return r.json()
+
+
+def test_notifications_invalid_token(user_invalid):
+    """
+    Tests that when the user getting notifications is invalid.
+    """
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_invalid
+    })
+    assert request_notifications.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_notifications_invite_to_channel(user_1, user_2, channel_public):
