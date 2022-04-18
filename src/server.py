@@ -7,7 +7,7 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
-from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
+from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, search_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.helper import save_data_store, load_data_store
@@ -398,6 +398,82 @@ def admin_userpermission_change():
     body = request.get_json()
     admin_userpermission_change_v1(
         body['token'], body['u_id'], body['permission_id'])
+    return dumps({})
+
+
+@APP.route("/search/v1", methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    body = search_v1(token, query_str)
+
+    return dumps({
+        "messages": body["messages"]
+    })
+
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def message_sendlater():
+    body = request.get_json()
+    data = message_sendlater_v1(
+        body['token'], body['channel_id'], body['message'], body["time_sent"])
+    save_data_store()
+    return dumps({
+        'message_id': data['message_id']
+    })
+
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    body = request.get_json()
+    data = message_sendlaterdm_v1(
+        body['token'], body['dm_id'], body['message'], body["time_sent"])
+    save_data_store()
+    return dumps({
+        'message_id': data['message_id']
+    })
+
+
+@APP.route("/message/share/v1", methods=['POST'])
+def merssage_share():
+    body = request.get_json()
+    data = message_share_v1(body['token'], body['og_message_id'],
+                            body["message"], body["channel_id"], body["dm_id"])
+    save_data_store()
+    return dumps({
+        'shared_message_id': data['shared_message_id']
+    })
+
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    body = request.get_json()
+    message_react_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    body = request.get_json()
+    message_unreact_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/pin/v1", methods=['POST'])
+def message_pin():
+    body = request.get_json('token')
+    message_pin_v1(body["token"], body["message_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def message_unpin():
+    body = request.get_json('token')
+    message_unpin_v1(body["token"], body["message_id"])
+    save_data_store()
     return dumps({})
 
 # wew14
