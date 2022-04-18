@@ -15,7 +15,7 @@ import pytest
 
 ##MAY CHANGE PORT LATER##
 BASE_URL = url
-
+requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 # Users
 

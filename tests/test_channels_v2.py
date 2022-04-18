@@ -14,9 +14,7 @@ import requests
 
 BASE_URL = url
 
-requests.delete(f"{BASE_URL}/clear/v1", json={
-
-})
+requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 @pytest.fixture
@@ -351,12 +349,12 @@ def test_message_remove_no_access(user_1, user_2, public_channel_user1):
 
 
 def test_message_remove1(user_1, public_channel_user1):
-    requests.post(f"{BASE_URL}/message/send/v1", json={
+    assert requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": 1,
         "message": "hello"
     })
-    requests.post(f"{BASE_URL}/message/send/v1", json={
+    assert requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": 1,
         "message": "world"

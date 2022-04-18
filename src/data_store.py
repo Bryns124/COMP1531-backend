@@ -44,6 +44,7 @@ initial_object = {
         # message_id : clas object,
         # message_id : class object
     },
+    "removed_messages": [], #list of message ids
     "removed_users": {
         # channel_id : class object,
         # channel_id : class object
