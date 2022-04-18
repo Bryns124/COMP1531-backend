@@ -1,3 +1,3 @@
-port = 7192
+port = 9023
 
 url = f"http://localhost:{port}/"

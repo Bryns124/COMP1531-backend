@@ -472,7 +472,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     crop_photo(filename, x_start, y_start, x_end, y_end)
 
-    store["users"][auth_user_id].profile_img_url = BASE_URL + "static/cropped_" + str(auth_user_id) + ".jpg"
+    store["users"][auth_user_id].profile_img_url = f"BASE_URL" + "static/cropped_" + str(auth_user_id) + ".jpg"
     data_store.set(store)
     return {}
 

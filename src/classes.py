@@ -80,7 +80,7 @@ class User:
         self.messages_current[msg_id] = message_object
 
     def remove_message(self, msg_id):
-        self.messages_current.pop(msg_id)
+        self.messages_current.pop(msg_id, None)
 
     def channel_leave(self, ch_id):
         self.all_channels.pop(ch_id, None)

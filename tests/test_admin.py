@@ -9,13 +9,13 @@ from src.auth import auth_register_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.helper import SECRET, generate_timestamp
-from src.config import port
+from src.config import port, url
 from flask import request, Flask
 
 from src.user import users_all_v1
 
 
-BASE_URL = f"http://127.0.0.1:{port}/"
+BASE_URL = url
 requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 @pytest.fixture()
