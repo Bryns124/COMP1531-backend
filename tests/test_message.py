@@ -335,59 +335,59 @@ def test_messages_send_token_error(user_invalid, channel_public, message_text):
     })
 
 
-# def test_messages_send_50(user_1, channel_public, message_text, starting_value):
-#     time_sent = generate_timestamp()
-#     for _ in range(50):
-#         requests.post(f"{BASE_URL}/message/send/v1", json={
-#             "token": user_1['token'],
-#             "channel_id": channel_public['channel_id'],
-#             "message": message_text
-#         })
+def test_messages_send_50(user_1, channel_public, message_text, starting_value):
+    time_sent = generate_timestamp()
+    for _ in range(50):
+        requests.post(f"{BASE_URL}/message/send/v1", json={
+            "token": user_1['token'],
+            "channel_id": channel_public['channel_id'],
+            "message": message_text
+        })
 
-#     r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "start": starting_value
-#     })
-#     payload = r.json()
-#     for i in range(49):
-#         assert r.status_code == 200
-#         assert payload['messages'][i]['message_id'] == (
-#             starting_value + 50) - i
-#         assert payload['messages'][i]['u_id'] == 1
-#         assert payload['messages'][i]['message'] == message_text
-#         assert payload['messages'][i]['time_sent'] >= time_sent
-#         assert payload['start'] == 0
-#         assert payload['end'] == 50
-#     requests.delete(f"{BASE_URL}/clear/v1", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": starting_value
+    })
+    payload = r.json()
+    for i in range(49):
+        assert r.status_code == 200
+        assert payload['messages'][i]['message_id'] == (
+            starting_value + 50) - i
+        assert payload['messages'][i]['u_id'] == 1
+        assert payload['messages'][i]['message'] == message_text
+        assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['start'] == 0
+        assert payload['end'] == 50
+    requests.delete(f"{BASE_URL}/clear/v1", json={
 
-#     })
+    })
 
 
-# def test_messages_send_51(user_1, channel_public, message_text, starting_value):
-#     time_sent = generate_timestamp()
-#     for _ in range(50):
-#         requests.post(f"{BASE_URL}/message/send/v1", json={
-#             "token": user_1['token'],
-#             "channel_id": channel_public['channel_id'],
-#             "message": message_text
-#         })
+def test_messages_send_51(user_1, channel_public, message_text, starting_value):
+    time_sent = generate_timestamp()
+    for _ in range(50):
+        requests.post(f"{BASE_URL}/message/send/v1", json={
+            "token": user_1['token'],
+            "channel_id": channel_public['channel_id'],
+            "message": message_text
+        })
 
-#     r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
-#         "token": user_1['token'],
-#         "channel_id": channel_public['channel_id'],
-#         "start": starting_value
-#     })
-#     payload = r.json()
-#     for i in range(49):
-#         assert r.status_code == 200
-#         assert payload['messages'][i]['message_id'] == (
-#             starting_value + 50) - i
-#         assert payload['messages'][i]['u_id'] == 1
-#         assert payload['messages'][i]['message'] == message_text
-#         assert payload['messages'][i]['time_sent'] >= time_sent
-#         assert payload['start'] == 0
-#         assert payload['end'] == 50
-#     requests.delete(f"{BASE_URL}/clear/v1", json={
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": starting_value
+    })
+    payload = r.json()
+    for i in range(49):
+        assert r.status_code == 200
+        assert payload['messages'][i]['message_id'] == (
+            starting_value + 50) - i
+        assert payload['messages'][i]['u_id'] == 1
+        assert payload['messages'][i]['message'] == message_text
+        assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['start'] == 0
+        assert payload['end'] == 50
+    requests.delete(f"{BASE_URL}/clear/v1", json={
 
-#     })
+    })
