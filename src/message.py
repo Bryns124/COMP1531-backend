@@ -1,5 +1,5 @@
 from src.data_store import data_store
-from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp, get_reacts
+from src.helper import decode_token, detect_tagged_user, notify_react, validate_token, channel_validity, already_member, generate_timestamp, get_reacts
 from src.error import AccessError, InputError
 from src.classes import Message, User
 from datetime import timezone
@@ -46,6 +46,11 @@ def do_messages_send_v1(token, channel_id, message):
     store['users'][u_id].add_msg(new_message.id, new_message)
     store['channels'][channel_id].message_list.append(new_message.id)
     store['messages'][new_message.id] = new_message
+
+    for user in detect_tagged_user(message, parent.all_members):
+        notify_tagged_user(
+            user, store['users'][u_id].handle, message, channel_id, parent.name, True)
+
     data_store.set(store)
     return new_message
 
@@ -53,7 +58,6 @@ def message_senddm_v1(token, dm_id, message):
     validate_message(message)
     new_dm_message = do_message_senddm_v1(token, dm_id, message)
     return {"message_id": new_dm_message.id}
-
 
 def do_message_senddm_v1(token, dm_id, message):
     store = data_store.get()
@@ -70,6 +74,10 @@ def do_message_senddm_v1(token, dm_id, message):
     store['dms'][dm_id].message_list.append(new_dm_message.id)
     store['messages'][new_dm_message.id] = new_dm_message
     store["users"][u_id].add_msg(new_dm_message.id, new_dm_message)
+
+    for user in detect_tagged_user(message, store['dms'][dm_id].all_members):
+        notify_tagged_user(
+            user, store['users'][u_id].handle, message, dm_id, store['dms'][dm_id].name, False)
 
     data_store.set(store)
     return new_dm_message
@@ -138,6 +146,7 @@ def message_remove_v1(token, message_id):
 
 
 def search_v1(token, query_str):
+
     """given query string, returns a collection of messages with that query
 
     Args:
@@ -252,6 +261,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     ).start()
 
 
+
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     """sends message to d, are specified time
 
@@ -305,15 +315,24 @@ def message_react_v1(token, message_id, react_id):
     store = data_store.get()
 
     validate_mid(store["messages"], message_id)
+    message = store["messages"][message_id]
 
     if react_id <= 0:
         raise InputError(description='React ID is invalid')
 
-    if store["messages"][message_id].is_user_reacted(u_id):
+    if message.is_user_reacted(u_id):
         raise InputError(
             description='You have already reacted to this message')
 
-    store["messages"][message_id].react(u_id)
+    message.react(u_id)
+
+    author_id = store["messages"][message_id].u_id
+
+    if message.parent.get_type() == "channel":
+        notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, True)
+    elif message.parent.get_type() == "dm":
+        notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, False)
+
     data_store.set(store)
     return {}
 
@@ -347,6 +366,7 @@ def message_unreact_v1(token, message_id, react_id):
 
     store["messages"][message_id].unreact(u_id)
     data_store.set(store)
+
 
     return {}
 
@@ -406,7 +426,6 @@ def message_unpin_v1(token, message_id):
     Returns:
         empty dictionary
     """
-
     auth_user_id = decode_token(token)["auth_user_id"]
     store = data_store.get()
 
@@ -427,6 +446,7 @@ def message_unpin_v1(token, message_id):
     data_store.set(store)
 
     return {}
+
 
 
 ########################################
@@ -458,7 +478,6 @@ def message_access(store, message_id, u_id):
 
     raise AccessError(description="no access to message")
 
-
 def check_user_is_message_member(u_id, message_id):
     '''
     Returns True if the u_id provided is a member of the message specified by message id
@@ -483,3 +502,45 @@ def check_user_is_message_owner(u_id, message_id):
     if u_id in message_owners:
         return True
     return False
+
+
+def notify_tagged_user(user_tagged, sender_handle, message_text, parent_id, parent_name, is_channel):
+    """
+    Updates the notifications list with a tag notification of the form:
+    {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message":
+            "{User's handle} tagged you in {channel/DM name}: {first 20 characters of the message}"
+    }
+    where channel_id is the id of the channel that the event happened in, and is -1 if it is being sent to a DM.
+    dm_id is the DM that the event happened in, and is -1 if it is being sent to a channel.
+
+    Args:
+        user_tagged (User): The user tagged in the massage
+        sender_handle (string): The handle of the user who sent the message
+        message_text (string): The message sent containing the tag
+        parent_id (int): The channel/dm id the message is sent to
+        parent_name (string): The name of the channel/dm the message is sent to
+        is_channel (bool): True if the parent is a channel, False if it is a dm
+
+    Returns:
+        None
+    """
+    store = data_store.get()
+    trunc_msg = message_text[0:20]
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} tagged you in {parent_name}: {trunc_msg}"
+    }
+    store["users"][user_tagged].notifications.append(notification)
+    data_store.set(store)
