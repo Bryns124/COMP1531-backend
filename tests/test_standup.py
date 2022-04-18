@@ -212,9 +212,8 @@ def test_standup_send(clear, user_1, user_2, channel_public, message_text):
 
 
 def test_standup_send_empty(clear, user_1, user_2, channel_public, invalid_message_text_short):
-    response = fix.standup_start_v1(
+    fix.standup_start_v1(
         user_1['token'], channel_public['channel_id'], NORMAL_LENGTH)
-    body = response.json()
 
     time.sleep(NORMAL_LENGTH)
 
