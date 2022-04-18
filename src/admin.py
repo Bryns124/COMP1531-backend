@@ -41,10 +41,10 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     store["users"][u_id].permission_id = permission_id
 
     if permission_id == 1:
-        store["global_users_count"] += 1
+        store['global_owners_count'] += 1
 
     if permission_id == 2:
-        store["global_users_count"] -= 1
+        store['global_owners_count'] += 1
 
     data_store.set(store)
     return {}
@@ -85,7 +85,14 @@ def admin_user_remove_v1(token, u_id):
         messages_dict[message].message = "Removed user"
 
     store["removed_users"][u_id] = store["users"].pop(u_id)
-
     data_store.set(store)
+
+    channels = store["users"][auth_user_id].all_channels
+    for channel in channels:
+        channels[channel].user_leave(u_id)
+
+    dms = store["users"][auth_user_id].all_dms
+    for dm in dms:
+        dms[dm].user_leave(u_id)
 
     return{}

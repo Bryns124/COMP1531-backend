@@ -25,7 +25,7 @@ class User:
     def set_u_id(self):
         try:
             store = data_store.get()
-            return len(store['users']) + 1
+            return len(store['users']) + len(store['removed_users']) + 1
         except:
             store = data_store.get()
             return 1
@@ -219,6 +219,10 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
+        self.is_pinned = False
+        self.react_id = 0
+        self.react_ud_ids = []
+        # self.react = react_type(object)
 
     def set_message_id(self):
         store = data_store.get()
@@ -232,3 +236,36 @@ class Message:
 
     def get_parent_type(self):
         return self.parent.get_type()
+
+    def react(self, u_id):
+        self.react_id = 1
+        self.react_ud_ids.append(u_id)
+
+    def unreact(self, u_id):
+        self.react_ud_ids.remove(u_id)
+        if len(self.react_ud_ids) == 0:
+            self.react_id = 0
+
+    def is_user_reacted(self, u_id):
+        if u_id in self.react_ud_ids:
+            return True
+        return False
+
+# class Reacts:
+#     def __init__(self, u_id, message_object):
+#         self.id = self.set_react_id()
+#         self.u_ids = [] #list of people who have reacted
+#         self.parent_message = message_object # allows access to the message object
+#         # self.parent_message_id = self.parent_message.id
+
+#     def set_react_id(self):
+#         store = data_store.get()
+#         if store['reacts'] == {}:
+#             return 1
+#         else:
+#             return len(store['reacts']) + 1
+
+#     def is_user_reacted(self, u_id):
+#         if u_id in self.u_ids:
+#             return True
+#         return False

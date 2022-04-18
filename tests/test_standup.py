@@ -166,13 +166,17 @@ def test_standup_send(clear, user_1, user_2, channel_public, message_text):
         user_1['token'], channel_public['channel_id'], 0)
 
     body2 = response2.json()
-
-    assert body2['messages'] == [{
-        "message_id": 1,
-        "u_id": 1,
-        "message": "mikeytest: Hello world",
-        "time_sent": body["time_finish"]
-    }]
+    assert response2.status_code == 200
+    assert body2['messages'][-1]['message_id'] == 1
+    assert body2['messages'][-1]['u_id'] == 1
+    assert body2['messages'][-1]['message'] == "mikeytest: Hello world"
+    assert body2['messages'][-1]['time_sent'] == body["time_finish"]
+    # assert body2['messages'] == [{
+    #     "message_id": 1,
+    #     "u_id": 1,
+    #     "message": "mikeytest: Hello world",
+    #     "time_sent": body["time_finish"]
+    # }]
 
 
 def test_standup_send_empty(clear, user_1, user_2, channel_public, invalid_message_text_short):
@@ -183,17 +187,21 @@ def test_standup_send_empty(clear, user_1, user_2, channel_public, invalid_messa
         user_1['token'], channel_public['channel_id'], invalid_message_text_short)
     time.sleep(NORMAL_LENGTH)
 
-    reponse2 = fix.channel_messages_v2(
+    response2 = fix.channel_messages_v2(
         user_1['token'], channel_public['channel_id'], 0)
 
-    body2 = reponse2.json()
-
-    assert body2['messages'] == [{
-        "message_id": 1,
-        "u_id": 1,
-        "message": "mikeytest: ",
-        "time_sent": body['time_finish']
-    }]
+    body2 = response2.json()
+    assert response2.status_code == 200
+    assert body2['messages'][-1]['message_id'] == 1
+    assert body2['messages'][-1]['u_id'] == 1
+    assert body2['messages'][-1]['message'] == "mikeytest: "
+    assert body2['messages'][-1]['time_sent'] == body["time_finish"]
+    # assert body2['messages'] == [{
+    #     "message_id": 1,
+    #     "u_id": 1,
+    #     "message": "mikeytest: ",
+    #     "time_sent": body['time_finish']
+    # }]
 
 
 def test_standup_send_multiple_users(clear, user_1, user_2, channel_public, message_text):
@@ -211,17 +219,23 @@ def test_standup_send_multiple_users(clear, user_1, user_2, channel_public, mess
 
     time.sleep(NORMAL_LENGTH)
 
-    reponse2 = fix.channel_messages_v2(
+    response2 = fix.channel_messages_v2(
         user_1['token'], channel_public['channel_id'], 0)
 
-    body2 = reponse2.json()
+    body2 = response2.json()
 
-    assert body2['messages'] == [{
-        "message_id": 1,
-        "u_id": 1,
-        "message": "mikeytest: Hello world\nmigueltest: Hello world",
-        "time_sent": body['time_finish']
-    }]
+    assert response2.status_code == 200
+    assert body2['messages'][-1]['message_id'] == 1
+    assert body2['messages'][-1]['u_id'] == 1
+    assert body2['messages'][-1]['message'] == "mikeytest: Hello world\nmigueltest: Hello world"
+    assert body2['messages'][-1]['time_sent'] == body["time_finish"]
+
+    # assert body2['messages'] == [{
+    #     "message_id": 1,
+    #     "u_id": 1,
+    #     "message": "mikeytest: Hello world\nmigueltest: Hello world",
+    #     "time_sent": body['time_finish']
+    # }]
 
 
 def test_standup_send_multiple_messages_multiple_users(clear, user_1, user_2, channel_public, message_text):
@@ -244,9 +258,13 @@ def test_standup_send_multiple_messages_multiple_users(clear, user_1, user_2, ch
 
     body2 = response2.json()
     assert response2.status_code == 200
-    assert body2['messages'] == [{
-        "message_id": 1,
-        "u_id": 2,
-        "message": "mikeytest: Hello world\nmigueltest: Hello world\nmikeytest: Hello world\nmigueltest: Hello world",
-        "time_sent": body["time_finish"]
-    }]
+    assert body2['messages'][-1]['message_id'] == 1
+    assert body2['messages'][-1]['u_id'] == 2
+    assert body2['messages'][-1]['message'] == "mikeytest: Hello world\nmigueltest: Hello world\nmikeytest: Hello world\nmigueltest: Hello world"
+    assert body2['messages'][-1]['time_sent'] == body["time_finish"]
+    # [{
+    #     "message_id": 1,
+    #     "u_id": 2,
+    #     "message": "mikeytest: Hello world\nmigueltest: Hello world\nmikeytest: Hello world\nmigueltest: Hello world",
+    #     "time_sent": body["time_finish"]
+    # }]
