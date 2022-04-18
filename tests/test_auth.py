@@ -139,45 +139,45 @@ def test_last_name_length_more_than_50():
 # Testing that the handle is generated correctly
 
 
-# @pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
-#     ("Bryan", "Le", "bryanle0", "Bryan", "Le", "bryanle1"),
-#     ("Bryan", "Le", "bryanle0", "Bryan",
-#      "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee"),
-#     ("Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee",
-#      "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee0"),
-#     ("Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn", "Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn0")])
-# def test_handle_generated_correctly(user_1, channel_public, name_first, name_last, handle_1, name_first_2, name_last_2, handle_2):
-#     user1 = auth_register_v1("bryanle1@gmail.com",
-#                              "password123", name_first, name_last)
-#     user2 = auth_register_v1("bryanle2@gmail.com",
-#                              "password123", name_first_2, name_last_2)
+@pytest.mark.parametrize('name_first, name_last, handle_1, name_first_2, name_last_2, handle_2', [
+    ("Bryan", "Le", "bryanle0", "Bryan", "Le", "bryanle1"),
+    ("Bryan", "Le", "bryanle0", "Bryan",
+     "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee"),
+    ("Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee",
+     "Bryan", "Leeeeeeeeeeeeeeeeeeeeeeeeeee", "bryanleeeeeeeeeeeeee0"),
+    ("Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn", "Bryannnnnnnnnnnnnnnn", "Le", "bryannnnnnnnnnnnnnnn0")])
+def test_handle_generated_correctly(user_1, channel_public, name_first, name_last, handle_1, name_first_2, name_last_2, handle_2):
+    user1 = auth_register_v1("bryanle1@gmail.com",
+                             "password123", name_first, name_last)
+    user2 = auth_register_v1("bryanle2@gmail.com",
+                             "password123", name_first_2, name_last_2)
 
-#     channel_join_v1(user1['token'], channel_public['channel_id'])
-#     channel_join_v1(user2['token'], channel_public['channel_id'])
+    channel_join_v1(user1['token'], channel_public['channel_id'])
+    channel_join_v1(user2['token'], channel_public['channel_id'])
 
-#     details = channel_details_v1(user_1['token'], channel_public['channel_id'])
+    details = channel_details_v1(user_1['token'], channel_public['channel_id'])
 
-#     for users in details['all_members']:
-#         if users['u_id'] == user1['auth_user_id']:
-#             assert users['name_first'] == name_first
-#             assert users['name_last'] == name_last
-#             assert users['handle_str'] == handle_1
-#         if users['u_id'] == user2['auth_user_id']:
-#             assert users['name_first'] == name_first_2
-#             assert users['name_last'] == name_last_2
-#             assert users['handle_str'] == handle_2
-#     clear_v1()
+    for users in details['all_members']:
+        if users['u_id'] == user1['auth_user_id']:
+            assert users['name_first'] == name_first
+            assert users['name_last'] == name_last
+            assert users['handle_str'] == handle_1
+        if users['u_id'] == user2['auth_user_id']:
+            assert users['name_first'] == name_first_2
+            assert users['name_last'] == name_last_2
+            assert users['handle_str'] == handle_2
+    clear_v1()
 
 
-# def test_handles_appends_correctly(user_1, channel_public):
-#     handles = ["bryanle", "abcdef", 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
-#                'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10', 'abcdef11', 'abcdef12', 'abcdef13', 'abcdef14', 'abcdef15', 'abcdef16', 'abcdef17', 'abcdef18', 'abcdef19', 'abcdef20']
-#     for _ in range(22):
-#         users = auth_register_v1(
-#             f"bryanle{_}@gmail.com", "password123", "abc", "def")
-#         channel_join_v1(users['token'], channel_public['channel_id'])
+def test_handles_appends_correctly(user_1, channel_public):
+    handles = ["bryanle", "abcdef", 'abcdef0', 'abcdef1', 'abcdef2', 'abcdef3', 'abcdef4',
+               'abcdef5', 'abcdef6', 'abcdef7', 'abcdef8', 'abcdef9', 'abcdef10', 'abcdef11', 'abcdef12', 'abcdef13', 'abcdef14', 'abcdef15', 'abcdef16', 'abcdef17', 'abcdef18', 'abcdef19', 'abcdef20']
+    for _ in range(22):
+        users = auth_register_v1(
+            f"bryanle{_}@gmail.com", "password123", "abc", "def")
+        channel_join_v1(users['token'], channel_public['channel_id'])
 
-#     details = channel_details_v1(user_1['token'], channel_public['channel_id'])
-#     for users in details['all_members']:
-#         assert users['handle_str'] in handles
-#     clear_v1()
+    details = channel_details_v1(user_1['token'], channel_public['channel_id'])
+    for users in details['all_members']:
+        assert users['handle_str'] in handles
+    clear_v1()

@@ -42,6 +42,17 @@ def user_2():
 
 
 @pytest.fixture
+def user_3():
+    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
+        "email": "bryan@unsw.com",
+        "password": "test123456",
+        "name_first": "Bryan",
+        "name_last": "Test"
+    })
+    return r.json()
+
+
+@pytest.fixture
 def user_no_access():
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "error@unsw.com",
@@ -341,3 +352,165 @@ def test_notifications_no_notifications(user_1, user_2, channel_public):
     assert notifications == []
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_tag_user_not_in_channel(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "@migueltest hey miguel!"
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_2['token']
+    })
+
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == []
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_multiple_reacts_for_message_channel(user_1, user_2, user_3, channel_public):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_public['channel_id'],
+    })
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_3["token"],
+        "channel_id": channel_public['channel_id'],
+    })
+    message = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "hey guys!"
+    })
+    message_info = message.json()["message_id"]
+
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_2["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_3["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == [
+        {
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "bryantest reacted to your message in Test Channel"
+        },
+        {
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "migueltest reacted to your message in Test Channel"
+        }]
+    assert len(notifications) == 2
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_unreact_still_notification_channel(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_public['channel_id'],
+    })
+    message = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "hey miguel!"
+    })
+    message_info = message.json()["message_id"]
+
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_2["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+
+    requests.post(f"{BASE_URL}/message/unreact/v1", json={
+        "token": user_2["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == [{
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1,
+        "notification_message": "migueltest reacted to your message in Test Channel"
+    }]
+    assert len(notifications) == 1
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_unreact_still_notification_dm(user_1, user_2, c):
+    message = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": c['dm_id'],
+        "message": "hey miguel!"
+    })
+    message_info = message.json()["message_id"]
+    requests.post(f"{BASE_URL}/message/react/v1", json={
+        "token": user_2["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+    requests.post(f"{BASE_URL}/message/unreact/v1", json={
+        "token": user_2["token"],
+        "message_id": message_info,
+        "react_id": 1
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+    assert notifications == [{
+        "channel_id": -1,
+        "dm_id": c['dm_id'],
+        "notification_message": "migueltest reacted to your message in migueltest, mikeytest"
+    }]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+# def test_notifications_multiple_tags_for_user_channel(user_1, user_2, channel_public):
+#     pass
+# def test_notifications_multiple_tags_for_user_dm(user_1, user_2, c):
+#     pass
+
+
+def test_notifications_user_more_than_20_notifications(user_1, user_2, channel_public):
+    requests.post(f"{BASE_URL}/channel/join/v2", json={
+        "token": user_2["token"],
+        "channel_id": channel_public['channel_id'],
+    })
+    
+    for i in range(0, 30):
+        requests.post(f"{BASE_URL}/message/send/v1", json={
+            "token": user_2['token'],
+            "channel_id": channel_public['channel_id'],
+            "message": "@mikeytest hey mikey!"
+        })
+    
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_1['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+
+    assert len(notifications) == 20
+
+    j = 31
+    for i in range(0,20):
+        assert notifications[i]["channel_id"] == channel_public['channel_id']
+        assert notifications[i]["dm_id"] == -1
+        assert notifications[i]["notification_message"] == "migueltest tagged you in Test Channel: @mikeytest hey mikey"
+        j -= 1
