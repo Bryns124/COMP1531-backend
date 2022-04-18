@@ -143,7 +143,7 @@ def test_clear():
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_invite_to_channel(user_1, user_2, channel_public, message_text):
+def test_notifications_invite_to_channel(user_1, user_2, channel_public):
     # user_1 invites user_2 into channel
     requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
@@ -163,7 +163,7 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public, message
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_invite_to_dm(user_1, user_2, c, message_text):
+def test_notifications_invite_to_dm(user_1, user_2, c):
     # user_1 invites user_2 into dm
     # might need a dm_create not sure
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
@@ -183,7 +183,7 @@ def test_notifications_invite_to_dm(user_1, user_2, c, message_text):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_tag_in_channel(user_1, user_2, channel_public, c, message_text):
+def test_notifications_tag_in_channel(user_1, user_2, channel_public):
     # user_2 joins channel
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
@@ -205,14 +205,11 @@ def test_notifications_tag_in_channel(user_1, user_2, channel_public, c, message
         "dm_id": -1,
         "notification_message": "migueltest tagged you in Test Channel: @mikeytest hey mikey"
     }]
-    # assert notifications[0]["channel_id"] == channel_public['channel_id']
-    # assert notifications[0]["dm_id"] == -1
-    # assert notifications[0]["notification_message"] == "mikey tagged you in a message: @miguel hey miguel!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text):
+def test_notifications_tag_in_dm(user_1, user_2, c):
     # user_2 tags user_1
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_2['token'],
@@ -294,7 +291,7 @@ def test_notifications_reacts_in_dm(user_1, user_2, c):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_multiple_notifications(user_1, user_2, channel_public, message_text):
+def test_notifications_multiple_notifications(user_1, user_2, channel_public):
     # user_1 invites user_2 into channel
     inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
