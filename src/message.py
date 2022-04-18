@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.helper import decode_token, detect_tagged_user, notify_react, validate_token, channel_validity, already_member, generate_timestamp, get_reacts
 from src.error import AccessError, InputError
-from src.classes import Message
+from src.classes import Message, User
 from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner
@@ -133,9 +133,10 @@ def message_remove_v1(token, message_id):
     validate_mid(store["messages"], message_id)
     message_access(store, message_id, u_id)
 
+    store["removed_messages"].append(int(message_id))
     message = store['messages'][message_id]
-
     if message.parent.get_type() == "channel":
+
         message.parent.message_list.remove(message_id)
     elif message.parent.get_type() == "dm":
         message.parent.message_list.remove(message_id)
