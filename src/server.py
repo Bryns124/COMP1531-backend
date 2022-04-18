@@ -1,11 +1,8 @@
-from operator import methodcaller
-import sys
 import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError
-from src import config, data_store
+from src import config
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, search_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
@@ -16,6 +13,7 @@ from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, use
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 from src.standup import standup_active_v1, standup_send_v1, standup_start_v1
+from src.notifications import notifications_get_v1
 
 
 def quit_gracefully(*args):
@@ -503,6 +501,15 @@ def message_unpin():
     message_unpin_v1(body["token"], body["message_id"])
     save_data_store()
     return dumps({})
+
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get():
+    token = request.args.get('token')
+    body = notifications_get_v1(token)
+    return dumps({
+        "notifications": body["notifications"]
+    })
 
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT

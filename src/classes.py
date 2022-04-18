@@ -21,6 +21,7 @@ class User:
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
+        self.notifications = []  # maybe change to a list
 
     def set_u_id(self):
         store = data_store.get()
@@ -75,6 +76,18 @@ class User:
             return 2
     # def set_session_id(self):
     #     self.session_id.append(True)
+
+    # def event_in_channel(self, ch_id):
+    #     if ch_id in self.all_channels:
+    #         return ch_id
+    #     else:
+    #         return -1
+
+    # def event_in_dm(self, dm_id):
+    #     if dm_id in self.all_dms:
+    #         return dm_id
+    #     else:
+    #         return -1
 
 
 class BaseChannel:
@@ -221,7 +234,6 @@ class Message:
         self.is_pinned = False
         self.react_id = 0
         self.react_ud_ids = []
-        # self.react = react_type(object)
 
     def set_message_id(self):
         store = data_store.get()
@@ -249,22 +261,3 @@ class Message:
         if u_id in self.react_ud_ids:
             return True
         return False
-
-# class Reacts:
-#     def __init__(self, u_id, message_object):
-#         self.id = self.set_react_id()
-#         self.u_ids = [] #list of people who have reacted
-#         self.parent_message = message_object # allows access to the message object
-#         # self.parent_message_id = self.parent_message.id
-
-#     def set_react_id(self):
-#         store = data_store.get()
-#         if store['reacts'] == {}:
-#             return 1
-#         else:
-#             return len(store['reacts']) + 1
-
-#     def is_user_reacted(self, u_id):
-#         if u_id in self.u_ids:
-#             return True
-#         return False
