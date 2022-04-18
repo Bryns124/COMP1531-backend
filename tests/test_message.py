@@ -937,7 +937,7 @@ def test_dm_unpin(user_1, user_2, create_dm_2_user, message_text):
     payload1 = response.json()
     assert payload1["messages"][0]["is_pinned"] == True
 
-    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
+    requests.post(f"{BASE_URL}/message/unpin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
     })
