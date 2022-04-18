@@ -183,6 +183,11 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
+        self.is_pinned = False
+        self.react_id = 0
+        self.react_ud_ids = []
+        # self.is_user_reacted = self.is_user_reacted_return(u_id)
+        # self.react = react_type(object)
 
     def set_message_id(self):
         store = data_store.get()
@@ -196,6 +201,21 @@ class Message:
 
     def get_parent_type(self):
         return self.parent.get_type()
+
+    def react(self, u_id):
+        self.react_id = 1
+        self.react_ud_ids.append(u_id)
+
+    def unreact(self, u_id):
+        self.react_ud_ids.remove(u_id)
+        if len(self.react_ud_ids) == 0:
+            self.react_id = 0
+
+    def is_user_reacted(self, u_id):
+        if u_id in self.react_ud_ids:
+            return True
+        return False
+
 
 
 # class Notifications:
