@@ -67,6 +67,24 @@ def test_standup_start(clear, user_1, channel_public):
     body2 = response2.json()
     assert body2["time_finish"] == None
     assert body2["is_active"] == False
+
+
+def test_standup_start_zero(clear, user_1, channel_public):
+    time_start = int(time.time())
+    response = fix.standup_start_v1(
+        user_1['token'], channel_public['channel_id'], ZERO_LENGTH)
+    response1 = fix.standup_active_v1(
+        user_1['token'], channel_public['channel_id'])
+    body = response.json()
+    body1 = response1.json()
+    assert body["time_finish"] == body1['time_finish']
+    assert body1["is_active"] == True
+    # time.sleep(ZERO_LENGTH)
+    response2 = fix.standup_active_v1(
+        user_1['token'], channel_public['channel_id'])
+    body2 = response2.json()
+    assert body2["time_finish"] == time_start
+    assert body2["is_active"] == True
 # Standup Active
 
 
