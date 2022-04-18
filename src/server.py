@@ -417,7 +417,6 @@ def admin_userpermission_change():
     return dumps({})
 
 
-<<<<<<< HEAD
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request():
     body = request.get_json()
