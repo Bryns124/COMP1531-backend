@@ -23,8 +23,7 @@ def standup_start_v1(token, channel_id, length):
 
 def standup_active_v1(token, channel_id):
     auth_user_id = decode_token(token)
-    if is_channel_valid(channel_id):
-        raise InputError(description="A standup is currently active.")
+    is_channel_valid(channel_id)
     is_user_in_channel(auth_user_id, channel_id)
 
     store = data_store.get()
