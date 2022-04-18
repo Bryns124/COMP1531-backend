@@ -262,3 +262,63 @@ def test_notifications_reacts_in_dm(user_1, user_2, c):
     assert notifications[0]["notification_message"] == "mikey reacted to your message in dm: hey miguel!"
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_notifications_multiple_notifications(user_1, user_2, channel_public, message_text):
+    # user_1 invites user_2 into channel
+    inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert inv.status_code == 200
+
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "@migueltest hey miguel!"
+    })
+    
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
+        "token": user_2['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == [
+        {
+            "channel_id": 1,
+            "dm_id": -1,
+            "notification_message": "mikeytest tagged you in Test Channel: @migueltest hey migu"
+        },
+        {
+            "channel_id": 1,
+            "dm_id": -1,
+            "notification_message": "mikeytest added you to Test Channel"
+        }
+        ]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_notifications_no_notifications(user_1, channel_1):
+    inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
+        "token": user_1["token"],
+        "channel_id": channel_public['channel_id'],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert inv.status_code == 200
+    request_message = requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_2['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "mikeytest hey mikey!"
+    })
+    assert request_message.status_code == 200
+
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
+        "token": user_2['token']
+    })
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == []
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+    
