@@ -316,11 +316,11 @@ def test_dm_details_3_users(user_1, user_2, user_3, create_dm_3_user):
     assert payload["name"] == "adiyatrahman, alicewan, michaelchai"
     assert payload["members"] == [
         {'u_id': 1, 'email': 'alice@gmail.com', 'name_first': 'Alice',
-         'name_last': 'Wan', 'handle_str': 'alicewan'},
+         'name_last': 'Wan', 'handle_str': 'alicewan', "profile_img_url": "{BASE_URL}/static/default.jpg"},
         {'u_id': 2, 'email': 'adi@gmail.com', 'name_first': 'Adiyat',
-            'name_last': 'Rahman', 'handle_str': 'adiyatrahman'},
+            'name_last': 'Rahman', 'handle_str': 'adiyatrahman', "profile_img_url": "{BASE_URL}/static/default.jpg"},
         {'u_id': 3, 'email': 'michael@gmail.com', 'name_first': 'Michael',
-            'name_last': 'Chai', 'handle_str': 'michaelchai'}
+            'name_last': 'Chai', 'handle_str': 'michaelchai', "profile_img_url": "{BASE_URL}/static/default.jpg"}
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -710,6 +710,7 @@ def test_message_remove2(user_1, user_2, create_dm_3_user):
     r = requests.delete(f"{BASE_URL}/message/remove/v1", json={
         "token": user_1["token"],
         "message_id": 2,
+
     })
     assert r.status_code == 200
     r2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={

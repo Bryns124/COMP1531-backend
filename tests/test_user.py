@@ -123,258 +123,267 @@ requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 
-# def test_users_all_2_users(user_1, user_2):
-#     response = requests.get(f"{BASE_URL}/users/all/v1", params={
-#         "token": user_1['token']
-#     })
+def test_users_all_2_users(user_1, user_2):
+    response = requests.get(f"{BASE_URL}/users/all/v1", params={
+        "token": user_1['token']
+    })
 
-#     payload = response.json()
-#     assert payload["users"] == [{
-#         'u_id': user_1['auth_user_id'],
-#         'email': "alice@gmail.com",
-#         'name_first': "Alice",
-#         'name_last': "Wan",
-#         'handle_str': "alicewan"
-#     },
-#         {
-#         'u_id': user_2['auth_user_id'],
-#         'email': "adi@gmail.com",
-#         'name_first': "Adiyat",
-#         'name_last': "Rahman",
-#         'handle_str': "adiyatrahman"
-#     }]
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
-# def test_users_all_1_user(user_1):
-#     response = requests.get(f"{BASE_URL}/users/all/v1", params={
-#         "token": user_1['token']
-#     })
-
-#     payload = response.json()
-#     assert payload['users'] == [{
-#         'u_id': user_1['auth_user_id'],
-#         'email': "alice@gmail.com",
-#         'name_first': "Alice",
-#         'name_last': "Wan",
-#         'handle_str': "alicewan"
-#     }]
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    payload = response.json()
+    assert payload["users"] == [{
+        'u_id': user_1['auth_user_id'],
+        'email': "alice@gmail.com",
+        'name_first': "Alice",
+        'name_last': "Wan",
+        'handle_str': "alicewan",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    },
+        {
+        'u_id': user_2['auth_user_id'],
+        'email': "adi@gmail.com",
+        'name_first': "Adiyat",
+        'name_last': "Rahman",
+        'handle_str': "adiyatrahman",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    }]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_users_all_3_users(user_1, user_2, user_3):
-#     response = requests.get(f"{BASE_URL}/users/all/v1", params={
-#         "token": user_1["token"]
-#     })
+def test_users_all_1_user(user_1):
+    response = requests.get(f"{BASE_URL}/users/all/v1", params={
+        "token": user_1['token']
+    })
 
-#     payload = response.json()
-#     assert payload["users"] == [{
-#         'u_id': user_1['auth_user_id'],
-#         'email': "alice@gmail.com",
-#         'name_first': "Alice",
-#         'name_last': "Wan",
-#         'handle_str': "alicewan"
-#     },
-#         {
-#         'u_id': user_2['auth_user_id'],
-#         'email': "adi@gmail.com",
-#         'name_first': "Adiyat",
-#         'name_last': "Rahman",
-#         'handle_str': "adiyatrahman"
-#     },
-#         {
-#         'u_id': user_3['auth_user_id'],
-#         'email': "michael@gmail.com",
-#         'name_first': "Michael",
-#         'name_last': "Chai",
-#         'handle_str': "michaelchai"
-#     }]
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+    payload = response.json()
+    assert payload['users'] == [{
+        'u_id': user_1['auth_user_id'],
+        'email': "alice@gmail.com",
+        'name_first': "Alice",
+        'name_last': "Wan",
+        'handle_str': "alicewan",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    }]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_user_profile_valid_user_1(user_1):
-#     response = requests.get(f"{BASE_URL}/user/profile/v1", params={
-#         "token": user_1["token"],
-#         "u_id": user_1["auth_user_id"]
-#     })
-#     payload = response.json()
-#     assert payload == {
-#         'user': {
-#             'u_id': user_1['auth_user_id'],
-#             'email': "alice@gmail.com",
-#             'name_first': "Alice",
-#             'name_last': "Wan",
-#             'handle_str': "alicewan"
-#         }
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_users_all_3_users(user_1, user_2, user_3):
+    response = requests.get(f"{BASE_URL}/users/all/v1", params={
+        "token": user_1["token"]
+    })
+
+    payload = response.json()
+    assert payload["users"] == [{
+        'u_id': user_1['auth_user_id'],
+        'email': "alice@gmail.com",
+        'name_first': "Alice",
+        'name_last': "Wan",
+        'handle_str': "alicewan",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    },
+        {
+        'u_id': user_2['auth_user_id'],
+        'email': "adi@gmail.com",
+        'name_first': "Adiyat",
+        'name_last': "Rahman",
+        'handle_str': "adiyatrahman",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    },
+        {
+        'u_id': user_3['auth_user_id'],
+        'email': "michael@gmail.com",
+        'name_first': "Michael",
+        'name_last': "Chai",
+        'handle_str': "michaelchai",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
+    }]
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_user_profile_valid_user_2(user_1, user_2):
-#     response = requests.get(f"{BASE_URL}/user/profile/v1", params={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
-#     payload = response.json()
-#     assert payload == {
-#         'user': {
-#             'u_id': user_2['auth_user_id'],
-#             'email': "adi@gmail.com",
-#             'name_first': "Adiyat",
-#             'name_last': "Rahman",
-#             'handle_str': "adiyatrahman"
-#         }
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_user_profile_valid_user_1(user_1):
+    response = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": user_1["auth_user_id"]
+    })
+    payload = response.json()
+    assert payload == {
+        'user': {
+            'u_id': user_1['auth_user_id'],
+            'email': "alice@gmail.com",
+            'name_first': "Alice",
+            'name_last': "Wan",
+            'handle_str': "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
+        }
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_user_profile_invalid(user_1):
-#     r = requests.get(f"{BASE_URL}/user/profile/v1", params={
-#         "token": user_1["token"],
-#         "u_id": 200
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_user_profile_valid_user_2(user_1, user_2):
+    response = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+    payload = response.json()
+    assert payload == {
+        'user': {
+            'u_id': user_2['auth_user_id'],
+            'email': "adi@gmail.com",
+            'name_first': "Adiyat",
+            'name_last': "Rahman",
+            'handle_str': "adiyatrahman",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
+        }
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setemail_valid(user_1):
-#     new_email = "alicenew@gmail.com"
-#     r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
-#         "token": user_1['token'],
-#         "email": new_email
-#     })
-#     assert r.status_code == 200
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_user_profile_invalid(user_1):
+    r = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": 200
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setemail_invalid_1(user_1):
-#     new_email = "alicenew@gmail"
-#     r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
-#         "token": user_1['token'],
-#         "email": new_email
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_setemail_valid(user_1):
+    new_email = "alicenew@gmail.com"
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
+        "token": user_1['token'],
+        "email": new_email
+    })
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setemail_invalid_2(user_1, user_2):
-#     new_email = "adi@gmail.com"
-#     r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
-#         "token": user_1['token'],
-#         "email": new_email
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_setemail_invalid_1(user_1):
+    new_email = "alicenew@gmail"
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
+        "token": user_1['token'],
+        "email": new_email
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_sethandle_valid(user_1):
-#     new_handle = "unfertileegg"
-#     r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
-#         "token": user_1['token'],
-#         "handle_str": new_handle
-#     })
-#     assert r.status_code == 200
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_setemail_invalid_2(user_1, user_2):
+    new_email = "adi@gmail.com"
+    r = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json={
+        "token": user_1['token'],
+        "email": new_email
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_sethandle_invalid_not_alphanumeric(user_1):
-#     new_handle = "unfertile&&egg"
-#     r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
-#         "token": user_1['token'],
-#         "handle_str": new_handle
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_sethandle_valid(user_1):
+    new_handle = "unfertileegg"
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
+        "token": user_1['token'],
+        "handle_str": new_handle
+    })
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_sethandle_invalid_length_short(user_1):
-#     new_handle = "un"
-#     r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
-#         "token": user_1['token'],
-#         "handle_str": new_handle
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_sethandle_invalid_not_alphanumeric(user_1):
+    new_handle = "unfertile&&egg"
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
+        "token": user_1['token'],
+        "handle_str": new_handle
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_sethandle_invalid_length_long(user_1):
-#     new_handle = "abcdefjhijklmnopqrtuvwxyz"
-#     r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
-#         "token": user_1['token'],
-#         "handle_str": new_handle
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_sethandle_invalid_length_short(user_1):
+    new_handle = "un"
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
+        "token": user_1['token'],
+        "handle_str": new_handle
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_sethandle_invalid_3(user_1, user_2):
-#     new_handle = "alicewan"
-#     r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
-#         "token": user_1['token'],
-#         "handle_str": new_handle
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_sethandle_invalid_length_long(user_1):
+    new_handle = "abcdefjhijklmnopqrtuvwxyz"
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
+        "token": user_1['token'],
+        "handle_str": new_handle
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setname_valid(user_1):
-#     new_first_name = "Unfertile"
-#     new_last_name = "Egg"
-#     r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
-#         "token": user_1['token'],
-#         "name_first": new_first_name,
-#         "name_last": new_last_name
-#     })
-#     assert r.status_code == 200
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_sethandle_invalid_3(user_1, user_2):
+    new_handle = "alicewan"
+    r = requests.put(f"{BASE_URL}/user/profile/sethandle/v1", json={
+        "token": user_1['token'],
+        "handle_str": new_handle
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setname_firstname_long(user_1):
-#     new_first_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
-#     new_last_name = "Egg"
-#     r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
-#         "token": user_1['token'],
-#         "name_first": new_first_name,
-#         "name_last": new_last_name
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_setname_valid(user_1):
+    new_first_name = "Unfertile"
+    new_last_name = "Egg"
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
+        "token": user_1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
+    })
+    assert r.status_code == 200
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-# def test_setname_lastname_long(user_1):
-#     new_first_name = "Unfertile"
-#     new_last_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
-#     r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
-#         "token": user_1['token'],
-#         "name_first": new_first_name,
-#         "name_last": new_last_name
-#     })
-#     assert r.status_code == InputError.code
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_setname_firstname_long(user_1):
+    new_first_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
+    new_last_name = "Egg"
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
+        "token": user_1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# def test_user_profile_removed_user(user_1, user_2):
-#     request_delete = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
-#     assert request_delete.status_code == 200
 
-#     response = requests.get(f"{BASE_URL}/user/profile/v1", params={
-#         "token": user_1["token"],
-#         "u_id": user_2["auth_user_id"]
-#     })
+def test_setname_lastname_long(user_1):
+    new_first_name = "Unfertile"
+    new_last_name = "Abcdefghijklmnopqertuvwxyzabcdefghijklmnopqertuvwxyz"
+    r = requests.put(f"{BASE_URL}/user/profile/setname/v1", json={
+        "token": user_1['token'],
+        "name_first": new_first_name,
+        "name_last": new_last_name
+    })
+    assert r.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-#     payload = response.json()
-#     assert payload == {
-#         'user': {
-#             'u_id': user_2['auth_user_id'],
-#             'email': "adi@gmail.com",
-#             'name_first': "Removed",
-#             'name_last': "user",
-#             'handle_str': "adiyatrahman"
-#         }
-#     }
-#     requests.delete(f"{BASE_URL}/clear/v1", json={})
+def test_user_profile_removed_user(user_1, user_2):
+    request_delete = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+    assert request_delete.status_code == 200
+
+    response = requests.get(f"{BASE_URL}/user/profile/v1", params={
+        "token": user_1["token"],
+        "u_id": user_2["auth_user_id"]
+    })
+
+    payload = response.json()
+    assert payload == {
+        'user': {
+            'u_id': user_2['auth_user_id'],
+            'email': "adi@gmail.com",
+            'name_first': "Removed",
+            'name_last': "user",
+            'handle_str': "adiyatrahman",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
+        }
+    }
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_user_stats_none(user_1):
@@ -500,9 +509,18 @@ def test_users_stats_none(user_1):
     })
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(0)
-    assert payload['workspace_stats']['channels_exist'] == []
-    assert payload['workspace_stats']['dms_exist'] == []
-    assert payload['workspace_stats']['messages_exist'] == []
+    assert payload['workspace_stats']['channels_exist'] == [{
+            "num_channels_exist": 0,
+            "time_stamp": 0
+        }]
+    assert payload['workspace_stats']['dms_exist'] == [{
+            "num_dms_exist": 0,
+            "time_stamp": 0
+        }]
+    assert payload['workspace_stats']['messages_exist'] == [{
+            "num_messages_exist": 0,
+            "time_stamp": 0
+        }]
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -515,8 +533,14 @@ def test_users_stats_one_channel(user_1, public_channel_user1):
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'] == []
-    assert payload['workspace_stats']['messages_exist'] == []
+    assert payload['workspace_stats']['dms_exist'] == [{
+            "num_dms_exist": 0,
+            "time_stamp": 0
+        }]
+    assert payload['workspace_stats']['messages_exist'] == [{
+            "num_messages_exist": 0,
+            "time_stamp": 0
+        }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -527,8 +551,14 @@ def test_users_stats_two_channels(user_1, public_channel_user1, private_channel_
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 2
-    assert payload['workspace_stats']['dms_exist'] == []
-    assert payload['workspace_stats']['messages_exist'] == []
+    assert payload['workspace_stats']['dms_exist'] == [{
+            "num_dms_exist": 0,
+            "time_stamp": 0
+        }]
+    assert payload['workspace_stats']['messages_exist'] == [{
+            "num_messages_exist": 0,
+            "time_stamp": 0
+        }]
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -540,9 +570,15 @@ def test_users_stats_one_dm(user_1, create_dm_2_user):
     payload = response.json()
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1, rel=1e-1)
-    assert payload['workspace_stats']['channels_exist'] == []
+    assert payload['workspace_stats']['channels_exist'] == [{
+            "num_channels_exist": 0,
+            "time_stamp": 0
+        }]
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 1
-    assert payload['workspace_stats']['messages_exist'] == []
+    assert payload['workspace_stats']['messages_exist'] == [{
+            "num_messages_exist": 0,
+            "time_stamp": 0
+        }]
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -554,9 +590,15 @@ def test_users_stats_two_dms(user_3, create_dm_2_user, create_dm_3_user):
     payload = response.json()
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
-    assert payload['workspace_stats']['channels_exist'] == []
+    assert payload['workspace_stats']['channels_exist'] == [{
+            "num_channels_exist": 0,
+            "time_stamp": 0
+        }]
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
-    assert payload['workspace_stats']['messages_exist'] == []
+    assert payload['workspace_stats']['messages_exist'] == [{
+            "num_messages_exist": 0,
+            "time_stamp": 0
+        }]
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -567,7 +609,10 @@ def test_users_stats_dm_messages(user_1, send_multiple_dms):
     })
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
-    assert payload['workspace_stats']['channels_exist'] == []
+    assert payload['workspace_stats']['channels_exist'] == [{
+            "num_channels_exist": 0,
+            "time_stamp": 0
+        }]
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
     assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
@@ -581,7 +626,10 @@ def test_users_stats_channel_messages(user_1, messages_send_2_channel):
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'] == []
+    assert payload['workspace_stats']['dms_exist'] == [{
+            "num_dms_exist": 0,
+            "time_stamp": 0
+        }]
     assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})

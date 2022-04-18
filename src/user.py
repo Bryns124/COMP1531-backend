@@ -276,7 +276,10 @@ def calculate_ir(auth_user_id):
 def generate_channels_joined_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    channels_joined_list = []
+    channels_joined_list = [{
+            "num_channels_joined": counter,
+            "time_stamp": 0
+        }]
 
     all_channels = store["users"][auth_user_id].all_channels
     for channel in all_channels:
@@ -292,7 +295,10 @@ def generate_channels_joined_timed(auth_user_id):
 def generate_dms_joined_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    dms_joined_list = []
+    dms_joined_list = [{
+            "num_dms_joined": counter,
+            "time_stamp": 0
+        }]
 
     all_dms = store["users"][auth_user_id].all_dms
     for dm in all_dms:
@@ -308,7 +314,10 @@ def generate_dms_joined_timed(auth_user_id):
 def generate_messages_sent_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    messages_sent_list = []
+    messages_sent_list = [{
+            "num_messages_sent": counter,
+            "time_stamp": 0
+        }]
 
     messages_sent = store["users"][auth_user_id].messages_sent
     for message in messages_sent:
@@ -366,9 +375,12 @@ def calculate_utilization_rate():
 
 def generate_channels_exist_timed():
     store = data_store.get()
-
-    channel_exist = []
     counter = 0
+    channel_exist = [{
+            "num_channels_exist": counter,
+            "time_stamp": 0
+        }]
+
     for channel in store["channels"]:
         counter += 1
         new_entry = {
@@ -380,9 +392,12 @@ def generate_channels_exist_timed():
 
 def generate_dms_exist_timed():
     store = data_store.get()
-
-    dm_exist = []
     counter = 0
+    dm_exist = [{
+            "num_dms_exist": counter,
+            "time_stamp": 0
+        }]
+
     for dm in store["dms"]:
         counter += 1
         new_entry = {
@@ -394,9 +409,12 @@ def generate_dms_exist_timed():
 
 def generate_messages_exist_timed():
     store = data_store.get()
-
-    messages_exist = []
     counter = 0
+    messages_exist = [{
+            "num_messages_exist": counter,
+            "time_stamp": 0
+        }]
+
     for message in store["messages"]:
         counter += 1
         new_entry = {
@@ -448,13 +466,13 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError("Only urls with jpg format are allowed")
 
 
-    filename = f"./src/static/images/{auth_user_id}.jpg"
+    filename = f"./src/static/cropped_{auth_user_id}.jpg"
     store = data_store.get()
     urllib.request.urlretrieve(img_url, filename)
 
     crop_photo(filename, x_start, y_start, x_end, y_end)
 
-    store["users"][auth_user_id].profile_img_url = BASE_URL + "static/images/" + str(auth_user_id) + ".jpg"
+    store["users"][auth_user_id].profile_img_url = BASE_URL + "static/cropped_" + str(auth_user_id) + ".jpg"
     data_store.set(store)
     return {}
 

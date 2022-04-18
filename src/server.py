@@ -401,7 +401,7 @@ def admin_userpermission_change():
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
 
-@APP.route('/static/images/<path:path>')
+@APP.route('/static/<path:path>')
 def send_js(path):
     return send_from_directory('', path)
 
