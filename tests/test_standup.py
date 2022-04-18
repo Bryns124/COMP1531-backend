@@ -2,7 +2,7 @@ import tests.conftest as fix
 import time
 import threading
 from src.error import AccessError, InputError
-NORMAL_LENGTH = 60  # seconds
+NORMAL_LENGTH = 1  # seconds
 INVALID_LENGTH = -1
 
 
@@ -175,10 +175,12 @@ def test_standup_send(clear, user_1, user_2, channel_public, message_text):
     }]
 
 
-def test_standup_send_empty(clear, user_1, user_2, channel_public, message_text):
+def test_standup_send_empty(clear, user_1, user_2, channel_public, invalid_message_text_short):
     response = fix.standup_start_v1(
         user_1['token'], channel_public['channel_id'], NORMAL_LENGTH)
     body = response.json()
+    fix.standup_send_v1(
+        user_1['token'], channel_public['channel_id'], invalid_message_text_short)
     time.sleep(NORMAL_LENGTH)
 
     reponse2 = fix.channel_messages_v2(
@@ -186,7 +188,12 @@ def test_standup_send_empty(clear, user_1, user_2, channel_public, message_text)
 
     body2 = reponse2.json()
 
-    assert body2['messages'] == []
+    assert body2['messages'] == [{
+        "message_id": 1,
+        "u_id": 1,
+        "message": "mikeytest: ",
+        "time_sent": body['time_finish']
+    }]
 
 
 def test_standup_send_multiple_users(clear, user_1, user_2, channel_public, message_text):
@@ -229,6 +236,7 @@ def test_standup_send_multiple_messages_multiple_users(clear, user_1, user_2, ch
             user_2['token'], channel_public['channel_id'], message_text)
     body = response.json()
     assert response.status_code == 200
+
     time.sleep(NORMAL_LENGTH)
 
     response2 = fix.channel_messages_v2(

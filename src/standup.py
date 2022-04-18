@@ -45,7 +45,8 @@ def standup_send_v1(token, channel_id, message):
     auth_user_id = decode_token(token)
     is_channel_valid(channel_id)
     is_user_in_channel(auth_user_id, channel_id)
-    validate_message(message)
+    if len(message) > 1000:
+        raise InputError(description="Message cannot be over 1000.")
     if not is_standup_active(channel_id):
         raise InputError(description="A standup is currently not active.")
 
