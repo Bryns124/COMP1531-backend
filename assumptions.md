@@ -6,3 +6,4 @@
 6. Messages start value is equal to 0 in itteration 1. 
 7. When creating a new channel, isPublic is set to None.
 8. For the functions channel_create, channel_list, channel_listall, channel_details, channel_join, channel_messages,  which have auth_user_id as an argument, the user_id will always be valid.
+9. You can standup send with message of char length 0. 
