@@ -365,40 +365,6 @@ def message_react_v1(token, message_id, react_id):
     return {}
 
 
-
-def message_unreact_v1(token, message_id, react_id):
-    """unreacts to particular message
-
-    Args:
-        token (string): user's token
-        message_id (int): message to be unreacted
-        react_id (int): reaction type
-
-    Raises:
-        InputError: react ID does not refer to a valid reaction type
-        InputError: message is already unreacted
-
-    Returns:
-        empty dictionary
-    """
-    u_id = decode_token(token)['auth_user_id']
-    store = data_store.get()
-
-    validate_mid(store["messages"], message_id)
-
-    if react_id <= 0:
-        raise InputError(description='React ID is invalid')
-
-    if not store["messages"][message_id].is_user_reacted(u_id):
-        raise InputError(
-            description='You have already unreacted to this message')
-
-    store["messages"][message_id].unreact(u_id)
-
-    return {}
-
-
-
 def message_unreact_v1(token, message_id, react_id):
     """unreacts to particular message
 
