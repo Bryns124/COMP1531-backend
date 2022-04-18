@@ -18,6 +18,9 @@ Functions:
     user_profile_setname: Update the authorised user's first name and last name
     user_profile_setemail: Update the authorised user's email address
     user_profile_sethandle: Update the authorised user's hand (handle name)
+    user_stats_v1: gives out data about the channels joined, dm joined and messages sent by the user and their involvement rate
+    users_stats_v1: gives out data about the utilization of UNSW Seams
+    user_profile_uploadphoto_v1: Allows user to upload their own profile pictures
 """
 
 
@@ -220,6 +223,17 @@ def duplicate_handle(store, handle_str):
 
 
 def user_stats_v1(token):
+    """returns the stats for a particular user about their user of UNSW Seams
+
+    Args:
+        token (string): user calling the function
+
+    Raises:
+        None
+
+    Returns:
+        user_stats (dictionary): containing list of dictionaries with the usage details of the users
+    """
     auth_user_id = decode_token(token)['auth_user_id']
 
     channels_joined = generate_channels_joined_timed(auth_user_id)
@@ -310,6 +324,17 @@ def generate_messages_sent_timed(auth_user_id):
 
 
 def users_stats_v1(token):
+    """returns the stats related to the usage of UNSW Seams
+
+    Args:
+        token (string): user calling the function
+
+    Raises:
+        None
+
+    Returns:
+        users_stats (dictionary): containing list of dictionaries with the usage details of the website
+    """
     decode_token(token)
 
     channels_exist = generate_channels_exist_timed()
@@ -383,6 +408,25 @@ def generate_messages_exist_timed():
 
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    """Allows users to upload their profile pictures using a url for their image
+
+    Args:
+        token (string): user calling the function
+        img_url (string): url containing the image that the user wants to upload
+        x_start (int): dimension to start cropping the image in the horizontal direction
+        y_start (int): dimension to start cropping the image in the vertical direction
+        x_end (int): dimension to finish cropping the image in the horizontal direction
+        y_end (int):  dimension to finish cropping the image in the vertical direction
+
+    Raises:
+        InputError: url returns an HTTP status other than 200 or any other errors occur
+        InputError: any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL
+        InputError: x_end is less than or equal to x_start or y_end is less than or equal to y_start
+        InputError: image uploaded is not a JPG
+
+    Returns:
+        None
+    """
     auth_user_id = decode_token(token)['auth_user_id']
 
     try:
@@ -406,7 +450,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     filename = f"./src/static/images/{auth_user_id}.jpg"
     store = data_store.get()
-    store["users"][auth_user_id].profile_img_url = BASE_URL + filename
+    store["users"][auth_user_id].profile_img_url = BASE_URL + "static/images/" + str(auth_user_id) + ".jpg"
 
     urllib.request.urlretrieve(img_url, filename)
 
