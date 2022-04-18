@@ -2,7 +2,8 @@ from src.channel import user_details
 from src.data_store import data_store
 from src.classes import BaseChannel, Message, Dm
 from src.error import InputError, AccessError
-from src.helper import decode_token, validate_token, get_reacts
+from src.helper import decode_token, notify_add, validate_token, get_reacts
+
 """Dm has the 7 functions: create, list, remove, details, leave, messages, senddm
 Functions:
     dm_create: creates a new dm is created
@@ -60,6 +61,7 @@ def dm_create_v1(token, u_ids):
     for id in u_ids:
         new_dm.add_member(id, store["users"][id])
         store['users'][id].add_dm(new_dm.id, new_dm)
+        notify_add(id, store['users'][auth_user_id].handle, new_dm.id, store['dms'][new_dm.id].name, False)
 
     data_store.set(store)
 

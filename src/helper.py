@@ -37,7 +37,7 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    try :
+    try:
         token_data = jwt.decode(token, SECRET, algorithms="HS256")
     except:
         # raise Error
@@ -213,6 +213,78 @@ def load_dm(dm_id):
         if dm['dm_id'] == dm_id:
             return dm
     raise InputError(description="Could not locate dm")
+
+
+def detect_tagged_user(message_text, users):
+    """
+    Searchs a given string for a tagged user of the form "@handle" where handle is a handle of
+    a user listed in users.
+
+    Args:
+        message_text (string): The contents of a message being sent to a channel/dm
+        users (dictionary): The members of the channel/dm where the message is being sent
+                            of the form {u_id: User object}
+
+    Returns:
+        dictionary: The users tagged in the message of the form {u_id: User object}, an empty dict
+                    if no users are tagged
+    """
+    tagged_users = {}
+    if "@" not in message_text:
+        return tagged_users
+
+    handles_list = []
+
+    for u_id in users:
+        handles_list.append((u_id, '@' + users[u_id].handle))
+        # handles_list.append('@' + users[u_id].handle)
+
+    # for handle in handles_list:
+    for user in handles_list:
+        u_id = user[0]
+        handle = user[1]
+        if handle in message_text:
+            tagged_users[u_id] = users[u_id]
+
+    return tagged_users
+
+
+def notify_add(user_invited, sender_handle, parent_id, parent_name, is_channel):
+    store = data_store.get()
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} added you to {parent_name}"
+    }
+    store["users"][user_invited].notifications.append(notification)
+    data_store.set(store)
+
+
+def notify_react(user_reacted, sender_handle, parent_id, parent_name, is_channel):
+    store = data_store.get()
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} reacted to your message in {parent_name}"
+    }
+    store["users"][user_reacted].notifications.append(notification)
+    data_store.set(store)
 
 def get_reacts(message_id, u_id):
     react_list = []
