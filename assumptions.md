@@ -8,4 +8,4 @@
 8. For the functions channel_create, channel_list, channel_listall, channel_details, channel_join, channel_messages,  which have auth_user_id as an argument, the user_id will always be valid.
 9. when a dm or channel gets removed, the messages are still considered to be "sent" by the user
 10. A user won't be removed from an active standup
-11. Even if a standup has the length 0 seconds, the time it takes for the server to conclude the standup, means it will remain active for a short period of time as it attempts to end. This means that someone could theroretically send a message in the time it takes to end the standup, as this is a untested length of time according to Emily, we will accept this behaviour. Thus, theroretically checking if the standup is active after starting a standup with a length of zero will return the active standup.  
+11. When a standup is runing for the length of 0 seconds, when testing we are assuming that the server will run with no lag, as otherwise, it is possible for the processes of ending the standup to exceed the time it takes to make another request to the server.
