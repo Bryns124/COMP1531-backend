@@ -237,11 +237,13 @@ def detect_tagged_user(message_text, users):
     handles_list = []
 
     for u_id in users:
-        # handles_list.append(u_id, '@' + users[u_id].handle)
-        handles_list.append('@' + users[u_id].handle)
+        handles_list.append((u_id, '@' + users[u_id].handle))
+        # handles_list.append('@' + users[u_id].handle)
 
-    # for u_id, handle in handles_list:
-    for handle in handles_list:
+    # for handle in handles_list:
+    for user in handles_list:
+        u_id = user[0]
+        handle = user[1]
         if handle in message_text:
             tagged_users[u_id] = users[u_id]
 
@@ -261,7 +263,7 @@ def notify_add(user_invited, sender_handle, parent_id, parent_name, is_channel):
     notification = {
         "channel_id": channel_id,
         "dm_id": dm_id,
-        "notification_message": f"{sender_handle} added you to {parent_name}: "
+        "notification_message": f"{sender_handle} added you to {parent_name}"
     }
     store["users"][user_invited].notifications.append(notification)
     data_store.set(store)

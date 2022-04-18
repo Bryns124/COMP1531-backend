@@ -305,7 +305,6 @@ def message_react_v1(token, message_id, react_id):
 
     validate_mid(store["messages"], message_id)
     message = store["messages"][message_id]
-    message_parent = store["messages"][message_id].parent
 
     if react_id <= 0:
         raise InputError(description='React ID is invalid')
@@ -316,10 +315,10 @@ def message_react_v1(token, message_id, react_id):
 
     message.react(u_id)
 
-    if message_parent.get_type == "channel":
-        notify_react(u_id, store["users"][u_id].handle, message_parent.id, message_parent.name, True)
-    elif message_parent.get_type == "dm":
-        notify_react(u_id, store["users"][u_id].handle, message_parent.id, message_parent.name, False)
+    if message.parent.get_type() == "channel":
+        notify_react(u_id, store["users"][u_id].handle, message.parent.id, message.parent.name, True)
+    elif message.parent.get_type() == "dm":
+        notify_react(u_id, store["users"][u_id].handle, message.parent.id, message.parent.name, False)
 
     data_store.set(store)
     return {}
