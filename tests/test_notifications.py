@@ -16,11 +16,17 @@ import pytest
 ##MAY CHANGE PORT LATER##
 BASE_URL = url
 
+"""
+Tests for notificatons functions
+"""
 
 # Users
 
 @pytest.fixture()
 def user_1():
+    """
+    Fixture for user_1
+    """
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "mikey@unsw.com",
         "password": "test123456",
@@ -32,6 +38,9 @@ def user_1():
 
 @pytest.fixture
 def user_2():
+    """
+    Fixture for user_2
+    """
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "miguel@unsw.com",
         "password": "test123456",
@@ -43,6 +52,9 @@ def user_2():
 
 @pytest.fixture
 def user_3():
+    """
+    Fixture for user_3
+    """
     r = requests.post(f"{BASE_URL}/auth/register/v2", json={
         "email": "bryan@unsw.com",
         "password": "test123456",
@@ -53,23 +65,10 @@ def user_3():
 
 
 @pytest.fixture
-def user_no_access():
-    r = requests.post(f"{BASE_URL}/auth/register/v2", json={
-        "email": "error@unsw.com",
-        "password": "no_access1235667",
-        "name_first": "no_access",
-        "name_last": "no_access"
-    })
-    return r.json()
-
-
-@pytest.fixture
-def user_invalid():
-    return jwt.encode({'auth_user_id': "invalid", 'session_id': 1}, SECRET, algorithm="HS256")
-
-
-@pytest.fixture
 def channel_public(user_1):
+    """
+    Fixture for public channel
+    """
     r = requests.post(f"{BASE_URL}/channels/create/v2", json={
         "token": user_1['token'],
         "name": "Test Channel",
@@ -80,6 +79,9 @@ def channel_public(user_1):
 
 @pytest.fixture
 def channel_private(user_1):
+    """
+    Fixture for private channel
+    """
     r = requests.post(f"{BASE_URL}/channels/create/v2", json={
         "token": user_1['token'],
         "name": "Private Channel",
@@ -90,6 +92,9 @@ def channel_private(user_1):
 
 @pytest.fixture
 def c(user_1, user_2):
+    """
+    Fixture for dm
+    """
     r = requests.post(f"{BASE_URL}/dm/create/v1", json={
         "token": user_1['token'],
         "u_ids": [user_2['auth_user_id']]
@@ -97,53 +102,10 @@ def c(user_1, user_2):
     return r.json()
 
 
-@pytest.fixture
-def channel_1(user_1):
-    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
-        "token": user_1['token'],
-        "name": "A New Hope",
-        "is_public": True
-    })
-    return r.json()
-
-
-@pytest.fixture
-def invalid_channel_id():
-    return -1
-
-
-@pytest.fixture
-def starting_value():
-    return 0
-
-
-@pytest.fixture
-def invalid_starting_value():
-    return 5
-
-# may add fixtures for sending messages
-
-
-@pytest.fixture
-def message_text():
-    return "Hello world"
-
-
-@pytest.fixture
-def invalid_message_text_short():
-    return ""
-
-
-@pytest.fixture
-def invalid_message_text():
-    return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
-
-
-def test_clear():
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
 def test_notifications_invite_to_channel(user_1, user_2, channel_public):
+    """
+    Tests that when user_1 invites user_2 into the channel, user_2 receives a notification.
+    """
     # user_1 invites user_2 into channel
     requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
@@ -163,9 +125,11 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_invite_to_dm(user_1, user_2, c):
+def test_notifications_invite_to_dm(user_2, c):
+    """
+    Tests that when user_1 invites user_2 into a dm, user_2 receives a notification.
+    """
     # user_1 invites user_2 into dm
-    # might need a dm_create not sure
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
         "token": user_2['token']
     })
@@ -184,6 +148,9 @@ def test_notifications_invite_to_dm(user_1, user_2, c):
 
 
 def test_notifications_tag_in_channel(user_1, user_2, channel_public):
+    """
+    Tests that when user_2 tags user_1 in a channel message, user_1 receives a notification.
+    """
     # user_2 joins channel
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
@@ -210,6 +177,9 @@ def test_notifications_tag_in_channel(user_1, user_2, channel_public):
 
 
 def test_notifications_tag_in_dm(user_1, user_2, c):
+    """
+    Tests that when user_2 tags user_1 in a dm message, user_1 receives a notification.
+    """
     # user_2 tags user_1
     requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_2['token'],
@@ -230,12 +200,11 @@ def test_notifications_tag_in_dm(user_1, user_2, c):
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-# make notification tests for reacts
-#
-
 
 def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
-
+    """
+    Tests that when user_2 reacts to a user_1 message in a channel, user_1 receives a notification.
+    """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
         "channel_id": channel_public['channel_id'],
@@ -267,7 +236,9 @@ def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
 
 
 def test_notifications_reacts_in_dm(user_1, user_2, c):
-
+    """
+    Tests that when user_2 reacts to a user_1 message in a dm, user_1 receives a notification.
+    """
     message = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": c['dm_id'],
@@ -292,6 +263,9 @@ def test_notifications_reacts_in_dm(user_1, user_2, c):
 
 
 def test_notifications_multiple_notifications(user_1, user_2, channel_public):
+    """
+    Tests that a user can receive and display multiple notifications.
+    """
     # user_1 invites user_2 into channel
     inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
@@ -327,6 +301,9 @@ def test_notifications_multiple_notifications(user_1, user_2, channel_public):
 
 
 def test_notifications_no_notifications(user_1, user_2, channel_public):
+    """
+    Tests that a user can receive and display no notifications.
+    """
     inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": channel_public['channel_id'],
@@ -350,24 +327,10 @@ def test_notifications_no_notifications(user_1, user_2, channel_public):
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
-def test_notifications_tag_user_not_in_channel(user_1, user_2, channel_public):
-    requests.post(f"{BASE_URL}/message/send/v1", json={
-        "token": user_1['token'],
-        "channel_id": channel_public['channel_id'],
-        "message": "@migueltest hey miguel!"
-    })
-    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
-        "token": user_2['token']
-    })
-
-    notifications = request_notifications.json()["notifications"]
-
-    assert notifications == []
-
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
-
-
 def test_notifications_multiple_reacts_for_message_channel(user_1, user_2, user_3, channel_public):
+    """
+    Tests that a user can display multiple react notifications.
+    """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
         "channel_id": channel_public['channel_id'],
@@ -413,7 +376,30 @@ def test_notifications_multiple_reacts_for_message_channel(user_1, user_2, user_
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
+def test_notifications_tag_user_not_in_channel(user_1, user_2, channel_public):
+    """
+    Tests that a user can be tagged but not receive the notification if the user is not in the channel.
+    """
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "@migueltest hey miguel!"
+    })
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_2['token']
+    })
+
+    notifications = request_notifications.json()["notifications"]
+
+    assert notifications == []
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_notifications_unreact_still_notification_channel(user_1, user_2, channel_public):
+    """
+    Tests that, if a user's message in channel is reacted to then unreacted to, the notification from the react will remain.
+    """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
         "channel_id": channel_public['channel_id'],
@@ -452,6 +438,9 @@ def test_notifications_unreact_still_notification_channel(user_1, user_2, channe
 
 
 def test_notifications_unreact_still_notification_dm(user_1, user_2, c):
+    """
+    Tests that, if a user's message in dm is reacted to then unreacted to, the notification from the react will remain.
+    """
     message = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": c['dm_id'],
@@ -478,13 +467,12 @@ def test_notifications_unreact_still_notification_dm(user_1, user_2, c):
         "notification_message": "migueltest reacted to your message in migueltest, mikeytest"
     }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-# def test_notifications_multiple_tags_for_user_channel(user_1, user_2, channel_public):
-#     pass
-# def test_notifications_multiple_tags_for_user_dm(user_1, user_2, c):
-#     pass
 
 
 def test_notifications_user_more_than_20_notifications(user_1, user_2, channel_public):
+    """
+    Tests that if a user receives more than 20 notifications, they can only see the most recent 20 notifications.
+    """
     requests.post(f"{BASE_URL}/channel/join/v2", json={
         "token": user_2["token"],
         "channel_id": channel_public['channel_id'],
