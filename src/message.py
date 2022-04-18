@@ -49,13 +49,6 @@ def do_messages_send_v1(token, channel_id, message):
     data_store.set(store)
     return new_message
 
-
-def validate_message(message):
-    if len(message) >= 1 and len(message) <= 1000:
-        return
-    raise InputError(description="incorrect message length")
-
-
 def message_senddm_v1(token, dm_id, message):
     validate_message(message)
     new_dm_message = do_message_senddm_v1(token, dm_id, message)
@@ -80,31 +73,6 @@ def do_message_senddm_v1(token, dm_id, message):
 
     data_store.set(store)
     return new_dm_message
-
-
-def validate_mid(messages, message_id):
-    if messages == []:
-        raise InputError(description="incorrect message id")
-    for message in messages.values():
-        if message_id == message.id:
-            return
-    raise InputError(description="incorrect message id")
-
-
-def message_access(store, message_id, u_id):
-    message = store['messages'][message_id]
-    if u_id == message.get_owner():
-        return
-    if message.get_parent_type() == "channel":
-        if message.parent.id == u_id:
-            return
-
-    if message.get_parent_type() == "dm":
-        if message.parent.id == u_id:
-            return
-
-    raise AccessError(description="no access to message")
-
 
 def message_edit_v1(token, message_id, message):
     """edits a message based on the message id
@@ -169,6 +137,16 @@ def message_remove_v1(token, message_id):
 
 
 def search_v1(token, query_str):
+    """given query string, returns a collection of messages with that query
+
+    Args:
+        token (string): user's token
+        query_str (string): message being searched
+
+    Returns:
+        messages: List of dictionaries, where each dictionary contains types
+        { message_id, u_id, message, time_sent, reacts, is_pinned  }
+    """
     auth_user_id = decode_token(token)['auth_user_id']
     validate_message(query_str)
 
@@ -192,21 +170,35 @@ def search_v1(token, query_str):
 
 
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    """shares a message to either a specified dm or channel
+
+    Args:
+        token (string): user's token
+        og_message_id (int): id of message to be shared
+        message (string): additional message when sharing message
+        channel_id (int): -1 if being shared to a dm
+        dm_id (int): -1 if being shared to a channel
+
+    Raises:
+        InputError: both channel and dm id do not exist
+        InputError: none of channel or dm id are -1
+        InputError: both channel and dm id are -1
+        InputError: message does not exist
+        InputError: message (aditional message) is too long
+
+    Returns:
+        shared_message_id(int): treated like a "new" message id
+    """
     store = data_store.get()
-    #auth_user_id = decode_token(token)['auth_user_id']
 
     if channel_id not in store["channels"] and dm_id not in store["dms"]:
         raise InputError("both channel and dm id are invalid")
     if channel_id != -1 and dm_id != -1:
         raise InputError("neither channel nor dm id are -1")
-    if channel_id == -1 and dm_id == -1:
-        raise InputError("no valid channel / dm is given")
     if len(message) > 1000:
         raise InputError("additional message is too long")
     if og_message_id not in store["messages"]:
         raise InputError("This message does not exist")
-    # if auth_user_id not in store["messages"][og_message_id].parents.all_members:
-    #     raise InputError("This message does not exist in the users channels / dms")
 
     new_message = message + " " + store["messages"][og_message_id].message
     if message == "":
@@ -225,6 +217,22 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
+    """sends message to channel are specified time
+
+    Args:
+        token (string): user's token
+        channel_id (int): channel sent to
+        message (string): message beings sent
+        time_sent (unix time stamp): future time to be sent at
+
+    Raises:
+        InputError: time is in the past
+        InputError: channel is ivalid
+        AccessError: user is not part of channel being sent to
+
+    Returns:
+        message_id: new message id
+    """
     store = data_store.get()
     validate_message(message)
     u_id = decode_token(token)["auth_user_id"]
@@ -244,6 +252,22 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    """sends message to d, are specified time
+
+    Args:
+        token (string): user's token
+        dm_id (int): dm sent to
+        message (string): message beings sent
+        time_sent (unix time stamp): future time to be sent at
+
+    Raises:
+        InputError: time is in the past
+        InputError: dm is ivalid
+        AccessError: user is not part of dm being sent to
+
+    Returns:
+        message_id: new message id
+    """
     store = data_store.get()
     validate_message(message)
     u_id = decode_token(token)["auth_user_id"]
@@ -260,36 +284,22 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     return threading.Timer(
         delay, message_senddm_v1, (token, dm_id, message)
     ).start()
-
-
-def message_dm_v1(token, dm_id, message, time_sent):
-    store = data_store.get()
-    validate_message(message)
-    u_id = decode_token(token)["auth_user_id"]
-    if time_sent < generate_timestamp():
-        raise InputError("Time is in the past")
-
-    if not valid_dm_id(store, dm_id):
-        raise InputError(description="dm id does not exist")
-
-    if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError(description="user is not part of dm")
-    delay = (time_sent - generate_timestamp())
-
-    return threading.Timer(
-        delay, message_senddm_v1, (token, dm_id, message)
-    ).start()
-
-
-def check_message_exists(message, auth_user_id):
-    store = data_store.get()
-    for m in store["messages"]:
-        if store["messages"][m].message == message and auth_user_id in store["messages"][m].parent.all_members:
-            return True
-    raise InputError("message is not a valid message you are a part of")
-
 
 def message_react_v1(token, message_id, react_id):
+    """reacts to particular message
+
+    Args:
+        token (string): user's token
+        message_id (int): message to be reacted
+        react_id (int): reaction type
+
+    Raises:
+        InputError: react id is not a valid reaction
+        InputError: message has already been reacted to
+
+    Returns:
+        empty dictionary
+    """
     u_id = decode_token(token)['auth_user_id']
     store = data_store.get()
 
@@ -308,6 +318,20 @@ def message_react_v1(token, message_id, react_id):
 
 
 def message_unreact_v1(token, message_id, react_id):
+    """unreacts to particular message
+
+    Args:
+        token (string): user's token
+        message_id (int): message to be unreacted
+        react_id (int): reaction type
+
+    Raises:
+        InputError: react ID does not refer to a valid reaction type
+        InputError: message is already unreacted
+
+    Returns:
+        empty dictionary
+    """
     u_id = decode_token(token)['auth_user_id']
     store = data_store.get()
 
@@ -321,11 +345,27 @@ def message_unreact_v1(token, message_id, react_id):
             description='You have already unreacted to this message')
 
     store["messages"][message_id].unreact(u_id)
+    data_store.set(store)
 
     return {}
 
 
 def message_pin_v1(token, message_id):
+    """given message is marked as pinned
+
+    Args:
+        token (string): user's token
+        message_id (int): message to be pinned
+
+    Raises:
+        InputError: message doe snot exist
+        InputError: user has not access to that message
+        AccessError: user has no permission to pin message
+        InputError: message is already pinned
+
+    Returns:
+        empty dictionary
+    """
 
     auth_user_id = decode_token(token)["auth_user_id"]
 
@@ -350,6 +390,21 @@ def message_pin_v1(token, message_id):
 
 
 def message_unpin_v1(token, message_id):
+    """given message is marked as unpinned
+
+    Args:
+        token (string): user's token
+        message_id (int): message to be unpinned
+
+    Raises:
+        InputError: message does no exist
+        InputError: user has no access to the message
+        AccessError: user does not have permission to unpin message
+        InputError: message is already unpinned
+
+    Returns:
+        empty dictionary
+    """
 
     auth_user_id = decode_token(token)["auth_user_id"]
     store = data_store.get()
@@ -361,7 +416,7 @@ def message_unpin_v1(token, message_id):
         raise InputError("You are not part of the specified channel/dm")
 
     if not check_user_is_message_owner(auth_user_id, message_id):
-        raise AccessError("You do not have permission to pin this message")
+        raise AccessError("You do not have permission to unpin this message")
 
     if not store["messages"][message_id].is_pinned:
         raise InputError("Message is not pinned")
@@ -371,6 +426,36 @@ def message_unpin_v1(token, message_id):
     data_store.set(store)
 
     return {}
+
+
+########################################
+###### - - HELPER FUNCTIONS - - #######
+######################################
+def validate_message(message):
+    if len(message) >= 1 and len(message) <= 1000:
+        return
+    raise InputError(description="incorrect message length")
+
+def validate_mid(messages, message_id):
+    for message in messages.values():
+        if message_id == message.id:
+            return
+    raise InputError(description="incorrect message id")
+
+
+def message_access(store, message_id, u_id):
+    message = store['messages'][message_id]
+    if u_id == message.get_owner():
+        return
+    if message.get_parent_type() == "channel":
+        if message.parent.id == u_id:
+            return
+
+    if message.get_parent_type() == "dm":
+        if message.parent.id == u_id:
+            return
+
+    raise AccessError(description="no access to message")
 
 
 def check_user_is_message_member(u_id, message_id):

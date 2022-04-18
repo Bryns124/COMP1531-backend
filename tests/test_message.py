@@ -158,17 +158,6 @@ def test_channel_messages(user_1, channel_public, starting_value, message_text):
     assert payload['messages'][-1]['message'] == message_text
     assert payload['start'] == 0
     assert payload['end'] == -1
-    # {"messages": [
-    #     {
-    #         'message_id': 1,
-    #         'u_id': 1,
-    #         'message': "Hello world",
-    #         'time_created': 1582426789,
-    #     },
-    # ],
-    #     'start': 0,
-    #     'end': -1,
-    # }
     requests.delete(f"{BASE_URL}/clear/v1", json={
 
     })
@@ -340,6 +329,14 @@ def test_messages_send_50(user_1, channel_public, message_text, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == message_text
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={
@@ -369,6 +366,14 @@ def test_messages_send_51(user_1, channel_public, message_text, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == message_text
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -393,6 +398,7 @@ def test_search_too_long(user_1, invalid_message_text):
 
 
 def test_search_specific(user_1, user_2, channel_public):
+    now = generate_timestamp()
     requests.post(f"{BASE_URL}/message/send/v1", json={
         "token": user_1['token'],
         "channel_id": channel_public['channel_id'],
@@ -411,6 +417,15 @@ def test_search_specific(user_1, user_2, channel_public):
     payload = r.json()
     assert payload["messages"][-1]["u_id"] == 1
     assert payload["messages"][-1]["message"] == "find this"
+    assert payload["messages"][-1]["is_pinned"] == False
+    assert payload["messages"][-1]["time_sent"] - now <= 1
+    assert payload["messages"][-1]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -481,12 +496,27 @@ def test_messages_share_no_minus1(user_1, user_2, channel_public, create_dm_2_us
     assert request.status_code == InputError.code
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_messages_share_both_minus1(user_1, user_2, channel_public, create_dm_2_user):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": -1,
+        "message": "Hello world"
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_1["token"],
+        "og_message_id": 1,
+        "message": "new message",
+        "channel_id": -1,
+        "dm_id": create_dm_2_user['dm_id']
+    })
+    assert request.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_messages_share_invalid_message(user_1, invalid_message_text, channel_public):
+def test_messages_share_invalid_message(user_1, channel_public):
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
         "token": user_1['token'],
         "og_message_id": 1,
-        "message": invalid_message_text,
+        "message": "hellow world",
         "channel_id": channel_public['channel_id'],
         "dm_id": -1
     })
@@ -560,7 +590,7 @@ def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_pub
     request = requests.post(f"{BASE_URL}/message/share/v1", json={
         "token": user_1["token"],
         "og_message_id": 1,
-        "message": "new message",
+        "message": "sharing this to a channel",
         "channel_id": channel_public['channel_id'],
         "dm_id": -1
     })
@@ -572,9 +602,33 @@ def test_messages_share_to_channel(user_1, user_2, create_dm_2_user, channel_pub
     })
     assert r.status_code == 200
     payload = r.json()
-    payload["messages"][-1]["message"] = "sharing this to a channel Hello World"
+    payload["messages"][-1]["message"] == "sharing this to a channel Hello World"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_messages_share_to_channel_no_additional(user_1, user_2, create_dm_2_user, channel_public):
+    r = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_2['token'],
+        "dm_id": 1,
+        "message": "Hello World",
+    })
+    assert r.status_code == 200
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_1["token"],
+        "og_message_id": 1,
+        "message": "",
+        "channel_id": channel_public['channel_id'],
+        "dm_id": -1
+    })
+    assert request.status_code == 200
+    r = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "start": 0
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    payload["messages"][-1]["message"] == "Hello World"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -597,9 +651,32 @@ def test_messages_share_to_dm(user_1, user_2, create_dm_2_user, channel_public):
     })
     assert r.status_code == 200
     payload = r.json()
-    payload["messages"][-1]["message"] = "sharing this to a dm Hello World"
+    payload["messages"][-1]["message"] == "sharing this to a dm Hello World"
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_messages_share_to_dm_no_additional(user_1, user_2, create_dm_2_user, channel_public):
+    requests.post(f"{BASE_URL}/message/send/v1", json={
+        "token": user_1['token'],
+        "channel_id": channel_public['channel_id'],
+        "message": "Hello world"
+    })
+    request = requests.post(f"{BASE_URL}/message/share/v1", json={
+        "token": user_1['token'],
+        "og_message_id": 1,
+        "message": "",
+        "channel_id": -1,
+        "dm_id": 1,
+    })
+    assert request.status_code == 200
+    r = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1["token"],
+        "dm_id": 1,
+        "start": 0
+    })
+    assert r.status_code == 200
+    payload = r.json()
+    payload["messages"][-1]["message"] == "Hello World"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_channel_pin_already_pinned(user_1, channel_public, message_text):
     request_send = requests.post(f"{BASE_URL}/message/send/v1", json={
@@ -713,6 +790,14 @@ def test_dm_pin_already_pinned(user_1, create_dm_2_user, message_text):
         "message_id": payload["message_id"],
     })
     assert request_pin_1.status_code == 200
+
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["is_pinned"] == True
     request_pin_2 = requests.post(f"{BASE_URL}/message/pin/v1", json={
         "token": user_1['token'],
         "message_id": payload["message_id"]
@@ -757,6 +842,31 @@ def test_dm_nonowner_pin(user_1, user_2, create_dm_2_user, message_text):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_dm_nonmember_pin(user_1, user_2, user_3, create_dm_2_user, message_text):
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
+        "token": user_3['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_no_message_unpin(user_1, user_2, create_dm_2_user, message_text):
+    request_pin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
+        "token": user_1['token'],
+        "message_id": 1
+    })
+    assert request_pin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
     request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
@@ -781,6 +891,66 @@ def test_dm_nonowner_unpin(user_1, user_2, create_dm_2_user, message_text):
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
+def test_dm_nonmember_unpin(user_1, user_2, user_3, create_dm_2_user, message_text):
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == 200
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
+        "token": user_3['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_unpin.status_code == InputError.code
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_unpin(user_1, user_2, create_dm_2_user, message_text):
+    request_send = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": create_dm_2_user['dm_id'],
+        "message": message_text
+    })
+    assert request_send.status_code == 200
+    payload = request_send.json()
+
+    request_pin = requests.post(f"{BASE_URL}/message/pin/v1", json={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+    assert request_pin.status_code == 200
+
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["is_pinned"] == True
+
+    request_unpin = requests.post(f"{BASE_URL}/message/unpin/v1", json={
+        "token": user_1['token'],
+        "message_id": payload["message_id"]
+    })
+
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["is_pinned"] == False
+
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_message_pin_invalid_message(user_1, invalid_message_id):
 
@@ -828,7 +998,20 @@ def test_messages_react_successful(user_1, channel_public, message_text):
         'message_id': payload['message_id'],
         'react_id': 1
     })
+    response1 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
 
+    payload1 = response1.json()
+    assert payload1["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [1],
+            "is_this_user_reacted": True
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -846,7 +1029,19 @@ def test_messages_react_successful_dm(user_1, create_dm_2_user, message_text):
         'message_id': payload['message_id'],
         'react_id': 1
     })
-
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [1],
+            "is_this_user_reacted": True
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -954,12 +1149,41 @@ def test_messages_unreact_successful(user_1, channel_public, message_text):
         'message_id': payload['message_id'],
         'react_id': 1
     })
+    response1 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+
+    payload1 = response1.json()
+    assert payload1["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [1],
+            "is_this_user_reacted": True
+        }
+    ]
+
     assert r.status_code == 200
     assert requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
+    response2 = requests.get(f"{BASE_URL}/channel/messages/v2", params={
+        "token": user_1['token'],
+        "channel_id": 1,
+        "start": 0
+    })
+
+    payload2 = response2.json()
+    assert payload2["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -976,13 +1200,39 @@ def test_messages_unreact_successful_dm(user_1, create_dm_2_user, message_text):
         'message_id': payload['message_id'],
         'react_id': 1
     })
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload1 = response.json()
+    assert payload1["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [1],
+            "is_this_user_reacted": True
+        }
+    ]
+
     assert request.status_code == 200
     assert requests.post(f"{url}/message/unreact/v1", json={
         'token': user_1['token'],
         'message_id': payload['message_id'],
         'react_id': 1
     })
-
+    response2 = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+    payload2 = response2.json()
+    assert payload2["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 

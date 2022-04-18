@@ -520,6 +520,14 @@ def test_dm_messages_multiple(user_1, create_dm_2_user, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -548,6 +556,14 @@ def test_dm_messages_multiple_51(user_1, create_dm_2_user, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -792,8 +808,25 @@ def test_dm_sendlater_different_times(user_1, create_dm_2_user):
     payload = response.json()
     assert payload["messages"][0]["time_sent"] - three_sec_after <= 1
     assert payload["messages"][0]["message"] == "This will be sent later"
+    assert payload["messages"][0]["is_pinned"] == False
     assert payload["messages"][0]["message_id"] == 2
+    assert payload["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
+
     assert payload["messages"][1]["time_sent"] <= three_sec_after
     assert payload["messages"][1]["message"] == "This will be sent first"
+    assert payload["messages"][1]["is_pinned"] == False
     assert payload["messages"][1]["message_id"] == 1
+    assert payload["messages"][1]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})

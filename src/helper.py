@@ -8,22 +8,6 @@ from src.classes import User, Channel
 
 SECRET = "ANT"
 
-class Queue():
-    def __init__(self):
-        self.data = []
-
-    def enqueue(self, item):
-        self.data.insert(0, item)
-
-    def dequeue(self):
-        if self.size() == 0:
-            return None
-        else:
-            return self.data.pop()
-
-    def size(self):
-        return len(self.data)
-
 def generate_token(u_id):
     """
     Takes a input user_id and generates a token for the user.
@@ -235,7 +219,7 @@ def get_reacts(message_id, u_id):
     store = data_store.get()
     m = store["messages"][message_id]
     new_react = {
-        "react_id": m.react_id,
+        "react_id": 1,
         "u_ids": m.react_ud_ids,
         "is_this_user_reacted": m.is_user_reacted(u_id)
     }

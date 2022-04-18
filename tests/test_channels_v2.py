@@ -595,7 +595,24 @@ def test_sendlater_different_times(user_1, public_channel_user1):
     assert payload["messages"][0]["time_sent"] - three_sec_after <= 1
     assert payload["messages"][0]["message"] == "This will be sent later"
     assert payload["messages"][0]["message_id"] == 2
+    assert payload["messages"][0]["is_pinned"] == False
+    assert payload["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     assert payload["messages"][1]["time_sent"] <= three_sec_after
     assert payload["messages"][1]["message"] == "This will be sent first"
     assert payload["messages"][1]["message_id"] == 1
+    assert payload["messages"][1]["is_pinned"] == False
+    assert payload["messages"][1]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
+
     requests.delete(f"{BASE_URL}/clear/v1", json={})
