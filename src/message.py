@@ -295,35 +295,6 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         delay, message_senddm_v1, (token, dm_id, message)
     ).start()
 
-
-
-def message_dm_v1(token, dm_id, message, time_sent):
-    store = data_store.get()
-    validate_message(message)
-    u_id = decode_token(token)["auth_user_id"]
-    if time_sent < generate_timestamp():
-        raise InputError("Time is in the past")
-
-    if not valid_dm_id(store, dm_id):
-        raise InputError(description="dm id does not exist")
-
-    if not is_dm_member(store, u_id, dm_id) and not is_dm_owner(store, u_id, dm_id):
-        raise AccessError(description="user is not part of dm")
-    delay = (time_sent - generate_timestamp())
-
-    return threading.Timer(
-        delay, message_senddm_v1, (token, dm_id, message)
-    ).start()
-
-
-def check_message_exists(message, auth_user_id):
-    store = data_store.get()
-    for m in store["messages"]:
-        if store["messages"][m].message == message and auth_user_id in store["messages"][m].parent.all_members:
-            return True
-    raise InputError("message is not a valid message you are a part of")
-
-
 def message_react_v1(token, message_id, react_id):
     """reacts to particular message
 
@@ -436,7 +407,6 @@ def message_pin_v1(token, message_id):
 
     data_store.set(store)
     return {}
-    store["messages"][message_id].is_pinned = True
 
 
 def message_unpin_v1(token, message_id):
