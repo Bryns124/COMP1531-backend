@@ -508,18 +508,9 @@ def test_users_stats_none(clear, user_1):
     })
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(0)
-    assert payload['workspace_stats']['channels_exist'] == [{
-            "num_channels_exist": 0,
-            "time_stamp": 0
-        }]
-    assert payload['workspace_stats']['dms_exist'] == [{
-            "num_dms_exist": 0,
-            "time_stamp": 0
-        }]
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -532,14 +523,8 @@ def test_users_stats_one_channel(clear, user_1, public_channel_user1):
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'] == [{
-            "num_dms_exist": 0,
-            "time_stamp": 0
-        }]
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
@@ -550,14 +535,8 @@ def test_users_stats_two_channels(clear, user_1, public_channel_user1, private_c
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 2
-    assert payload['workspace_stats']['dms_exist'] == [{
-            "num_dms_exist": 0,
-            "time_stamp": 0
-        }]
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -569,15 +548,9 @@ def test_users_stats_one_dm(clear, user_1, create_dm_2_user):
     payload = response.json()
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1, rel=1e-1)
-    assert payload['workspace_stats']['channels_exist'] == [{
-            "num_channels_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 1
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -589,15 +562,9 @@ def test_users_stats_two_dms(clear, user_3, create_dm_2_user, create_dm_3_user):
     payload = response.json()
     assert response.status_code == 200
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
-    assert payload['workspace_stats']['channels_exist'] == [{
-            "num_channels_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -608,10 +575,7 @@ def test_users_stats_dm_messages(clear, user_1, send_multiple_dms):
     })
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
-    assert payload['workspace_stats']['channels_exist'] == [{
-            "num_channels_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 0
     assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
     assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
@@ -625,10 +589,7 @@ def test_users_stats_channel_messages(clear, user_1, messages_send_2_channel):
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'] == [{
-            "num_dms_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
     assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 2
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -664,14 +625,8 @@ def test_users_stats_message_delete(clear, user_1, messages_send_2_channel):
     payload = response.json()
     assert payload['workspace_stats']['utilization_rate'] == approx(1)
     assert payload['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 1
-    assert payload['workspace_stats']['dms_exist'] == [{
-            "num_dms_exist": 0,
-            "time_stamp": 0
-        }]
-    assert payload['workspace_stats']['messages_exist'] == [{
-            "num_messages_exist": 0,
-            "time_stamp": 0
-        }]
+    assert payload['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 0
+    assert payload['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 0
     assert response.status_code == 200
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
