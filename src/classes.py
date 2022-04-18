@@ -3,6 +3,8 @@ import datetime
 from datetime import timezone
 # from src.helper import generate_timestamp
 from src.config import port, url
+import time
+import threading
 
 BASE_URL = url
 
@@ -16,8 +18,7 @@ def generate_timestamp():
     utc = time.replace(tzinfo=timezone.utc)
     timestamp = utc.timestamp()
     return int(timestamp)
-import time
-import threading
+
 
 
 class User:
