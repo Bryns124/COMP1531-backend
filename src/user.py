@@ -7,10 +7,6 @@ from urllib import request
 import requests
 import urllib.request
 import sys
-import Image
-from Pillow import Image
-import pillow
-import PIL.Image
 from PIL import Image, ImageFile
 from src.config import port, url
 
@@ -22,6 +18,9 @@ Functions:
     user_profile_setname: Update the authorised user's first name and last name
     user_profile_setemail: Update the authorised user's email address
     user_profile_sethandle: Update the authorised user's hand (handle name)
+    user_stats_v1: gives out data about the channels joined, dm joined and messages sent by the user and their involvement rate
+    users_stats_v1: gives out data about the utilization of UNSW Seams
+    user_profile_uploadphoto_v1: Allows user to upload their own profile pictures
 """
 
 
@@ -55,7 +54,8 @@ def extract_user_details(user):
         'email': user.email,
         'name_first': user.name_first,
         'name_last': user.name_last,
-        'handle_str': user.handle
+        'handle_str': user.handle,
+        'profile_img_url': user.profile_img_url
     }
     return users
 
@@ -223,6 +223,17 @@ def duplicate_handle(store, handle_str):
 
 
 def user_stats_v1(token):
+    """returns the stats for a particular user about their user of UNSW Seams
+
+    Args:
+        token (string): user calling the function
+
+    Raises:
+        None
+
+    Returns:
+        user_stats (dictionary): containing list of dictionaries with the usage details of the users
+    """
     auth_user_id = decode_token(token)['auth_user_id']
 
     channels_joined = generate_channels_joined_timed(auth_user_id)
@@ -265,7 +276,10 @@ def calculate_ir(auth_user_id):
 def generate_channels_joined_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    channels_joined_list = []
+    channels_joined_list = [{
+            "num_channels_joined": counter,
+            "time_stamp": 0
+        }]
 
     all_channels = store["users"][auth_user_id].all_channels
     for channel in all_channels:
@@ -281,7 +295,10 @@ def generate_channels_joined_timed(auth_user_id):
 def generate_dms_joined_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    dms_joined_list = []
+    dms_joined_list = [{
+            "num_dms_joined": counter,
+            "time_stamp": 0
+        }]
 
     all_dms = store["users"][auth_user_id].all_dms
     for dm in all_dms:
@@ -297,7 +314,10 @@ def generate_dms_joined_timed(auth_user_id):
 def generate_messages_sent_timed(auth_user_id):
     store = data_store.get()
     counter = 0
-    messages_sent_list = []
+    messages_sent_list = [{
+            "num_messages_sent": counter,
+            "time_stamp": 0
+        }]
 
     messages_sent = store["users"][auth_user_id].messages_sent
     for message in messages_sent:
@@ -313,6 +333,17 @@ def generate_messages_sent_timed(auth_user_id):
 
 
 def users_stats_v1(token):
+    """returns the stats related to the usage of UNSW Seams
+
+    Args:
+        token (string): user calling the function
+
+    Raises:
+        None
+
+    Returns:
+        users_stats (dictionary): containing list of dictionaries with the usage details of the website
+    """
     decode_token(token)
 
     channels_exist = generate_channels_exist_timed()
@@ -344,9 +375,12 @@ def calculate_utilization_rate():
 
 def generate_channels_exist_timed():
     store = data_store.get()
-
-    channel_exist = []
     counter = 0
+    channel_exist = [{
+            "num_channels_exist": counter,
+            "time_stamp": 0
+        }]
+
     for channel in store["channels"]:
         counter += 1
         new_entry = {
@@ -358,9 +392,12 @@ def generate_channels_exist_timed():
 
 def generate_dms_exist_timed():
     store = data_store.get()
-
-    dm_exist = []
     counter = 0
+    dm_exist = [{
+            "num_dms_exist": counter,
+            "time_stamp": 0
+        }]
+
     for dm in store["dms"]:
         counter += 1
         new_entry = {
@@ -372,9 +409,12 @@ def generate_dms_exist_timed():
 
 def generate_messages_exist_timed():
     store = data_store.get()
-
-    messages_exist = []
     counter = 0
+    messages_exist = [{
+            "num_messages_exist": counter,
+            "time_stamp": 0
+        }]
+
     for message in store["messages"]:
         counter += 1
         new_entry = {
@@ -386,7 +426,31 @@ def generate_messages_exist_timed():
 
 
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    """Allows users to upload their profile pictures using a url for their image
+
+    Args:
+        token (string): user calling the function
+        img_url (string): url containing the image that the user wants to upload
+        x_start (int): dimension to start cropping the image in the horizontal direction
+        y_start (int): dimension to start cropping the image in the vertical direction
+        x_end (int): dimension to finish cropping the image in the horizontal direction
+        y_end (int):  dimension to finish cropping the image in the vertical direction
+
+    Raises:
+        InputError: url returns an HTTP status other than 200 or any other errors occur
+        InputError: any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL
+        InputError: x_end is less than or equal to x_start or y_end is less than or equal to y_start
+        InputError: image uploaded is not a JPG
+
+    Returns:
+        None
+    """
     auth_user_id = decode_token(token)['auth_user_id']
+
+    try:
+        urllib.request.urlopen(img_url)
+    except:
+        raise InputError("Invalid image url")
 
     if (x_start > x_end or y_start > y_end):
         raise InputError("Invalid dimensions.")
@@ -402,14 +466,14 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError("Only urls with jpg format are allowed")
 
 
-    filename = f"{BASE_URL}/static/images/{auth_user_id}.jpg"
-
+    filename = f"./src/static/cropped_{auth_user_id}.jpg"
     store = data_store.get()
-    store["users"][auth_user_id].profile_img_url = filename
-
     urllib.request.urlretrieve(img_url, filename)
+
     crop_photo(filename, x_start, y_start, x_end, y_end)
 
+    store["users"][auth_user_id].profile_img_url = BASE_URL + "static/cropped_" + str(auth_user_id) + ".jpg"
+    data_store.set(store)
     return {}
 
 
@@ -422,9 +486,9 @@ def correct_format(img_url):
     return True
 
 
-def crop_photo(filename, x1, x2, y1, y2):
+def crop_photo(filename, x1, y1, x2, y2):
     image = Image.open(filename)
-    cropped_image = image.crop(x1, y1, x2, y2)
+    cropped_image = image.crop((x1, y1, x2, y2))
     cropped_image.save(filename)
 
 

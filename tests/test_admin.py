@@ -145,14 +145,16 @@ def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
             "email": "michael@gmail.com",
             "name_first": "Michael",
             "name_last": "Chai",
-            "handle_str": "michaelchai"
+            "handle_str": "michaelchai",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -181,7 +183,8 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
             "email": "adi@gmail.com",
             "name_first": "Adiyat",
             "name_last": "Rahman",
-            "handle_str": "adiyatrahman"
+            "handle_str": "adiyatrahman",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -210,14 +213,16 @@ def test_admin_user_remove_removing_channel_owner(user_1, user_2, user_3, create
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
             "email": "michael@gmail.com",
             "name_first": "Michael",
             "name_last": "Chai",
-            "handle_str": "michaelchai"
+            "handle_str": "michaelchai",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -314,7 +319,8 @@ def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
         "email": "adi@gmail.com",
         "name_first": "Removed",
         "name_last": "user",
-        "handle_str": "adiyatrahman"
+        "handle_str": "adiyatrahman",
+        "profile_img_url": "{BASE_URL}/static/default.jpg"
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -344,14 +350,16 @@ def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
             "email": "adi@gmail.com",
             "name_first": "Adiyat",
             "name_last": "Rahman",
-            "handle_str": "adiyatrahman"
+            "handle_str": "adiyatrahman",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -375,7 +383,8 @@ def test_users_all_admin_user_remove_v1(user_1, user_2):
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -477,14 +486,16 @@ def test_promoting_user_2_admin_userpermission_change_v1(user_1, user_2, user_3)
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 2,
             "email": "adi@gmail.com",
             "name_first": "Adiyat",
             "name_last": "Rahman",
-            "handle_str": "adiyatrahman"
+            "handle_str": "adiyatrahman",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -514,13 +525,15 @@ def test_promoting_user_2_admin_userpermission_change_v1_multiple_users(user_1, 
             "email": "alice@gmail.com",
             "name_first": "Alice",
             "name_last": "Wan",
-            "handle_str": "alicewan"
+            "handle_str": "alicewan",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }, {
             "u_id": 3,
             "email": "michael@gmail.com",
             "name_first": "Michael",
             "name_last": "Chai",
-            "handle_str": "michaelchai"
+            "handle_str": "michaelchai",
+            "profile_img_url": "{BASE_URL}/static/default.jpg"
         }
 
     ]

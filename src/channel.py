@@ -78,6 +78,7 @@ def channel_details_v1(token, channel_id):
         "name_first": first name (string),
         "name_last": last name (string),
         "handle_str": user handle (string)
+        "profile_img_url": url for user profile image (string)
         }
         "all_members": a list of dictionaries in the same format as owner_members,
         however containing information
@@ -134,6 +135,7 @@ def user_details(user_object):
     "name_first": first name (string),
     "name_last": last name (string),
     "handle_str": user handle (string)
+    "profile_img_url": url for user profile image (string)
     }
     """
 
@@ -142,7 +144,8 @@ def user_details(user_object):
         'email': user_object.email,
         'name_first': user_object.name_first,
         'name_last': user_object.name_last,
-        'handle_str': user_object.handle
+        'handle_str': user_object.handle,
+        'profile_img_url': user_object.profile_img_url
     }
 
 
