@@ -120,11 +120,12 @@ def invalid_message_text():
 
 def test_notifications_invite_to_channel(user_1, user_2, channel_public, message_text):
     # user_1 invites user_2 into channel
-    requests.post(f"{BASE_URL}/channel/invite/v2", json={
+    inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": channel_public['channel_id'],
         "u_id": user_2["auth_user_id"]
     })
+    assert inv.status_code == 200
     request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
         "token": user_2['token']
     })
