@@ -32,6 +32,7 @@ class User:
         self.channels_owned = {}    # Channels owned
         self.all_channels = {}  # Channels owned and joined
         self.messages_sent = {}
+        self.messages_current = {}
         self.dms_own = {}
         self.all_dms = {}  # ask
         self.profile_img_url = "{BASE_URL}/static/images/default.jpg"
@@ -76,6 +77,10 @@ class User:
 
     def add_msg(self, msg_id, message_object):
         self.messages_sent[msg_id] = message_object
+        self.messages_current[msg_id] = message_object
+
+    def remove_message(self, msg_id):
+        self.messages_current.pop(msg_id)
 
     def channel_leave(self, ch_id):
         self.all_channels.pop(ch_id, None)

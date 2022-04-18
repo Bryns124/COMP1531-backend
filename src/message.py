@@ -145,10 +145,12 @@ def message_remove_v1(token, message_id):
     message = store['messages'][message_id]
 
     if message.parent.get_type() == "channel":
+
         message.parent.message_list.remove(message_id)
     elif message.parent.get_type() == "dm":
         message.parent.message_list.remove(message_id)
 
+    store["users"][u_id].remove_message(message_id)
     data_store.set(store)
     return {}
 
