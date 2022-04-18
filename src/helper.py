@@ -38,11 +38,11 @@ def decode_token(token):
     Returns:
         dict: Dictionary containing user's u_id and session_id.
     """
-    try :
+    try:
         token_data = jwt.decode(token, SECRET, algorithms="HS256")
     except:
         # raise Error
-        pass
+        raise AccessError(description="Token is Invalid") from AccessError
     validate_token(token_data)
     return token_data
 
@@ -98,20 +98,20 @@ def channel_validity(channel_id, store):
         return True
     return False
 
+# Depcriated
+# def user_validity(u_id, store):
+#     """_summary_
+#     Checks for a valid channel
+#     Args:
+#         channel_id (channel_id): _description_
+#         store (datastore): _description_
 
-def user_validity(u_id, store):
-    """_summary_
-    Checks for a valid channel
-    Args:
-        channel_id (channel_id): _description_
-        store (datastore): _description_
-
-    Returns:
-        _Boolean: Returns if the channel exists or not.
-    """
-    if u_id in store["users"]:
-        return True
-    return False
+#     Returns:
+#         _Boolean: Returns if the channel exists or not.
+#     """
+#     if u_id in store["users"]:
+#         return True
+#     return False
 
 
 def already_member(auth_user_id, channel_id, store):
@@ -131,28 +131,28 @@ def already_member(auth_user_id, channel_id, store):
         return True
     return False
 
+# Depcriated
+# def is_global_owner(store):
+#     for users in store['users']:
+#         if users['u_id'] == 1:
+#             return True
+#     return False
 
-def is_global_owner(store):
-    for users in store['users']:
-        if users['u_id'] == 1:
-            return True
-    return False
+# Depcriated
+# def extract_channel_details(channel_id, store):
+#     """
+#     A method which coppies the data in the input_channel and returns it.
+#     Args:
+#         channel_id (int): ID of the channel info being looked for.
+#         store (dict): The current state of datastore.
 
-
-def extract_channel_details(channel_id, store):
-    """
-    A method which coppies the data in the input_channel and returns it.
-    Args:
-        channel_id (int): ID of the channel info being looked for.
-        store (dict): The current state of datastore.
-
-    Returns:
-        dict: the corresponding channel info
-    """
-    for channels in store['channels']:
-        if channels['channel_id'] == channel_id:
-            channel_details = channels
-    return channel_details
+#     Returns:
+#         dict: the corresponding channel info
+#     """
+#     for channels in store['channels']:
+#         if channels['channel_id'] == channel_id:
+#             channel_details = channels
+#     return channel_details
 
 
 def generate_timestamp():
@@ -183,13 +183,13 @@ def load_data_store():
     with open('datastore.p', 'rb') as FILE:
         data_store.set(pickle.load(FILE))
 
-
-def load_channel(channel_id):
-    store = data_store.get()
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel
-    raise InputError(description="Could not locate channel")
+# Depcriated
+# def load_channel(channel_id):
+#     store = data_store.get()
+#     for channel in store['channels']:
+#         if channel['channel_id'] == channel_id:
+#             return channel
+#     raise InputError(description="Could not locate channel")
 
 
 def load_user(u_id):
@@ -200,17 +200,102 @@ def load_user(u_id):
     raise InputError(description="Could not locate user")
 
 
-def load_message(message_id):
-    store = data_store.get()
-    for message in store['messages']:
-        if message['message_id'] == message_id:
-            return message
-    raise InputError(description="Could not locate message")
+# Depcriated
+# def load_message(message_id):
+#     store = data_store.get()
+#     for message in store['messages']:
+#         if message['message_id'] == message_id:
+#             return message
+#     raise InputError(description="Could not locate message")
+
+# Depcriated
+# def load_dm(dm_id):
+#     store = data_store.get()
+#     for dm in store['dms']:
+#         if dm['dm_id'] == dm_id:
+#             return dm
+#     raise InputError(description="Could not locate dm")
 
 
-def load_dm(dm_id):
+def detect_tagged_user(message_text, users):
+    """
+    Searchs a given string for a tagged user of the form "@handle" where handle is a handle of
+    a user listed in users.
+
+    Args:
+        message_text (string): The contents of a message being sent to a channel/dm
+        users (dictionary): The members of the channel/dm where the message is being sent
+                            of the form {u_id: User object}
+
+    Returns:
+        dictionary: The users tagged in the message of the form {u_id: User object}, an empty dict
+                    if no users are tagged
+    """
+    tagged_users = {}
+    if "@" not in message_text:
+        return tagged_users
+
+    handles_list = []
+
+    for u_id in users:
+        handles_list.append((u_id, '@' + users[u_id].handle))
+        # handles_list.append('@' + users[u_id].handle)
+
+    # for handle in handles_list:
+    for user in handles_list:
+        u_id = user[0]
+        handle = user[1]
+        if handle in message_text:
+            tagged_users[u_id] = users[u_id]
+
+    return tagged_users
+
+
+def notify_add(user_invited, sender_handle, parent_id, parent_name, is_channel):
     store = data_store.get()
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            return dm
-    raise InputError(description="Could not locate dm")
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} added you to {parent_name}"
+    }
+    store["users"][user_invited].notifications.append(notification)
+    data_store.set(store)
+
+
+def notify_react(user_reacted, sender_handle, parent_id, parent_name, is_channel):
+    store = data_store.get()
+
+    if is_channel:
+        channel_id = parent_id
+        dm_id = -1
+    else:
+        channel_id = -1
+        dm_id = parent_id
+
+    notification = {
+        "channel_id": channel_id,
+        "dm_id": dm_id,
+        "notification_message": f"{sender_handle} reacted to your message in {parent_name}"
+    }
+    store["users"][user_reacted].notifications.append(notification)
+    data_store.set(store)
+
+def get_reacts(message_id, u_id):
+    react_list = []
+    store = data_store.get()
+    m = store["messages"][message_id]
+    new_react = {
+        "react_id": 1,
+        "u_ids": m.react_ud_ids,
+        "is_this_user_reacted": m.is_user_reacted(u_id)
+    }
+    react_list.append(new_react)
+    return react_list

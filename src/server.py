@@ -1,14 +1,18 @@
-from operator import methodcaller
-import sys
 import signal
 from json import dumps
 from flask import Flask, request
 from flask_mail import Mail, Message
 from flask_cors import CORS
+<<<<<<< HEAD
 from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
+=======
+from src import config
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, search_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
+>>>>>>> development3
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.helper import save_data_store, load_data_store
@@ -16,6 +20,8 @@ from src.other import clear_v1
 from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
+from src.standup import standup_active_v1, standup_send_v1, standup_start_v1
+from src.notifications import notifications_get_v1
 
 EMAIL_ADDRESS = "w17a.ant@gmail.com"
 EMAIL_PASSWORD = """BirdsAren'tReal"""
@@ -415,6 +421,7 @@ def admin_userpermission_change():
     return dumps({})
 
 
+<<<<<<< HEAD
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request():
     body = request.get_json()
@@ -438,6 +445,117 @@ def auth_passwordreset_reset():
     auth_passwordreset_reset_v1(
         body['reset_code'], body['new_password'])
     return dumps({})
+
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start():
+    data = request.get_json()
+    body = standup_start_v1(data['token'], data['channel_id'], data['length'])
+    return dumps({
+        "time_finish": body['time_finish']
+    })
+
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    body = standup_active_v1(token, channel_id)
+    return dumps({
+        "is_active": body['is_active'],
+        "time_finish": body['time_finish']
+    })
+
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    data = request.get_json()
+    body = standup_send_v1(data['token'], data['channel_id'], data['message'])
+    return dumps(body)
+
+
+@APP.route("/search/v1", methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    body = search_v1(token, query_str)
+
+    return dumps({
+        "messages": body["messages"]
+    })
+
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def message_sendlater():
+    body = request.get_json()
+    data = message_sendlater_v1(
+        body['token'], body['channel_id'], body['message'], body["time_sent"])
+    save_data_store()
+    return dumps({
+        'message_id': data['message_id']
+    })
+
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    body = request.get_json()
+    data = message_sendlaterdm_v1(
+        body['token'], body['dm_id'], body['message'], body["time_sent"])
+    save_data_store()
+    return dumps({
+        'message_id': data['message_id']
+    })
+
+
+@APP.route("/message/share/v1", methods=['POST'])
+def merssage_share():
+    body = request.get_json()
+    data = message_share_v1(body['token'], body['og_message_id'],
+                            body["message"], body["channel_id"], body["dm_id"])
+    save_data_store()
+    return dumps({
+        'shared_message_id': data['shared_message_id']
+    })
+
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    body = request.get_json()
+    message_react_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    body = request.get_json()
+    message_unreact_v1(body['token'], body['message_id'], body["react_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/pin/v1", methods=['POST'])
+def message_pin():
+    body = request.get_json('token')
+    message_pin_v1(body["token"], body["message_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def message_unpin():
+    body = request.get_json('token')
+    message_unpin_v1(body["token"], body["message_id"])
+    save_data_store()
+    return dumps({})
+
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications_get():
+    token = request.args.get('token')
+    body = notifications_get_v1(token)
+    return dumps({
+        "notifications": body["notifications"]
+    })
 
 # wew14
 # NO NEED TO MODIFY BELOW THIS POINT
