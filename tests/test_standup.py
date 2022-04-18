@@ -95,6 +95,14 @@ def test_standup_active_invalid_channel_id(clear, user_1, invalid_channel_id):
     assert response.status_code == InputError.code
 
 
+def test_standup_active_no_standup(clear, user_1, channel_public):
+    response1 = fix.standup_active_v1(
+        user_1['token'], channel_public['channel_id'])
+    body1 = response1.json()
+    assert body1["time_finish"] == None
+    assert body1["is_active"] == False
+
+
 def test_standup_active(clear, user_1, channel_public):
     response = fix.standup_start_v1(
         user_1['token'], channel_public['channel_id'], NORMAL_LENGTH)

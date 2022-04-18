@@ -2,7 +2,7 @@ from src.channel import user_details
 from src.data_store import data_store
 from src.classes import BaseChannel, Message, Dm
 from src.error import InputError, AccessError
-from src.helper import decode_token, validate_token, get_reacts
+from src.helper import decode_token, get_reacts
 """Dm has the 7 functions: create, list, remove, details, leave, messages, senddm
 Functions:
     dm_create: creates a new dm is created

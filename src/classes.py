@@ -23,12 +23,8 @@ class User:
         self.set_session_id()  # fix later
 
     def set_u_id(self):
-        try:
-            store = data_store.get()
-            return len(store['users']) + len(store['removed_users']) + 1
-        except:
-            store = data_store.get()
-            return 1
+        store = data_store.get()
+        return len(store['users']) + len(store['removed_users']) + 1
 
     def set_session_id(self):
         self.session_id.append(True)
@@ -92,11 +88,8 @@ class BaseChannel:
         self.end = self.set_end()
 
     def set_ch_id(self):
-        try:
-            store = data_store.get()
-            return len(store['channels']) + 1
-        except:
-            return 1
+        store = data_store.get()
+        return len(store['channels']) + 1
 
     def add_owner(self, auth_user_id, user_object):
         self.owner_members[auth_user_id] = user_object
@@ -124,11 +117,11 @@ class BaseChannel:
         elif self.id in store['dms']:
             return "dm"
 
-    def check_msg_list(self, message_id):
-        if message_id in self.message_list:
-            return True
-        else:
-            return False
+    # def check_msg_list(self, message_id):
+    #     if message_id in self.message_list:
+    #         return True
+    #     else:
+    #         return False
 
 
 class Dm(BaseChannel):
@@ -137,11 +130,8 @@ class Dm(BaseChannel):
         self.id = self.set_dm_id()
 
     def set_dm_id(self):
-        try:
-            store = data_store.get()
-            return len(store['dms']) + 1
-        except:
-            return 1
+        store = data_store.get()
+        return len(store['dms']) + 1
 
     def remove_all(self):
         # try:
