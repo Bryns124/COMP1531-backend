@@ -5,7 +5,9 @@ from src.channel import channel_join_v1
 from src.other import clear_v1
 from src.error import AccessError, InputError
 
+from src.config import port, url
 
+BASE_URL = url
 @pytest.fixture
 def user_1():
     return auth_register_v1('alice@gmail.com', '123456', 'Alice', 'Wan')

@@ -1,6 +1,6 @@
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_mail import Mail, Message
 from flask_cors import CORS
 from src import config
@@ -12,7 +12,8 @@ from src.channels import channels_list_v1, channels_listall_v1, channels_create_
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
 from src.helper import save_data_store, load_data_store
 from src.other import clear_v1
-from src.user import users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1
+from src.user import user_profile_uploadphoto_v1, users_all_v1, user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, user_stats_v1, users_stats_v1
+# from src.user import user_profile_uploadphoto_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 from src.standup import standup_active_v1, standup_send_v1, standup_start_v1
@@ -39,7 +40,7 @@ def defaultHandler(err):
     return response
 
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 mail = Mail(APP)
 
@@ -415,6 +416,35 @@ def admin_userpermission_change():
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
 
+@APP.route('/static/<path:path>')
+def send_js(path):
+    return send_from_directory('', path)
+
+
+@APP.route("/user/stats/v1", methods=["GET"])
+def user_stats():
+    token = request.args.get('token')
+
+    body = user_stats_v1(token)
+    return dumps({
+        'user_stats': body['user_stats']
+    })
+
+@APP.route("/users/stats/v1", methods=["GET"])
+def users_stats():
+    token = request.args.get('token')
+
+    body = users_stats_v1(token)
+    return dumps({
+        'workspace_stats': body['workspace_stats']
+    })
+
+@APP.route("/user/profile/uploadphoto/v1", methods=["POST"])
+def user_profile_uploadphoto():
+    data = request.get_json()
+
+    user_profile_uploadphoto_v1(data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end'])
+    return dumps({})
 
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request():
