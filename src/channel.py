@@ -184,7 +184,7 @@ def channel_messages_v1(token, channel_id, start):
         active_channel.all_members[decode_token(token)['auth_user_id']]
     except:
         raise AccessError(
-            description="You are not part of that channel.")
+            description="You are not part of that channel.") from AccessError
 
     returned_messages = {'messages': [], 'start': start, 'end': ""}
     returned_full = False
