@@ -7,7 +7,6 @@ from src.error import InputError
 from src import config, data_store
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
-from src import config
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, search_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
