@@ -356,13 +356,6 @@ def test_auth_passwordreset_email_sends():
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_auth_passwordreset_unregistered():
-    request_email = requests.post(f"{BASE_URL}/auth/passwordreset/request/v1", json={
-        "email": "danielyung144@outlook.com"
-    })
-    assert request_email.status_code == 200
-
-    requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 def test_auth_passwordreset_unregistered():
     request_email = requests.post(f"{BASE_URL}/auth/passwordreset/reset/v1", json={
