@@ -54,7 +54,8 @@ def channel_invite_v1(token, channel_id, u_id):
     ch_object = store["channels"][channel_id]
     store["users"][u_id].add_channel(channel_id, ch_object)
     ch_object.add_member(u_id, store["users"][u_id])
-    notify_add(u_id, store["users"][auth_user_id].handle, channel_id, ch_object.name, True)
+    notify_add(u_id, store["users"][auth_user_id].handle,
+               channel_id, ch_object.name, True)
     data_store.set(store)
     return {
     }
