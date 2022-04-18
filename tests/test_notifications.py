@@ -87,6 +87,16 @@ def c(user_1, user_2):
 
 
 @pytest.fixture
+def channel_1(user_1):
+    r = requests.post(f"{BASE_URL}/channels/create/v2", json={
+        "token": user_1['token'],
+        "name": "A New Hope",
+        "is_public": True
+    })
+    return r.json()
+
+
+@pytest.fixture
 def invalid_channel_id():
     return -1
 
@@ -118,6 +128,10 @@ def invalid_message_text():
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Ne"
 
 
+def test_clear():
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
 def test_notifications_invite_to_channel(user_1, user_2, channel_public, message_text):
     # user_1 invites user_2 into channel
     requests.post(f"{BASE_URL}/channel/invite/v2", json={
@@ -132,7 +146,7 @@ def test_notifications_invite_to_channel(user_1, user_2, channel_public, message
     assert notifications == [{
         "channel_id": channel_public['channel_id'],
         "dm_id": -1,
-        "notification_message": "migueltest added you to Test Channel"
+        "notification_message": "mikeytest added you to Test Channel"
     }]
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -149,7 +163,7 @@ def test_notifications_invite_to_dm(user_1, user_2, c, message_text):
     assert notifications == [{
         "channel_id": -1,
         "dm_id": c['dm_id'],
-        "notification_message": "migueltest added you to migueltest, mikeytest"
+        "notification_message": "mikeytest added you to migueltest, mikeytest"
     }]
     # assert notifications[0]["channel_id"] == -1
     # assert notifications[0]["dm_id"] == c['dm_id']
@@ -210,6 +224,8 @@ def test_notifications_tag_in_dm(user_1, user_2, channel_public, c, message_text
 
 # make notification tests for reacts
 #
+
+
 def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
 
     requests.post(f"{BASE_URL}/channel/join/v2", json={
@@ -236,14 +252,14 @@ def test_notifications_reacts_in_channel(user_1, user_2, channel_public):
     assert notifications == [{
         "channel_id": channel_public['channel_id'],
         "dm_id": -1,
-        "notification_message": "mikey reacted to your message in Test Channel"
+        "notification_message": "migueltest reacted to your message in Test Channel"
     }]
     assert len(notifications) == 1
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
 
 def test_notifications_reacts_in_dm(user_1, user_2, c):
-    
+
     message = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         "token": user_1['token'],
         "dm_id": c['dm_id'],
@@ -262,7 +278,7 @@ def test_notifications_reacts_in_dm(user_1, user_2, c):
     assert notifications == [{
         "channel_id": -1,
         "dm_id": c['dm_id'],
-        "notification_message": "mikey reacted to your message in channel: hey miguel!"
+        "notification_message": "migueltest reacted to your message in migueltest, mikeytest"
     }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -281,13 +297,13 @@ def test_notifications_multiple_notifications(user_1, user_2, channel_public, me
         "channel_id": channel_public['channel_id'],
         "message": "@migueltest hey miguel!"
     })
-    
-    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
+
+    request = requests.get(f"{BASE_URL}/notifications/get/v1", params={
         "token": user_2['token']
     })
-    notifications = request_notifications.json()["notifications"]
+    payload = request.json()["notifications"]
 
-    assert notifications == [
+    assert payload == [
         {
             "channel_id": 1,
             "dm_id": -1,
@@ -298,10 +314,11 @@ def test_notifications_multiple_notifications(user_1, user_2, channel_public, me
             "dm_id": -1,
             "notification_message": "mikeytest added you to Test Channel"
         }
-        ]
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
-def test_notifications_no_notifications(user_1, channel_1):
+
+def test_notifications_no_notifications(user_1, user_2, channel_public):
     inv = requests.post(f"{BASE_URL}/channel/invite/v2", json={
         "token": user_1["token"],
         "channel_id": channel_public['channel_id'],
@@ -315,12 +332,11 @@ def test_notifications_no_notifications(user_1, channel_1):
     })
     assert request_message.status_code == 200
 
-    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", json={
-        "token": user_2['token']
+    request_notifications = requests.get(f"{BASE_URL}/notifications/get/v1", params={
+        "token": user_1['token']
     })
     notifications = request_notifications.json()["notifications"]
 
     assert notifications == []
 
     requests.delete(f"{BASE_URL}/clear/v1", json={})
-

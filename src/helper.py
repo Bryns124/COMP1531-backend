@@ -282,7 +282,7 @@ def notify_react(user_reacted, sender_handle, parent_id, parent_name, is_channel
     notification = {
         "channel_id": channel_id,
         "dm_id": dm_id,
-        "notification_message": f"{sender_handle} reacted to your message in {parent_name}: "
+        "notification_message": f"{sender_handle} reacted to your message in {parent_name}"
     }
     store["users"][user_reacted].notifications.append(notification)
     data_store.set(store)

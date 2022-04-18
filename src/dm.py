@@ -60,7 +60,7 @@ def dm_create_v1(token, u_ids):
     for id in u_ids:
         new_dm.add_member(id, store["users"][id])
         store['users'][id].add_dm(new_dm.id, new_dm)
-        notify_add(id, store['users'][id].handle, new_dm.id, store['dms'][new_dm.id].name, False)
+        notify_add(id, store['users'][auth_user_id].handle, new_dm.id, store['dms'][new_dm.id].name, False)
 
     data_store.set(store)
 

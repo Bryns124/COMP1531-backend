@@ -315,10 +315,12 @@ def message_react_v1(token, message_id, react_id):
 
     message.react(u_id)
 
+    author_id = store["messages"][message_id].u_id
+
     if message.parent.get_type() == "channel":
-        notify_react(u_id, store["users"][u_id].handle, message.parent.id, message.parent.name, True)
+        notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, True)
     elif message.parent.get_type() == "dm":
-        notify_react(u_id, store["users"][u_id].handle, message.parent.id, message.parent.name, False)
+        notify_react(author_id, store["users"][u_id].handle, message.parent.id, message.parent.name, False)
 
     data_store.set(store)
     return {}
