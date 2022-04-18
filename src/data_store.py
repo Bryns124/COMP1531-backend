@@ -93,6 +93,7 @@ data_store = Datastore()
 #         self.messages_sent = []
 #         self.dms_own = []
 #         self.set_session_id()
+#         self.reset_code = None
 
 #     def set_u_id(self):
 #         try:

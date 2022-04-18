@@ -6,6 +6,12 @@ import jwt
 from src.helper import generate_token, decode_token
 import hashlib
 from src.classes import User
+import string
+import secrets
+
+EMAIL_ADDRESS = "w17a.ant@gmail.com"
+EMAIL_PASSWORD = """BirdsAren'tReal"""
+SECRET_CODE_LENG = 6
 
 
 def auth_login_v1(email, password):
@@ -75,6 +81,93 @@ def auth_logout_v1(token):
     data_store.set(store)
 
     return {}
+
+
+def auth_passwordreset_request_v1(email):
+    '''
+    Most of auth/passwordreset/request as outlined by the spec is done in server.py
+
+    If the email is in the datastore, generates a secret code and stores that in datastore 
+    then logs the user out of all their sessions.
+
+    Args: email (string): the email of the user trying to reset their password
+    Returns: 
+        If the email provided is not in the datastore:
+            None
+        If the email provided is valid:
+            secret_code (string): the code generated needed to reset the password
+    '''
+
+    store = data_store.get()
+    # return None if email not in data_store
+    if not duplicate_email_check(email):
+        return None
+
+    target_user = identify_user_from_email(email)
+    secret_code = generate_secret_code()
+
+    store["users"][target_user].reset_code = secret_code
+    for session in store["users"][target_user].session_id:
+        store["users"][target_user].session_id[session] = False
+
+    data_store.set(store)
+
+    return secret_code
+
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the password
+    provided. Once a reset code has been used, it is then invalidated.
+
+    InputError when: reset_code is not in the datastore, or if the new_password is
+    less than 6 characters.
+
+    Args: 
+        reset_code (string): the unique generated and saved to the datastore when
+        auth_passwordreset_request is called.
+        new_password (string): the new password chosen by the user
+
+    Returns:
+        None
+    '''
+    store = data_store.get()
+    target_user = identify_user_from_reset_code(reset_code)
+    if target_user == None:
+        raise InputError(description="Reset code invalid")
+
+    if len(new_password) < 6:
+        raise InputError(
+            description="Password entered must be longer than 6 characters")
+
+    store["users"][target_user].password = hash_password(new_password)
+    store["users"][target_user].reset_code = None
+
+    data_store.set(store)
+
+
+def identify_user_from_email(email):
+    '''
+    Given a valid email, returns the u_id of the user with that email.
+    Args: email (string), the email of the user to be identified
+    Returns: u_id (int), the u_id of the user with the specified email
+    '''
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].email == email:
+            return u_id
+
+
+def identify_user_from_reset_code(code):
+    '''
+    Given a code 
+    '''
+    store = data_store.get()
+
+    for u_id in store["users"]:
+        if store["users"][u_id].reset_code == code:
+            return u_id
 
 
 ########################################
@@ -164,3 +257,17 @@ def create_handle(name_first, name_last):
             i += 1
 
     return handle
+
+
+def generate_secret_code():
+    '''
+    Generates a random secret code that is cryptographically secure.
+    Args: None
+    Output: code (string), a randomly generated code of length SECRET_CODE_LENG
+    '''
+    code = ''
+    chars = string.digits + string.ascii_uppercase
+
+    for dummy in range(SECRET_CODE_LENG):
+        code += str(secrets.choice(chars))
+    return code

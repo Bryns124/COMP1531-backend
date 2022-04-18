@@ -40,7 +40,8 @@ class User:
         self.all_dms = {}  # ask
         self.profile_img_url = f"{BASE_URL}/static/default.jpg"
         self.set_session_id()  # fix later
-        self.notifications = []  # maybe change to a list
+        self.reset_code = None
+        self.notifications = []
 
     def set_u_id(self):
         store = data_store.get()

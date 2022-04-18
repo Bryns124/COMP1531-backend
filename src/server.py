@@ -1,9 +1,10 @@
 import signal
 from json import dumps
 from flask import Flask, request, send_from_directory
+from flask_mail import Mail, Message
 from flask_cors import CORS
 from src import config
-from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1, search_v1, message_share_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_messages_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1
@@ -15,6 +16,9 @@ from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_leave_v1, dm_messages_v1
 from src.standup import standup_active_v1, standup_send_v1, standup_start_v1
 from src.notifications import notifications_get_v1
+
+EMAIL_ADDRESS = "w17a.ant@gmail.com"
+EMAIL_PASSWORD = """BirdsAren'tReal"""
 
 
 def quit_gracefully(*args):
@@ -36,10 +40,20 @@ def defaultHandler(err):
 
 APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
+mail = Mail(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
+APP.config['MAIL_SERVER'] = 'smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = EMAIL_ADDRESS
+APP.config['MAIL_PASSWORD'] = EMAIL_PASSWORD
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+mail = Mail(APP)
+
+# I modified above this point - sorry
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
@@ -400,6 +414,7 @@ def admin_userpermission_change():
         body['token'], body['u_id'], body['permission_id'])
     return dumps({})
 
+
 @APP.route('/static/<path:path>')
 def send_js(path):
     return send_from_directory('', path)
@@ -414,6 +429,7 @@ def user_stats():
         'user_stats': body['user_stats']
     })
 
+
 @APP.route("/users/stats/v1", methods=["GET"])
 def users_stats():
     token = request.args.get('token')
@@ -423,12 +439,40 @@ def users_stats():
         'workspace_stats': body['workspace_stats']
     })
 
+
 @APP.route("/user/profile/uploadphoto/v1", methods=["POST"])
 def user_profile_uploadphoto():
     data = request.get_json()
 
-    user_profile_uploadphoto_v1(data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end'])
+    user_profile_uploadphoto_v1(
+        data['token'], data['img_url'], data['x_start'], data['y_start'], data['x_end'], data['y_end'])
     return dumps({})
+
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request():
+    body = request.get_json()
+    email = body["email"]
+    secret_code = auth_passwordreset_request_v1(email)
+    if secret_code:
+        reset_msg = Message(
+            subject='Reset Code for UNSW Seams',
+            sender=EMAIL_ADDRESS,
+            recipients=[email],
+            body=f"Your secret code to reset your password is {secret_code}.\n"
+        )
+        mail.send(reset_msg)
+
+    return dumps({})
+
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset():
+    body = request.get_json()
+    auth_passwordreset_reset_v1(
+        body['reset_code'], body['new_password'])
+    return dumps({})
+
 
 @APP.route("/standup/start/v1", methods=['POST'])
 def standup_start():
