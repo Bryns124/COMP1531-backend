@@ -1,6 +1,24 @@
 from src.data_store import data_store
+import datetime
+from datetime import timezone
+# from src.helper import generate_timestamp
+from src.config import port, url
 import time
 import threading
+
+BASE_URL = url
+
+def generate_timestamp():
+    """
+    Generates the times_sent for messages.
+    Returns:
+        int: Type cast int of the current utc timestamp.
+    """
+    time = datetime.datetime.now(timezone.utc)
+    utc = time.replace(tzinfo=timezone.utc)
+    timestamp = utc.timestamp()
+    return int(timestamp)
+
 
 
 class User:
@@ -20,6 +38,7 @@ class User:
         self.messages_sent = {}
         self.dms_own = {}
         self.all_dms = {}  # ask
+        self.profile_img_url = f"{BASE_URL}/static/default.jpg"
         self.set_session_id()  # fix later
         self.notifications = []  # maybe change to a list
 
@@ -141,6 +160,7 @@ class Dm(BaseChannel):
     def __init__(self, auth_user_id, name,  u_ids):
         BaseChannel.__init__(self, auth_user_id, name)
         self.id = self.set_dm_id()
+        self.time_created = generate_timestamp() #for the user and users stats
 
     def set_dm_id(self):
         store = data_store.get()
@@ -207,10 +227,12 @@ class Standup:
         self.parent_channel.message_list.append(new_message.id)
 
 
+
 class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
         BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
+        self.time_created = int(generate_timestamp()) #for the user and users stats
         self.active_standup = None
 
     def start_standup(self, auth_user_id, duration):

@@ -6,6 +6,9 @@ from src.error import InputError, AccessError
 from src.helper import SECRET
 import jwt
 import pytest
+from src.config import port, url
+
+BASE_URL = url
 
 
 """Users"""
@@ -209,11 +212,11 @@ def test_correct_inputs_channel_details_v1(user_1, channel_1):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     clear_v1()
@@ -235,13 +238,13 @@ def test_multiple_user_channel_details_v1(user_1, channel_2):
         'is_public':  True,
         'owner_members': [
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest'},
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest'}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     clear_v1()
