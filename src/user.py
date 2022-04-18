@@ -452,7 +452,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     try:
         urllib.request.urlopen(img_url)
     except:
-        raise InputError("Invalid image url")
+        raise InputError("Invalid image url") from InputError
 
     if (x_start > x_end or y_start > y_end):
         raise InputError("Invalid dimensions.")
