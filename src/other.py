@@ -21,6 +21,7 @@ def clear_v1():
     store['removed_messages'] = []
     store['removed_users'] = {}
     store['global_owners_count'] = 0
+    store['owner_timestamp'] = 0
     data_store.set(store)
 
     return {}

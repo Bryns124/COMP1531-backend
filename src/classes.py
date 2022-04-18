@@ -90,6 +90,7 @@ class User:
         if len(data_store.get()['users']) == 0:
             store = data_store.get()
             store['global_owners_count'] += 1
+            store['owner_timestamp'] = generate_timestamp()
             return 1
         else:
             return 2

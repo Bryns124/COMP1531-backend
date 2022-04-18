@@ -278,7 +278,7 @@ def generate_channels_joined_timed(auth_user_id):
     counter = 0
     channels_joined_list = [{
             "num_channels_joined": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     all_channels = store["users"][auth_user_id].all_channels
@@ -297,7 +297,7 @@ def generate_dms_joined_timed(auth_user_id):
     counter = 0
     dms_joined_list = [{
             "num_dms_joined": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     all_dms = store["users"][auth_user_id].all_dms
@@ -316,7 +316,7 @@ def generate_messages_sent_timed(auth_user_id):
     counter = 0
     messages_sent_list = [{
             "num_messages_sent": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     messages_sent = store["users"][auth_user_id].messages_sent
@@ -378,7 +378,7 @@ def generate_channels_exist_timed():
     counter = 0
     channel_exist = [{
             "num_channels_exist": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     for channel in store["channels"]:
@@ -395,7 +395,7 @@ def generate_dms_exist_timed():
     counter = 0
     dm_exist = [{
             "num_dms_exist": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     for dm in store["dms"]:
@@ -412,7 +412,7 @@ def generate_messages_exist_timed():
     counter = 0
     messages_exist = [{
             "num_messages_exist": counter,
-            "time_stamp": 0
+            "time_stamp": store["owner_timestamp"]
         }]
 
     for message in store["messages"]:
