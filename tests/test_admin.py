@@ -146,7 +146,7 @@ def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
@@ -154,7 +154,7 @@ def test_remove_user_2_admin_user_remove_v1(user_1, user_2, user_3):
             "name_first": "Michael",
             "name_last": "Chai",
             "handle_str": "michaelchai",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -184,7 +184,7 @@ def test_remove_global_owner_admin_user_remove_v1(user_1, user_2):
             "name_first": "Adiyat",
             "name_last": "Rahman",
             "handle_str": "adiyatrahman",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -214,7 +214,7 @@ def test_admin_user_remove_removing_channel_owner(user_1, user_2, user_3, create
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
@@ -222,7 +222,7 @@ def test_admin_user_remove_removing_channel_owner(user_1, user_2, user_3, create
             "name_first": "Michael",
             "name_last": "Chai",
             "handle_str": "michaelchai",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -320,7 +320,7 @@ def test_retrievable_with_user_profile_admin_user_remove_v1(user_1, user_2):
         "name_first": "Removed",
         "name_last": "user",
         "handle_str": "adiyatrahman",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -351,7 +351,7 @@ def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 3,
@@ -359,7 +359,7 @@ def test_email_and_handle_reusable_admin_user_remove_v1(user_1, user_2):
             "name_first": "Adiyat",
             "name_last": "Rahman",
             "handle_str": "adiyatrahman",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -384,7 +384,7 @@ def test_users_all_admin_user_remove_v1(user_1, user_2):
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -487,7 +487,7 @@ def test_promoting_user_2_admin_userpermission_change_v1(user_1, user_2, user_3)
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         },
         {
             "u_id": 2,
@@ -495,7 +495,7 @@ def test_promoting_user_2_admin_userpermission_change_v1(user_1, user_2, user_3)
             "name_first": "Adiyat",
             "name_last": "Rahman",
             "handle_str": "adiyatrahman",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -526,14 +526,14 @@ def test_promoting_user_2_admin_userpermission_change_v1_multiple_users(user_1, 
             "name_first": "Alice",
             "name_last": "Wan",
             "handle_str": "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }, {
             "u_id": 3,
             "email": "michael@gmail.com",
             "name_first": "Michael",
             "name_last": "Chai",
             "handle_str": "michaelchai",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
 
     ]

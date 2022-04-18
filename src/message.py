@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.helper import decode_token, validate_token, channel_validity, already_member, generate_timestamp
 from src.error import AccessError, InputError
-from src.classes import Message
+from src.classes import Message, User
 from datetime import timezone
 import datetime
 from src.dm import valid_dm_id, is_dm_member, is_dm_owner

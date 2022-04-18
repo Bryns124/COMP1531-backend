@@ -35,7 +35,7 @@ class User:
         self.messages_current = {}
         self.dms_own = {}
         self.all_dms = {}  # ask
-        self.profile_img_url = "{BASE_URL}/static/default.jpg"
+        self.profile_img_url = f"{BASE_URL}/static/default.jpg"
         self.set_session_id()  # fix later
 
     def set_u_id(self):

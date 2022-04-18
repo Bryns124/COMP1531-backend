@@ -135,7 +135,7 @@ def test_users_all_2_users(user_1, user_2):
         'name_first': "Alice",
         'name_last': "Wan",
         'handle_str': "alicewan",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     },
         {
         'u_id': user_2['auth_user_id'],
@@ -143,7 +143,7 @@ def test_users_all_2_users(user_1, user_2):
         'name_first': "Adiyat",
         'name_last': "Rahman",
         'handle_str': "adiyatrahman",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -160,7 +160,7 @@ def test_users_all_1_user(user_1):
         'name_first': "Alice",
         'name_last': "Wan",
         'handle_str': "alicewan",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -177,7 +177,7 @@ def test_users_all_3_users(user_1, user_2, user_3):
         'name_first': "Alice",
         'name_last': "Wan",
         'handle_str': "alicewan",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     },
         {
         'u_id': user_2['auth_user_id'],
@@ -185,7 +185,7 @@ def test_users_all_3_users(user_1, user_2, user_3):
         'name_first': "Adiyat",
         'name_last': "Rahman",
         'handle_str': "adiyatrahman",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     },
         {
         'u_id': user_3['auth_user_id'],
@@ -193,7 +193,7 @@ def test_users_all_3_users(user_1, user_2, user_3):
         'name_first': "Michael",
         'name_last': "Chai",
         'handle_str': "michaelchai",
-        "profile_img_url": "{BASE_URL}/static/default.jpg"
+        "profile_img_url": f"{BASE_URL}/static/default.jpg"
     }]
     requests.delete(f"{BASE_URL}/clear/v1", json={})
 
@@ -211,7 +211,7 @@ def test_user_profile_valid_user_1(user_1):
             'name_first': "Alice",
             'name_last': "Wan",
             'handle_str': "alicewan",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -230,7 +230,7 @@ def test_user_profile_valid_user_2(user_1, user_2):
             'name_first': "Adiyat",
             'name_last': "Rahman",
             'handle_str': "adiyatrahman",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -380,7 +380,7 @@ def test_user_profile_removed_user(user_1, user_2):
             'name_first': "Removed",
             'name_last': "user",
             'handle_str': "adiyatrahman",
-            "profile_img_url": "{BASE_URL}/static/default.jpg"
+            "profile_img_url": f"{BASE_URL}/static/default.jpg"
         }
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})

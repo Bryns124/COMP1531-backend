@@ -355,15 +355,15 @@ def test_channel_addowner(user_1, user_2, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -515,13 +515,13 @@ def test_channel_removeowner(user_1, user_2, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -555,13 +555,13 @@ def test_channel_removeowner_multiple_channels(user_1, user_2, channel_private, 
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+             'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+             'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -772,11 +772,11 @@ def test_channel_details_multiple_channels(user_1, channel_private, channel_publ
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -794,11 +794,11 @@ def test_channel_details(user_1, channel_public):
         'is_public': True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -822,13 +822,13 @@ def test_channel_details_multiple_users(user_2, channel_public, user_1):
         'is_public': True,
         'owner_members': [
             {'u_id': 2, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 2, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 1, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={
@@ -887,13 +887,13 @@ def test_channel_join_multiple_channels(channel_private, channel_public, user_2)
         'is_public':  True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -915,13 +915,13 @@ def test_channel_join(channel_public, user_2):
         'is_public':  True,
         'owner_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ],
         'all_members': [
             {'u_id': 1, 'email': 'mikey@unsw.com', 'name_first': 'Mikey',
-                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": "{BASE_URL}/static/default.jpg"},
+                'name_last': 'Test', 'handle_str': 'mikeytest', "profile_img_url": f"{BASE_URL}/static/default.jpg"},
             {'u_id': 2, 'email': 'miguel@unsw.com', 'name_first': 'Miguel',
-                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_last': 'Test', 'handle_str': 'migueltest', "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     assert r.status_code == 200
@@ -1020,7 +1020,7 @@ def test_only_owner_leaves(user_1, user_2, channel_1):
         "owner_members": [],
         "all_members": [
             {'email': 'miguel@unsw.com', 'handle_str': 'migueltest',
-                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2, "profile_img_url": "{BASE_URL}/static/default.jpg"}
+                'name_first': 'Miguel', 'name_last': 'Test', 'u_id': 2, "profile_img_url": f"{BASE_URL}/static/default.jpg"}
         ]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -1048,7 +1048,7 @@ def test_user_2_leaves_channel_leave_v1(user_1, user_2, channel_1):
     assert payload == {
         "name": "A New Hope",
         "is_public": True,
-        "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": "{BASE_URL}/static/default.jpg"}],
-        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": "{BASE_URL}/static/default.jpg"}]
+        "owner_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": f"{BASE_URL}/static/default.jpg"}],
+        "all_members": [{'email': 'mikey@unsw.com', 'handle_str': 'mikeytest', 'name_first': 'Mikey', 'name_last': 'Test', 'u_id': 1, "profile_img_url": f"{BASE_URL}/static/default.jpg"}]
     }
     requests.delete(f"{BASE_URL}/clear/v1", json={})
