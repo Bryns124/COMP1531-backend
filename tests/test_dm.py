@@ -9,6 +9,7 @@ import requests
 import urllib
 import jwt
 import pytest
+import time
 
 BASE_URL = url
 requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -519,6 +520,14 @@ def test_dm_messages_multiple(user_1, create_dm_2_user, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -547,6 +556,14 @@ def test_dm_messages_multiple_51(user_1, create_dm_2_user, starting_value):
         assert payload['messages'][i]['u_id'] == 1
         assert payload['messages'][i]['message'] == "hello world"
         assert payload['messages'][i]['time_sent'] >= time_sent
+        assert payload['messages'][i]['is_pinned'] == False
+        assert payload['messages'][i]['reacts'] == [
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": False
+            }
+        ]
         assert payload['start'] == 0
         assert payload['end'] == 50
     requests.delete(f"{BASE_URL}/clear/v1", json={})
@@ -721,4 +738,96 @@ def test_message_remove2(user_1, user_2, create_dm_3_user):
     assert r2.status_code == 200
     payload = r2.json()
     assert payload["messages"][-1]["message"] == "hello"
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_sendlater_invalid_time(user_1, create_dm_2_user):
+    ten_sec_before = generate_timestamp() - 10
+    response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "hello",
+        "time_sent": ten_sec_before
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_sendlater_invalid_dm(user_1, create_dm_2_user):
+    three_sec_after = generate_timestamp() + 3
+    response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 2,
+        "message": "hello",
+        "time_sent": three_sec_after
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_sendlater_invalid_message(user_1, create_dm_2_user, invalid_message_text):
+    three_sec_after = generate_timestamp() + 3
+    response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": invalid_message_text,
+        "time_sent": three_sec_after
+    })
+    assert response1.status_code == InputError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+def test_dm_sendlater_no_access(create_dm_2_user, user_3):
+    three_sec_after = generate_timestamp() + 3
+    response1 = requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
+        "token": user_3['token'],
+        "dm_id": 1,
+        "message": "hello world",
+        "time_sent": three_sec_after
+    })
+    assert response1.status_code == AccessError.code
+    requests.delete(f"{BASE_URL}/clear/v1", json={})
+
+
+def test_dm_sendlater_different_times(user_1, create_dm_2_user):
+    three_sec_after = generate_timestamp() + 3
+    requests.post(f"{BASE_URL}/message/sendlaterdm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "This will be sent later",
+        "time_sent": three_sec_after
+    })
+    requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "message": "This will be sent first"
+    })
+
+    time.sleep(3)
+    response = requests.get(f"{BASE_URL}/dm/messages/v1", params={
+        "token": user_1['token'],
+        "dm_id": 1,
+        "start": 0
+    })
+
+    payload = response.json()
+    assert payload["messages"][0]["time_sent"] - three_sec_after <= 1
+    assert payload["messages"][0]["message"] == "This will be sent later"
+    assert payload["messages"][0]["is_pinned"] == False
+    assert payload["messages"][0]["message_id"] == 2
+    assert payload["messages"][0]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
+
+    assert payload["messages"][1]["time_sent"] <= three_sec_after
+    assert payload["messages"][1]["message"] == "This will be sent first"
+    assert payload["messages"][1]["is_pinned"] == False
+    assert payload["messages"][1]["message_id"] == 1
+    assert payload["messages"][1]["reacts"] == [
+        {
+            "react_id": 1,
+            "u_ids": [],
+            "is_this_user_reacted": False
+        }
+    ]
     requests.delete(f"{BASE_URL}/clear/v1", json={})

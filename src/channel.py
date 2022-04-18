@@ -2,7 +2,7 @@ from base64 import decode
 from json import load
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details, load_channel, load_message, load_user
+from src.helper import decode_token,  already_member, channel_validity, load_user, get_reacts
 from src.classes import User, Channel
 
 """
@@ -171,7 +171,7 @@ def channel_messages_v1(token, channel_id, start):
     """
     store = data_store.get()
 
-    decode_token(token)['auth_user_id']
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if channel_id not in store["channels"]:
         raise InputError(
@@ -196,7 +196,10 @@ def channel_messages_v1(token, channel_id, start):
             {'message_id': store['messages'][message_id].id,
              'u_id': store['messages'][message_id].u_id,
              'message': store['messages'][message_id].message,
-             'time_sent': store['messages'][message_id].time_sent})
+             'time_sent': store['messages'][message_id].time_sent,
+             "reacts": get_reacts(message_id, auth_user_id),
+             "is_pinned": store['messages'][message_id].is_pinned
+             })
         number_of_messages += 1
 
         if number_of_messages == 50:

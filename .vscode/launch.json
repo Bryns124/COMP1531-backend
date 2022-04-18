@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: cur file",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "tests/test_user.py"
+            ],
+            "module": "pytest",
+            "justMyCode": true
+        },
+        {
             "name": "Python: server",
             "type": "python",
             "request": "launch",

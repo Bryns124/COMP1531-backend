@@ -416,7 +416,7 @@ def generate_messages_exist_timed():
         }]
 
     for message in store["messages"]:
-        if message in store["remove_messages"]:
+        if message in store["removed_messages"]:
             continue
         counter += 1
         new_entry = {

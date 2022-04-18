@@ -37,11 +37,11 @@ initial_object = {
         # channel_id : class object
     },
     "dms": {
-        # dm_id : clas object,
+        # dm_id : class object,
         # dm_id : class object
     },
     "messages": {
-        # message_id : clas object,
+        # message_id : class object,
         # message_id : class object
     },
     "removed_messages": [], #list of message ids
