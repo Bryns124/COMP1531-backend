@@ -163,3 +163,4 @@ def message_remove_v1(token, message_id):
 #     for dm in store['dms']:
 #         if message_id in dm['messages_list']:
 #             dm['messages_list'].remove(message_id)
+# 

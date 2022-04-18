@@ -1,12 +1,9 @@
-from operator import methodcaller
-import sys
 import signal
 from json import dumps
 from flask import Flask, request
 from flask_mail import Mail, Message
 from flask_cors import CORS
-from src.error import InputError
-from src import config, data_store
+from src import config
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.message import messages_send_v1, message_senddm_v1, message_edit_v1, message_remove_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
