@@ -1,4 +1,6 @@
 from src.data_store import data_store
+import time
+import threading
 
 
 class User:
@@ -20,14 +22,11 @@ class User:
         self.all_dms = {}  # ask
         self.set_session_id()  # fix later
         self.reset_code = None
+        self.notifications = []
 
     def set_u_id(self):
-        try:
-            store = data_store.get()
-            return len(store['users']) + len(store['removed_users']) + 1
-        except:
-            store = data_store.get()
-            return 1
+        store = data_store.get()
+        return len(store['users']) + len(store['removed_users']) + 1
 
     def set_session_id(self):
         self.session_id.append(True)
@@ -79,6 +78,18 @@ class User:
     # def set_session_id(self):
     #     self.session_id.append(True)
 
+    # def event_in_channel(self, ch_id):
+    #     if ch_id in self.all_channels:
+    #         return ch_id
+    #     else:
+    #         return -1
+
+    # def event_in_dm(self, dm_id):
+    #     if dm_id in self.all_dms:
+    #         return dm_id
+    #     else:
+    #         return -1
+
 
 class BaseChannel:
     def __init__(self, auth_user_id, name):
@@ -91,11 +102,8 @@ class BaseChannel:
         self.end = self.set_end()
 
     def set_ch_id(self):
-        try:
-            store = data_store.get()
-            return len(store['channels']) + 1
-        except:
-            return 1
+        store = data_store.get()
+        return len(store['channels']) + 1
 
     def add_owner(self, auth_user_id, user_object):
         self.owner_members[auth_user_id] = user_object
@@ -123,11 +131,11 @@ class BaseChannel:
         elif self.id in store['dms']:
             return "dm"
 
-    def check_msg_list(self, message_id):
-        if message_id in self.message_list:
-            return True
-        else:
-            return False
+    # def check_msg_list(self, message_id):
+    #     if message_id in self.message_list:
+    #         return True
+    #     else:
+    #         return False
 
 
 class Dm(BaseChannel):
@@ -136,11 +144,8 @@ class Dm(BaseChannel):
         self.id = self.set_dm_id()
 
     def set_dm_id(self):
-        try:
-            store = data_store.get()
-            return len(store['dms']) + 1
-        except:
-            return 1
+        store = data_store.get()
+        return len(store['dms']) + 1
 
     def remove_all(self):
         # try:
@@ -158,10 +163,66 @@ class Dm(BaseChannel):
             #     pass
 
 
+class Standup:
+    def __init__(self, auth_user_id, parent_channel, length):
+        self.owner = auth_user_id
+        self.start_time = int(time.time())
+        self.end_time = int(time.time() + length)
+        self.parent_channel = parent_channel
+        self.message = ""
+        self.session = self.start_session(length)
+
+    def start_session(self, length):
+        # not tested
+        # if length == 0:
+        #     t = threading.Timer(2, self.parent_channel.reset_standup())
+        #     t.start()
+        #     return False
+        # else:
+        t = threading.Timer(length, self.end_session)
+        t.start()
+        return True
+        # while time.time() < self.end_time:
+        #     return True
+        # return False
+
+    def end_session(self):
+        self.session = False
+        self.parent_channel.end_standup()
+
+    def message_compile(self, auth_user_id, message):
+        user_str = self.parent_channel.all_members[auth_user_id].handle
+        if self.message == "":
+            self.message = f"{user_str}: {message}"
+        else:
+            self.message = self.message + '\n' + f"{user_str}: {message}"
+
+    def message_send(self):
+        if self.message == "":
+            return
+        store = data_store.get()
+        new_message = Message(self.owner, self.message,
+                              self.end_time, self.parent_channel)
+        store['messages'][new_message.id] = new_message
+        store['users'][self.owner].add_msg(new_message.id, new_message)
+        self.parent_channel.message_list.append(new_message.id)
+
+
 class Channel(BaseChannel):
     def __init__(self, auth_user_id, name, is_public):
         BaseChannel.__init__(self, auth_user_id, name)
         self.is_public = is_public
+        self.active_standup = None
+
+    def start_standup(self, auth_user_id, duration):
+        self.active_standup = Standup(auth_user_id, self, duration)
+
+    def end_standup(self):
+        self.active_standup.message_send()
+        self.reset_standup()
+
+    def reset_standup(self):
+        self.active_standup = None
 
 
 class Message:
@@ -171,6 +232,9 @@ class Message:
         self.message = message
         self.time_sent = time_sent
         self.parent = parent
+        self.is_pinned = False
+        self.react_id = 0
+        self.react_ud_ids = []
 
     def set_message_id(self):
         store = data_store.get()
@@ -184,3 +248,17 @@ class Message:
 
     def get_parent_type(self):
         return self.parent.get_type()
+
+    def react(self, u_id):
+        self.react_id = 1
+        self.react_ud_ids.append(u_id)
+
+    def unreact(self, u_id):
+        self.react_ud_ids.remove(u_id)
+        if len(self.react_ud_ids) == 0:
+            self.react_id = 0
+
+    def is_user_reacted(self, u_id):
+        if u_id in self.react_ud_ids:
+            return True
+        return False

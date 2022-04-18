@@ -2,7 +2,7 @@ from base64 import decode
 from json import load
 from src.data_store import data_store
 from src.error import AccessError, InputError
-from src.helper import decode_token, generate_token, validate_token, already_member, channel_validity, user_validity, valid_auth_user_id, extract_channel_details, load_channel, load_message, load_user
+from src.helper import decode_token, already_member, channel_validity, load_user, get_reacts, notify_add
 from src.classes import User, Channel
 
 """
@@ -54,6 +54,8 @@ def channel_invite_v1(token, channel_id, u_id):
     ch_object = store["channels"][channel_id]
     store["users"][u_id].add_channel(channel_id, ch_object)
     ch_object.add_member(u_id, store["users"][u_id])
+    notify_add(u_id, store["users"][auth_user_id].handle,
+               channel_id, ch_object.name, True)
     data_store.set(store)
     return {
     }
@@ -168,11 +170,11 @@ def channel_messages_v1(token, channel_id, start):
     """
     store = data_store.get()
 
-    decode_token(token)['auth_user_id']
+    auth_user_id = decode_token(token)['auth_user_id']
 
     if channel_id not in store["channels"]:
         raise InputError(
-            description="The input channel_id does not exist in the datastore.") from InputError
+            description="The input channel_id does not exist in the datastore.")
 
     active_channel = store["channels"][channel_id]
     if len(active_channel.message_list) < start:
@@ -193,7 +195,10 @@ def channel_messages_v1(token, channel_id, start):
             {'message_id': store['messages'][message_id].id,
              'u_id': store['messages'][message_id].u_id,
              'message': store['messages'][message_id].message,
-             'time_sent': store['messages'][message_id].time_sent})
+             'time_sent': store['messages'][message_id].time_sent,
+             "reacts": get_reacts(message_id, auth_user_id),
+             "is_pinned": store['messages'][message_id].is_pinned
+             })
         number_of_messages += 1
 
         if number_of_messages == 50:
