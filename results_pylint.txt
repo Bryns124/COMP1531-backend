@@ -1,0 +1,10 @@
+************* Module src.classes
+src/classes.py:169:8: C0206: Consider iterating with .items() (consider-using-dict-items)
+src/classes.py:175:8: C0206: Consider iterating with .items() (consider-using-dict-items)
+************* Module src.server
+src/server.py:522:22: E1136: Value 'data' is unsubscriptable (unsubscriptable-object)
+src/server.py:533:22: E1136: Value 'data' is unsubscriptable (unsubscriptable-object)
+
+-------------------------------------------------------------------
+Your code has been rated at 9.97/10 (previous run: 10.00/10, -0.03)
+
