@@ -8,6 +8,10 @@ import threading
 
 BASE_URL = url
 
+# REMARK: You should consider splitting these classes up into multiple files,
+# so that your code is more maintainable
+# Event still, awesome job with them!!!
+
 def generate_timestamp():
     """
     Generates the times_sent for messages.

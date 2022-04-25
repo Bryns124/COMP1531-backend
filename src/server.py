@@ -17,6 +17,8 @@ from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_lea
 from src.standup import standup_active_v1, standup_send_v1, standup_start_v1
 from src.notifications import notifications_get_v1
 
+# REMARK: Remember to keep your constants somewhere central rather than
+# copy-pasting them everywhere
 EMAIL_ADDRESS = "w17a.ant@gmail.com"
 EMAIL_PASSWORD = """BirdsAren'tReal"""
 

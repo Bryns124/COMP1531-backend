@@ -191,7 +191,8 @@ def load_data_store():
 #             return channel
 #     raise InputError(description="Could not locate channel")
 
-
+# REMARK: Don't forget docstrings - they're really helpful for checking out
+# what a function does without having to actually read the code
 def load_user(u_id):
     store = data_store.get()
     if u_id in store["users"]:
@@ -200,7 +201,7 @@ def load_user(u_id):
     raise InputError(description="Could not locate user")
 
 
-# Depcriated
+# Deprecated
 # def load_message(message_id):
 #     store = data_store.get()
 #     for message in store['messages']:

@@ -32,6 +32,9 @@ def channels_list_v1(token):
 
     output = []
 
+    # REMARK: You could reduce repeated code by having an `asJson()` method on
+    # all your classes - that way you won't forget to include data and it'll be
+    # cleaner
     for channel in channels:
         temp = {
             "channel_id": channel,

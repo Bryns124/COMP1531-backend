@@ -78,6 +78,7 @@ def check_duplicate(auth_user_id, u_id_list):
         return True
 
 
+# REMARK: This looks like there would be a helper somewhere else
 def check_invalid_id(store, u_ids):
     '''Checks if any u_id passed in as argument for dm_create does not exist'''
     for ids in u_ids:
@@ -311,6 +312,8 @@ def dm_leave_v1(token, dm_id):
 
     return {}
 
+# REMARK: This could be changed to a method in BaseChannel, which would mean
+# that you wouldn't need duplicate code
 
 def dm_messages_v1(token, dm_id, start):
     """returns up to 50 messages in dm based on the start

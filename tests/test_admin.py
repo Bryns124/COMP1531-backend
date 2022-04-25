@@ -14,6 +14,8 @@ from flask import request, Flask
 
 from src.user import users_all_v1
 
+# REMARK: It'd be awesome if you split these up over multiple files, since
+# these are a bit lengthy
 
 BASE_URL = url
 requests.delete(f"{BASE_URL}/clear/v1", json={})

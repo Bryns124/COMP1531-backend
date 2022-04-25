@@ -76,6 +76,7 @@ print('Loading Datastore...')
 global data_store
 data_store = Datastore()
 
+# REMARK: Don't forget to tidy up old code!
 
 # class User:
 

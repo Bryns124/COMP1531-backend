@@ -453,6 +453,8 @@ def message_unpin_v1(token, message_id):
 ###### - - HELPER FUNCTIONS - - #######
 ######################################
 def validate_message(message):
+    # REMARK: Check if it's within a range instead
+    # if len(message) in range(1, 1001)
     if len(message) >= 1 and len(message) <= 1000:
         return
     raise InputError(description="incorrect message length")

@@ -6,6 +6,7 @@ from src.data_store import data_store
 from src.helper import decode_token, validate_token
 from src.error import AccessError
 
+# REMARK: I would add functions for managing notifications here too
 
 def notifications_get_v1(token):
     """

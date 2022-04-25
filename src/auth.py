@@ -9,6 +9,7 @@ from src.classes import User
 import string
 import secrets
 
+# REMARK: You should consider keeping these in a central consts.py module
 EMAIL_ADDRESS = "w17a.ant@gmail.com"
 EMAIL_PASSWORD = """BirdsAren'tReal"""
 SECRET_CODE_LENG = 6
@@ -87,11 +88,11 @@ def auth_passwordreset_request_v1(email):
     '''
     Most of auth/passwordreset/request as outlined by the spec is done in server.py
 
-    If the email is in the datastore, generates a secret code and stores that in datastore 
+    If the email is in the datastore, generates a secret code and stores that in datastore
     then logs the user out of all their sessions.
 
     Args: email (string): the email of the user trying to reset their password
-    Returns: 
+    Returns:
         If the email provided is not in the datastore:
             None
         If the email provided is valid:
@@ -123,7 +124,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     InputError when: reset_code is not in the datastore, or if the new_password is
     less than 6 characters.
 
-    Args: 
+    Args:
         reset_code (string): the unique generated and saved to the datastore when
         auth_passwordreset_request is called.
         new_password (string): the new password chosen by the user
@@ -161,7 +162,7 @@ def identify_user_from_email(email):
 
 def identify_user_from_reset_code(code):
     '''
-    Given a code 
+    Given a code
     '''
     store = data_store.get()
 

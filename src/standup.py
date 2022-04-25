@@ -3,7 +3,7 @@ from src.data_store import data_store
 from src.helper import decode_token
 from src.error import is_channel_valid, is_length_valid, is_standup_active, is_user_in_channel, InputError
 
-
+# REMARK: Docstrings please!
 def standup_start_v1(token, channel_id, length):
     auth_user_id = decode_token(token)
     is_channel_valid(channel_id)

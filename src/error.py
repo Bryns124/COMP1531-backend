@@ -12,7 +12,8 @@ class InputError(HTTPException):
     code = 400
     message = 'No message specified'
 
-
+# REMARK: Perhaps not the best place for these functions? They could be better
+# in helpers.py?
 def is_channel_valid(channel_id):
     from src.helper import channel_validity
     store = data_store.get()
